@@ -1,26 +1,24 @@
 import AppKit
 import Carbon
+import Combine
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
+    private let settings = Settings.shared
     private let tracker = GazeTracker()
     private let focus = FocusManager()
     private let laya = LayaFilter()
     private var model = GazeModel.load()
     private var calibration: Calibration?
+    private lazy var settingsWindow = SettingsWindowController(actions: SettingsActions(
+        calibrate: { [weak self] in self?.calibrate() },
+        calibratedDisplays: { [weak self] in Set(self?.model?.centroids.keys ?? [:].keys) },
+        testLaya: { [weak self] done in self?.laya.test(completion: done) }))
 
     private var statusItem: NSStatusItem!
     private var statusLine = NSMenuItem(title: "Starting…", action: nil, keyEquivalent: "")
     private var pauseItem: NSMenuItem!
-    private var layaItem: NSMenuItem!
-    private var pointerItem: NSMenuItem!
     private let screensMenu = NSMenu()
-
-    /// Screens GazeHop never switches to (e.g. a TV or a screen you only watch).
-    private var excluded: Set<UInt32> {
-        get { Set((UserDefaults.standard.array(forKey: "excludedDisplays") as? [Int] ?? []).map(UInt32.init)) }
-        set { UserDefaults.standard.set(newValue.map(Int.init), forKey: "excludedDisplays") }
-    }
-    private var connected: Set<UInt32> { Set(NSScreen.screens.map(\.displayID)) }
+    private var cancellables = Set<AnyCancellable>()
 
     private var paused = UserDefaults.standard.bool(forKey: "paused")
     private var smoothed: [Double]?
@@ -30,45 +28,62 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var lastDiag = Date.distantPast
     private var pauseHotKey: HotKey?
 
-    // Tuning
-    private let dwell: TimeInterval = 0.25       // must look at a screen this long
-    private let cooldown: TimeInterval = 0.6     // between switches
-    private let minConfidence = 0.2
-    private let alpha = 0.45                     // smoothing
+    private var connected: Set<UInt32> { Set(NSScreen.screens.map(\.displayID)) }
 
     func applicationDidFinishLaunching(_ note: Notification) {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem.autosaveName = "GazeHop"
+        statusItem.button?.imagePosition = .imageLeft
         buildMenu()
-        laya.enabled = UserDefaults.standard.bool(forKey: "layaFilter")
-        focus.movePointer = UserDefaults.standard.object(forKey: "movePointer") as? Bool ?? true
-        layaItem.state = laya.enabled ? .on : .off
-        pointerItem.state = focus.movePointer ? .on : .off
 
-        DebugLog.write("launch trusted=\(FocusManager.isTrusted) screens=\(NSScreen.screens.map(\.displayID)) model=\(model?.centroids.keys.sorted() ?? [])")
+        DebugLog.write("launch trusted=\(FocusManager.isTrusted) screens=\(connected.sorted()) model=\(model?.centroids.keys.sorted() ?? [])")
         if !FocusManager.isTrusted { FocusManager.promptForAccessibility() }
         focus.start()
 
-        // ⌘F1 pauses/resumes from anywhere, e.g. mid-game.
-        pauseHotKey = HotKey(keyCode: UInt32(kVK_F1), modifiers: UInt32(cmdKey)) { [weak self] in
-            self?.togglePause()
-        }
-        if pauseHotKey == nil { DebugLog.write("could not register ⌘F1 (taken by another app?)") }
+        // Re-apply anything that depends on settings whenever they change.
+        // objectWillChange fires before the new value lands, so hop to the next runloop turn.
+        settings.objectWillChange
+            .sink { [weak self] _ in DispatchQueue.main.async { self?.applySettings() } }
+            .store(in: &cancellables)
+        applySettings()
 
         NotificationCenter.default.addObserver(self, selector: #selector(screensChanged),
             name: NSApplication.didChangeScreenParametersNotification, object: nil)
 
         tracker.onSample = { [weak self] f in self?.handle(f) }
         tracker.onNoFace = { [weak self] in self?.candidate = nil }
+        guard !paused else { refreshStatus(); return }
         tracker.start { [weak self] error in
             guard let self else { return }
-            if let error { self.setStatus(error.localizedDescription, icon: "eye.trianglebadge.exclamationmark"); return }
+            if let error { self.setStatus(error.localizedDescription, icon: .attention); return }
             if self.model == nil || !self.uncalibratedScreens.isEmpty {
-                self.setStatus("Needs calibration", icon: "eye.trianglebadge.exclamationmark")
+                self.setStatus("Needs calibration", icon: .attention)
                 self.calibrate()
             } else {
                 self.refreshStatus()
             }
         }
+    }
+
+    private var registeredHotKey: HotKeyPreset?
+
+    private func applySettings() {
+        let preset = settings.hotKey
+        if preset != registeredHotKey {
+            pauseHotKey = nil
+            if let combo = preset.carbon {
+                pauseHotKey = HotKey(keyCode: combo.keyCode, modifiers: combo.modifiers) { [weak self] in
+                    self?.togglePause()
+                }
+                if pauseHotKey == nil { DebugLog.write("could not register \(preset.label) (taken by another app?)") }
+            }
+            let eq = preset.menuEquivalent
+            pauseItem.keyEquivalent = eq.key
+            pauseItem.keyEquivalentModifierMask = eq.mask
+            registeredHotKey = preset
+        }
+        candidate = nil
+        refreshStatus()
     }
 
     // MARK: menu
@@ -78,15 +93,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusLine.isEnabled = false
         menu.addItem(statusLine)
         menu.addItem(.separator())
-        pauseItem = menu.addItem(withTitle: "Pause", action: #selector(togglePause), keyEquivalent: String(UnicodeScalar(NSF1FunctionKey)!))
-        pauseItem.keyEquivalentModifierMask = [.command]
-        menu.addItem(withTitle: "Calibrate…", action: #selector(calibrate), keyEquivalent: "c")
+        pauseItem = menu.addItem(withTitle: "Pause", action: #selector(togglePause), keyEquivalent: "")
+        menu.addItem(withTitle: "Calibrate…", action: #selector(calibrate), keyEquivalent: "")
         let screensItem = menu.addItem(withTitle: "Screens", action: nil, keyEquivalent: "")
         screensMenu.delegate = self
         screensItem.submenu = screensMenu
         menu.addItem(.separator())
-        pointerItem = menu.addItem(withTitle: "Move pointer with focus", action: #selector(togglePointer), keyEquivalent: "")
-        layaItem = menu.addItem(withTitle: "Laya smart filter (needs ~/laya/serve.sh)", action: #selector(toggleLaya), keyEquivalent: "")
+        menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         menu.addItem(.separator())
         menu.addItem(withTitle: "Quit GazeHop", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         for item in menu.items where item.action != nil && item.action != #selector(NSApplication.terminate(_:)) {
@@ -95,43 +108,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem.menu = menu
     }
 
-    private func setStatus(_ text: String, icon: String) {
+    private func setStatus(_ text: String, icon: MenuBarIcon.State) {
         statusLine.title = text
-        statusItem.button?.image = NSImage(systemSymbolName: icon, accessibilityDescription: "GazeHop")
+        guard let button = statusItem.button else { return }
+        button.image = MenuBarIcon.image(icon)
+        button.title = settings.showNameInMenuBar ? " GazeHop" : ""
+        button.toolTip = "GazeHop: \(text)"
     }
 
     private func refreshStatus() {
         pauseItem.title = paused ? "Resume" : "Pause"
-        if paused { setStatus("Paused", icon: "eye.slash"); return }
-        if !FocusManager.isTrusted { setStatus("Grant Accessibility access", icon: "eye.trianglebadge.exclamationmark"); return }
+        if paused { setStatus("Paused", icon: .paused); return }
+        if !FocusManager.isTrusted { setStatus("Grant Accessibility access", icon: .attention); return }
+        if model == nil { setStatus("Needs calibration", icon: .attention); return }
+        if !uncalibratedScreens.isEmpty { setStatus("New screen connected: calibrate", icon: .attention); return }
+        let active = connected.subtracting(settings.excludedDisplays).count
         let layaNote = laya.enabled ? " · Laya \(laya.lastStatus)" : ""
-        if !uncalibratedScreens.isEmpty {
-            setStatus("New screen connected: calibrate", icon: "eye.trianglebadge.exclamationmark"); return
-        }
-        let active = connected.subtracting(excluded).count
-        setStatus("Watching \(active) of \(connected.count) screens\(layaNote)", icon: "eye")
+        setStatus("Watching \(active) of \(connected.count) screens\(layaNote)", icon: .active)
     }
+
+    @objc private func openSettings() { settingsWindow.show() }
 
     @objc private func togglePause() {
         paused.toggle()
         UserDefaults.standard.set(paused, forKey: "paused")
         paused ? tracker.stop() : tracker.start { _ in }
         candidate = nil
-        NSSound(named: paused ? "Pop" : "Tink")?.play()
+        if settings.playSounds { NSSound(named: paused ? "Pop" : "Tink")?.play() }
         DebugLog.write(paused ? "paused" : "resumed")
-        refreshStatus()
-    }
-
-    @objc private func togglePointer() {
-        focus.movePointer.toggle()
-        pointerItem.state = focus.movePointer ? .on : .off
-        UserDefaults.standard.set(focus.movePointer, forKey: "movePointer")
-    }
-
-    @objc private func toggleLaya() {
-        laya.enabled.toggle()
-        layaItem.state = laya.enabled ? .on : .off
-        UserDefaults.standard.set(laya.enabled, forKey: "layaFilter")
         refreshStatus()
     }
 
@@ -174,7 +178,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let item = menu.addItem(withTitle: title, action: #selector(toggleScreen(_:)), keyEquivalent: "")
             item.target = self
             item.tag = Int(id)
-            item.state = excluded.contains(id) ? .off : .on
+            item.state = settings.excludedDisplays.contains(id) ? .off : .on
         }
         menu.addItem(.separator())
         let hint = menu.addItem(withTitle: "Unchecked screens are never switched to", action: nil, keyEquivalent: "")
@@ -183,9 +187,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func toggleScreen(_ item: NSMenuItem) {
         let id = UInt32(item.tag)
-        if excluded.contains(id) { excluded.remove(id) } else { excluded.insert(id) }
-        candidate = nil
-        refreshStatus()
+        if settings.excludedDisplays.contains(id) { settings.excludedDisplays.remove(id) }
+        else { settings.excludedDisplays.insert(id) }
     }
 
     // MARK: gaze → focus
@@ -194,20 +197,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let calibration { calibration.add(raw); return }
         guard !paused, let model else { return }
 
+        let alpha = 1 - settings.smoothing
         smoothed = smoothed.map { s in zip(s, raw).map { $0 * (1 - alpha) + $1 * alpha } } ?? raw
         let pred = model.predict(smoothed!, among: connected)
-        if UserDefaults.standard.bool(forKey: "debug"), Date().timeIntervalSince(lastDiag) > 1 {
+        if settings.debugLogging, Date().timeIntervalSince(lastDiag) > 1 {
             lastDiag = Date()
             DebugLog.write("pred=\(pred.map { "\($0.display) conf=\(String(format: "%.2f", $0.confidence))" } ?? "nil") trusted=\(FocusManager.isTrusted) focused=\(focus.focusedDisplay.map(String.init) ?? "nil") front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?") known=\(focus.lastWindow.map { "\($0.key):\($0.value.appName)" })")
         }
-        guard let p = pred, p.confidence >= minConfidence else { candidate = nil; return }
+        guard let p = pred, p.confidence >= settings.strictness else { candidate = nil; return }
 
         if candidate?.display != p.display { candidate = (p.display, Date()); return }
-        guard let c = candidate, Date().timeIntervalSince(c.since) >= dwell,
-              Date().timeIntervalSince(lastSwitch) >= cooldown,
+        guard let c = candidate, Date().timeIntervalSince(c.since) * 1000 >= settings.dwellMs,
+              Date().timeIntervalSince(lastSwitch) * 1000 >= settings.cooldownMs,
               !pendingLaya,
               CGEventSource.buttonState(.combinedSessionState, button: .left) == false,  // not mid-drag
-              !excluded.contains(p.display),
+              !settings.excludedDisplays.contains(p.display),
               let current = focus.focusedDisplay, current != p.display,
               let target = focus.lastWindow[p.display] else { return }
 
@@ -226,9 +230,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             if allow {
                 let ok = self.focus.focus(display: p.display)
                 DebugLog.write("SWITCH -> \(p.display) \(target.appName) ok=\(ok)")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    DebugLog.write("after switch front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?") focused=\(self.focus.focusedDisplay.map(String.init) ?? "nil")")
-                }
             } else { DebugLog.write("laya blocked switch") }
             if self.laya.enabled { self.refreshStatus() }
         }

@@ -5,10 +5,10 @@ import Foundation
 /// model, so it sees a description of the situation, never camera frames.
 /// Fails open: if the server is down or slow, the switch goes ahead.
 final class LayaFilter {
-    var enabled = false
-    var threshold = 0.5
-    private let url = URL(string: "http://127.0.0.1:8077/decide")!
-    private(set) var lastStatus = "off"
+    private var settings: Settings { .shared }
+    var enabled: Bool { settings.layaEnabled }
+    private var url: URL? { URL(string: settings.layaURL) }
+    private(set) var lastStatus = "not used yet"
 
     struct Context {
         let fromApp: String, fromTitle: String
@@ -19,7 +19,7 @@ final class LayaFilter {
     }
 
     func shouldSwitch(_ c: Context, completion: @escaping (Bool) -> Void) {
-        guard enabled else { completion(true); return }
+        guard enabled, let url else { completion(true); return }
 
         let state = """
         The user has two screens. Keyboard focus is on "\(c.fromApp)" (\(c.fromTitle)). \
@@ -47,12 +47,33 @@ final class LayaFilter {
                let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let answers = json["answers"] as? [String: Any],
                let p = Self.probability(answers["switch"]) {
-                allow = p >= self.threshold
+                allow = p >= self.settings.layaThreshold
                 self.lastStatus = String(format: "last p=%.2f", p)
             } else {
                 self.lastStatus = error == nil ? "bad reply" : "server unreachable"
             }
             DispatchQueue.main.async { completion(allow) }
+        }.resume()
+    }
+
+    /// One round-trip to check the server is up; reports latency.
+    func test(completion: @escaping (String) -> Void) {
+        guard let url else { completion("Invalid URL"); return }
+        var req = URLRequest(url: url, timeoutInterval: 3)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "content-type")
+        req.httpBody = try? JSONSerialization.data(withJSONObject: [
+            "state": "connection test",
+            "questions": ["ok": ["type": "noul", "instructions": "Is this a test?"]],
+        ])
+        let start = Date()
+        URLSession.shared.dataTask(with: req) { data, _, error in
+            let ms = Int(Date().timeIntervalSince(start) * 1000)
+            let msg: String
+            if let error { msg = "Not reachable: \(error.localizedDescription)" }
+            else if let data, (try? JSONSerialization.jsonObject(with: data)) is [String: Any] { msg = "Connected (\(ms) ms)" }
+            else { msg = "Server replied, but not like Laya" }
+            DispatchQueue.main.async { completion(msg) }
         }.resume()
     }
 

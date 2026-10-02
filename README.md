@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/icon.png" width="160" alt="GazeHop icon"></p>
+
 # GazeHop
 
 Look at a screen, and your keyboard follows.
@@ -26,6 +28,7 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
 ## Build and run
 
 ```sh
+./scripts/make-signing-cert.sh   # once: lets macOS remember permissions across rebuilds
 ./build.sh
 open build/GazeHop.app
 ```
@@ -36,19 +39,38 @@ On first launch:
 2. Enable GazeHop in **System Settings › Privacy & Security › Accessibility**.
 3. Follow the calibration dots on each screen.
 
-> The build is ad-hoc signed, so macOS treats every rebuild as a new app and the
-> Accessibility toggle stops working. After rebuilding, clear the stale entry and re-enable it:
-> `tccutil reset Accessibility io.github.gazehop`
+GazeHop shows up in the menu bar (next to the battery and clock) as an eye with a hop arrow
+and the name **GazeHop**.
+
+> **Why the signing script?** macOS ties Camera and Accessibility permission to an app's code
+> signature. Without a certificate, each build is signed ad-hoc and looks like a brand-new app,
+> so you'd have to allow everything again after every rebuild. `make-signing-cert.sh` creates a
+> self-signed certificate ("GazeHop Local Signing") in your login keychain; `build.sh` uses it
+> automatically. It never leaves your Mac.
 
 ## Using it
 
-| | |
+| Menu | |
 |---|---|
-| **⌘F1** | Pause / resume from anywhere (e.g. while gaming). On Mac keyboards you may need **Fn⌘F1**. |
+| **Pause / Resume (⌘F1)** | Pause from anywhere, e.g. while gaming. On Mac keyboards you may need **Fn⌘F1**. |
 | **Calibrate…** | Re-run calibration (needed if you move your screens or camera, or add a new screen) |
-| **Screens** | Check/uncheck each connected display. Unchecked screens (a TV, a screen you only watch) are never switched to |
-| **Move pointer with focus** | Bring the pointer along so scrolling hits the right window |
-| **Laya smart filter** | Experimental, see below |
+| **Screens** | Check/uncheck each connected display. Unchecked screens are never switched to |
+| **Settings… (⌘,)** | Everything below |
+
+The menu bar icon shows the state: plain eye = watching, slashed = paused, dot = needs attention
+(calibration or permission).
+
+### Settings
+
+| Tab | Options |
+|---|---|
+| **General** | Launch at login · show the name in the menu bar · move pointer with focus · sounds · pause shortcut (⌘F1, ⌥F1, ⌃⌥G, ⌃⌥⌘G or none) |
+| **Tracking** | Look time before switching · minimum time between switches · strictness · smoothing · recalibrate |
+| **Screens** | Per-display on/off, calibration status |
+| **Laya** | Enable, server URL, confidence threshold, test connection |
+| **Advanced** | Debug logging, open log, shortcuts to Camera/Accessibility settings |
+
+All settings apply immediately.
 
 ## Multiple screens
 
@@ -75,10 +97,20 @@ It's off by default: in early testing Laya didn't reliably tell glances from rea
 swift test
 ```
 
-## Debugging
+## Icons
+
+The app icon and menu bar icon are drawn in code. To regenerate the app icon after editing
+`scripts/make-icon.swift`:
 
 ```sh
-defaults write io.github.gazehop debug -bool true   # log predictions once per second
+swift scripts/make-icon.swift   # writes Resources/AppIcon.icns and docs/icon.png
+```
+
+## Debugging
+
+Turn on **Settings › Advanced › Detailed debug logging**, then:
+
+```sh
 tail -f ~/Library/Logs/GazeHop.log
 ```
 

@@ -13,7 +13,7 @@ final class FocusManager {
 
     private(set) var lastWindow: [UInt32: WindowRef] = [:]
     private var timer: Timer?
-    var movePointer = true
+    var movePointer: Bool { Settings.shared.movePointer }
 
     static var isTrusted: Bool { AXIsProcessTrusted() }
 

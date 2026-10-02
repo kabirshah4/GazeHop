@@ -2,7 +2,7 @@ import Foundation
 
 /// Appends diagnostics to ~/Library/Logs/GazeHop.log
 enum DebugLog {
-    private static let url = FileManager.default.homeDirectoryForCurrentUser
+    static let url = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("Library/Logs/GazeHop.log")
     private static let fmt: DateFormatter = { let f = DateFormatter(); f.dateFormat = "HH:mm:ss.SSS"; return f }()
 
