@@ -37,7 +37,7 @@ final class Settings: ObservableObject {
 
     private init() {
         d.register(defaults: [
-            "showNameInMenuBar": true, "movePointer": true, "playSounds": true,
+            "showNameInMenuBar": false, "movePointer": true, "playSounds": true,
             "hotKey": HotKeyPreset.cmdF1.rawValue,
             "dwellMs": 250.0, "cooldownMs": 600.0, "strictness": 0.2, "smoothing": 0.55,
             "layaURL": "http://127.0.0.1:8077/decide", "layaThreshold": 0.5,

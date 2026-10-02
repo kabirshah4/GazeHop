@@ -39,8 +39,8 @@ On first launch:
 2. Enable GazeHop in **System Settings › Privacy & Security › Accessibility**.
 3. Follow the calibration dots on each screen.
 
-GazeHop shows up in the menu bar (next to the battery and clock) as an eye with a hop arrow
-and the name **GazeHop**.
+GazeHop shows up in the menu bar (next to the battery and clock) as an eye icon. You can add
+the name next to it in **Settings › General**.
 
 > **Why the signing script?** macOS ties Camera and Accessibility permission to an app's code
 > signature. Without a certificate, each build is signed ad-hoc and looks like a brand-new app,
