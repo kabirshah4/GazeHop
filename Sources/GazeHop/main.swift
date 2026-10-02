@@ -1,7 +1,7 @@
 import AppKit
 import Carbon
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let tracker = GazeTracker()
     private let focus = FocusManager()
     private let laya = LayaFilter()
@@ -13,6 +13,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pauseItem: NSMenuItem!
     private var layaItem: NSMenuItem!
     private var pointerItem: NSMenuItem!
+    private let screensMenu = NSMenu()
+
+    /// Screens GazeHop never switches to (e.g. a TV or a screen you only watch).
+    private var excluded: Set<UInt32> {
+        get { Set((UserDefaults.standard.array(forKey: "excludedDisplays") as? [Int] ?? []).map(UInt32.init)) }
+        set { UserDefaults.standard.set(newValue.map(Int.init), forKey: "excludedDisplays") }
+    }
+    private var connected: Set<UInt32> { Set(NSScreen.screens.map(\.displayID)) }
 
     private var paused = UserDefaults.standard.bool(forKey: "paused")
     private var smoothed: [Double]?
@@ -46,12 +54,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if pauseHotKey == nil { DebugLog.write("could not register ⌘F1 (taken by another app?)") }
 
+        NotificationCenter.default.addObserver(self, selector: #selector(screensChanged),
+            name: NSApplication.didChangeScreenParametersNotification, object: nil)
+
         tracker.onSample = { [weak self] f in self?.handle(f) }
         tracker.onNoFace = { [weak self] in self?.candidate = nil }
         tracker.start { [weak self] error in
             guard let self else { return }
             if let error { self.setStatus(error.localizedDescription, icon: "eye.trianglebadge.exclamationmark"); return }
-            if self.model == nil || !self.modelMatchesScreens() {
+            if self.model == nil || !self.uncalibratedScreens.isEmpty {
                 self.setStatus("Needs calibration", icon: "eye.trianglebadge.exclamationmark")
                 self.calibrate()
             } else {
@@ -70,6 +81,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         pauseItem = menu.addItem(withTitle: "Pause", action: #selector(togglePause), keyEquivalent: String(UnicodeScalar(NSF1FunctionKey)!))
         pauseItem.keyEquivalentModifierMask = [.command]
         menu.addItem(withTitle: "Calibrate…", action: #selector(calibrate), keyEquivalent: "c")
+        let screensItem = menu.addItem(withTitle: "Screens", action: nil, keyEquivalent: "")
+        screensMenu.delegate = self
+        screensItem.submenu = screensMenu
         menu.addItem(.separator())
         pointerItem = menu.addItem(withTitle: "Move pointer with focus", action: #selector(togglePointer), keyEquivalent: "")
         layaItem = menu.addItem(withTitle: "Laya smart filter (needs ~/laya/serve.sh)", action: #selector(toggleLaya), keyEquivalent: "")
@@ -91,7 +105,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if paused { setStatus("Paused", icon: "eye.slash"); return }
         if !FocusManager.isTrusted { setStatus("Grant Accessibility access", icon: "eye.trianglebadge.exclamationmark"); return }
         let layaNote = laya.enabled ? " · Laya \(laya.lastStatus)" : ""
-        setStatus("Watching \(model?.centroids.count ?? 0) screens\(layaNote)", icon: "eye")
+        if !uncalibratedScreens.isEmpty {
+            setStatus("New screen connected: calibrate", icon: "eye.trianglebadge.exclamationmark"); return
+        }
+        let active = connected.subtracting(excluded).count
+        setStatus("Watching \(active) of \(connected.count) screens\(layaNote)", icon: "eye")
     }
 
     @objc private func togglePause() {
@@ -131,9 +149,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         c.run()
     }
 
-    private func modelMatchesScreens() -> Bool {
-        guard let model else { return false }
-        return Set(NSScreen.screens.map(\.displayID)) == Set(model.centroids.keys)
+    /// Connected screens the model has never been calibrated on.
+    private var uncalibratedScreens: Set<UInt32> {
+        connected.subtracting(model?.centroids.keys ?? [:].keys)
+    }
+
+    @objc private func screensChanged() {
+        DebugLog.write("screens changed: \(connected.sorted()) uncalibrated=\(uncalibratedScreens.sorted())")
+        focus.forget(except: connected)
+        candidate = nil
+        refreshStatus()
+    }
+
+    // MARK: Screens submenu
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        guard menu === screensMenu else { return }
+        menu.removeAllItems()
+        let calibrated = Set(model?.centroids.keys ?? [:].keys)
+        for (i, screen) in NSScreen.screens.enumerated() {
+            let id = screen.displayID
+            var title = "\(i + 1). \(screen.localizedName)"
+            if !calibrated.contains(id) { title += " (not calibrated)" }
+            let item = menu.addItem(withTitle: title, action: #selector(toggleScreen(_:)), keyEquivalent: "")
+            item.target = self
+            item.tag = Int(id)
+            item.state = excluded.contains(id) ? .off : .on
+        }
+        menu.addItem(.separator())
+        let hint = menu.addItem(withTitle: "Unchecked screens are never switched to", action: nil, keyEquivalent: "")
+        hint.isEnabled = false
+    }
+
+    @objc private func toggleScreen(_ item: NSMenuItem) {
+        let id = UInt32(item.tag)
+        if excluded.contains(id) { excluded.remove(id) } else { excluded.insert(id) }
+        candidate = nil
+        refreshStatus()
     }
 
     // MARK: gaze → focus
@@ -143,7 +195,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard !paused, let model else { return }
 
         smoothed = smoothed.map { s in zip(s, raw).map { $0 * (1 - alpha) + $1 * alpha } } ?? raw
-        let pred = model.predict(smoothed!)
+        let pred = model.predict(smoothed!, among: connected)
         if UserDefaults.standard.bool(forKey: "debug"), Date().timeIntervalSince(lastDiag) > 1 {
             lastDiag = Date()
             DebugLog.write("pred=\(pred.map { "\($0.display) conf=\(String(format: "%.2f", $0.confidence))" } ?? "nil") trusted=\(FocusManager.isTrusted) focused=\(focus.focusedDisplay.map(String.init) ?? "nil") front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?") known=\(focus.lastWindow.map { "\($0.key):\($0.value.appName)" })")
@@ -155,6 +207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
               Date().timeIntervalSince(lastSwitch) >= cooldown,
               !pendingLaya,
               CGEventSource.buttonState(.combinedSessionState, button: .left) == false,  // not mid-drag
+              !excluded.contains(p.display),
               let current = focus.focusedDisplay, current != p.display,
               let target = focus.lastWindow[p.display] else { return }
 

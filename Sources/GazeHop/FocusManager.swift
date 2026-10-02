@@ -28,6 +28,11 @@ final class FocusManager {
         }
     }
 
+    /// Drop remembered windows on displays that are no longer connected.
+    func forget(except displays: Set<UInt32>) {
+        lastWindow = lastWindow.filter { displays.contains($0.key) }
+    }
+
     /// Display that currently has keyboard focus.
     var focusedDisplay: UInt32? {
         guard let w = currentWindow() else { return nil }

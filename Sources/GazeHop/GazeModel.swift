@@ -34,8 +34,10 @@ struct GazeModel: Codable {
         let confidence: Double
     }
 
-    func predict(_ x: [Double]) -> Prediction? {
-        let ranked = centroids.map { (id, c) in (id, distance(x, c)) }.sorted { $0.1 < $1.1 }
+    /// Nearest screen among `among` (connected displays); calibrated-but-unplugged screens are ignored.
+    func predict(_ x: [Double], among: Set<UInt32>) -> Prediction? {
+        let ranked = centroids.filter { among.contains($0.key) }
+            .map { (id, c) in (id, distance(x, c)) }.sorted { $0.1 < $1.1 }
         guard let best = ranked.first else { return nil }
         let second = ranked.count > 1 ? ranked[1].1 : best.1 * 2
         let confidence = second > 0 ? max(0, 1 - best.1 / second) : 0

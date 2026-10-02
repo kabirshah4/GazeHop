@@ -5,6 +5,7 @@ let package = Package(
     name: "GazeHop",
     platforms: [.macOS(.v14)],
     targets: [
-        .executableTarget(name: "GazeHop", path: "Sources/GazeHop")
+        .executableTarget(name: "GazeHop", path: "Sources/GazeHop"),
+        .testTarget(name: "GazeHopTests", dependencies: ["GazeHop"], path: "Tests/GazeHopTests"),
     ]
 )

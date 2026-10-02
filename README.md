@@ -2,7 +2,7 @@
 
 Look at a screen, and your keyboard follows.
 
-GazeHop is a tiny macOS menu-bar app for multi-monitor setups. It uses your webcam to see
+GazeHop is a tiny macOS menu-bar app for multi-monitor setups: 2, 3, 4 or more screens. It uses your webcam to see
 which screen you're looking at and moves keyboard focus to the last window you used on that
 screen — so you stop typing into the window you just left.
 
@@ -20,7 +20,7 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
 
 ## Requirements
 
-- macOS 14 or later, two or more displays, a webcam
+- macOS 14 or later, two or more displays (any number; Sidecar iPads count too), a webcam
 - Xcode command-line tools (Swift 5.9+) to build
 
 ## Build and run
@@ -45,9 +45,20 @@ On first launch:
 | | |
 |---|---|
 | **⌘F1** | Pause / resume from anywhere (e.g. while gaming). On Mac keyboards you may need **Fn⌘F1**. |
-| **Calibrate…** | Re-run calibration (needed if you move your screens or camera) |
+| **Calibrate…** | Re-run calibration (needed if you move your screens or camera, or add a new screen) |
+| **Screens** | Check/uncheck each connected display. Unchecked screens (a TV, a screen you only watch) are never switched to |
 | **Move pointer with focus** | Bring the pointer along so scrolling hits the right window |
 | **Laya smart filter** | Experimental, see below |
+
+## Multiple screens
+
+GazeHop calibrates every connected display and picks whichever one you're looking at.
+
+- **Unplugging a screen** doesn't need recalibration; GazeHop just ignores it until it's back.
+- **Plugging in a new screen** shows *New screen connected: calibrate* in the menu; run
+  **Calibrate…** to include it.
+- Accuracy depends on how far apart the screens are from your point of view: side-by-side
+  and stacked layouts work best; two screens at almost the same angle are hard to tell apart.
 
 ## Optional: Laya smart filter
 
@@ -57,6 +68,12 @@ decision model, so it receives a short description of the situation (app names, 
 titles, dwell time), never camera frames. If the server is unreachable, switches go ahead.
 
 It's off by default: in early testing Laya didn't reliably tell glances from real switches.
+
+## Tests
+
+```sh
+swift test
+```
 
 ## Debugging
 

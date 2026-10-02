@@ -41,7 +41,7 @@ final class Calibration {
         if pi >= Self.points.count { step(screen: si + 1, point: 0); return }
 
         let screen = screens[si]
-        show(on: screen, at: Self.points[pi], label: "Screen \(si + 1) of \(screens.count): look at the dot")
+        show(on: screen, at: Self.points[pi], label: "\(screen.localizedName) (\(si + 1) of \(screens.count)): look at the dot")
         collectingFor = nil
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.settle) {
             self.collectingFor = screen.displayID
