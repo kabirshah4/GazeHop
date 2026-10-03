@@ -1,9 +1,9 @@
-// Generates the GazeHop logo SVGs, in the website's style (light macOS, dawn sky, one white eye):
+// Generates the GazeHop logo SVGs, in the website's style (light macOS, dawn sky, focus hopping between screens):
 //   brand/logo-mark.svg  full-colour app icon: continuous-corner tile filled with the hero's dawn
-//                        sky, a white eye glancing right (the same eye as the menu bar and HUD)
+//                        sky; a dim screen, a lit screen with the blue caret, and the hop between them
 //   brand/logo-tight.svg same tile cropped to its edges (favicons: no macOS icon margin)
 //   brand/logo-square.svg full-bleed square (apple-touch-icon: iOS rounds the corners itself)
-//   brand/logo-mono.svg  single-colour eye for small/one-ink uses
+//   brand/logo-mono.svg  single-colour version for small/one-ink uses
 // Run: node scripts/make-logo.mjs  then  node scripts/make-app-icon.mjs
 import { writeFileSync } from "node:fs";
 
@@ -24,9 +24,23 @@ function squircle(cx, cy, size, n = 5, steps = 256) {
 }
 
 const TILE = squircle(512, 512, 824);
-// Almond eye: two arcs meeting at sharp corners, like the menu bar glyph
-const EYE = "M192 512C296 344 728 344 832 512C728 680 296 680 192 512Z";
-const PX = 570, PY = 512; // pupil sits right of centre: the glance that moves focus
+const q = (t, a, c, b) => (1 - t) ** 2 * a + 2 * (1 - t) * t * c + t * t * b;
+// The hop: leaves above the dim screen, arcs over, lands on the lit one
+const P = [[300, 470], [500, 84], [709, 462]];
+const pt = (t) => [q(t, P[0][0], P[1][0], P[2][0]), q(t, P[0][1], P[1][1], P[2][1])];
+/** Tapered swoosh as a filled outline: thin where it leaves, full where it lands, round tip. */
+function swoosh(w0, w1) {
+  const N = 80, L = [], R = [];
+  for (let i = 0; i <= N; i++) {
+    const t = i / N, [x, y] = pt(t), [x2, y2] = pt(Math.min(1, t + 0.001)), [x1, y1] = pt(Math.max(0, t - 0.001));
+    const len = Math.hypot(x2 - x1, y2 - y1), nx = -(y2 - y1) / len, ny = (x2 - x1) / len, w = w0 + (w1 - w0) * t ** 1.3;
+    L.push(`${f(x + nx * w)} ${f(y + ny * w)}`); R.unshift(`${f(x - nx * w)} ${f(y - ny * w)}`);
+  }
+  return `M${L.join("L")}A${w1} ${w1} 0 0 0 ${R[0]}L${R.join("L")}Z`;
+}
+const HOP = swoosh(4, 28);
+const monitor = (x, op) => `<rect x="${x}" y="500" width="330" height="214" rx="32" fill="#fff"${op}/>
+    <path d="M${x + 146} 714h38l8 44h-54z" fill="#fff"${op}/><rect x="${x + 112}" y="756" width="106" height="16" rx="8" fill="#fff"${op}/>`;
 
 const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
   <defs>
@@ -40,16 +54,12 @@ const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org
     <linearGradient id="sheen" x1="0" y1="100" x2="0" y2="560" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="sclera" x1="0" y1="380" x2="0" y2="650" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEFB"/>
+    <linearGradient id="hop" x1="300" y1="0" x2="709" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".55" stop-color="#fff"/>
     </linearGradient>
-    <radialGradient id="iris" cx="${PX - 18}" cy="${PY - 22}" r="128" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#2C62E0"/><stop offset=".7" stop-color="#0B3FAE"/><stop offset="1" stop-color="#082C7C"/>
-    </radialGradient>
-    <filter id="lift" x="-20%" y="-40%" width="140%" height="200%">
-      <feDropShadow dx="0" dy="22" stdDeviation="26" flood-color="#0B1E5C" flood-opacity=".32"/>
+    <filter id="lift" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#0B1E5C" flood-opacity=".30"/>
     </filter>
-    <clipPath id="eyeClip"><path d="${EYE}"/></clipPath>
   </defs>
 
   <path d="${tile}" fill="url(#sky)"/>
@@ -57,20 +67,20 @@ const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org
   <path d="${tile}" fill="url(#sheen)"/>
 
   <g filter="url(#lift)">
-    <path d="${EYE}" fill="url(#sclera)"/>
+    ${monitor(150, ' fill-opacity=".36"')}
+    ${monitor(544, "")}
   </g>
-  <g clip-path="url(#eyeClip)">
-    <circle cx="${PX}" cy="${PY}" r="128" fill="url(#iris)"/>
-    <circle cx="${PX}" cy="${PY}" r="56" fill="#0A1433"/>
-  </g>
-  <circle cx="${PX - 42}" cy="${PY - 46}" r="24" fill="#fff" opacity=".95"/>
+  <rect x="692" y="552" width="34" height="110" rx="17" fill="#0071E3"/>
+  <path d="${HOP}" fill="url(#hop)"/>
 </svg>
 `;
 
-// One ink: almond outline with a filled pupil, the same glyph as the menu bar icon
-const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
-  <path d="M40 256C120 128 392 128 472 256C392 384 120 384 40 256Z" fill="none" stroke="#1d1d1f" stroke-width="36" stroke-linejoin="round"/>
-  <circle cx="282" cy="256" r="78" fill="#1d1d1f"/>
+// One ink: dim screen as an outline, lit screen solid, the hop above (same as the menu bar icon)
+const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="120 60 784 744" aria-hidden="true">
+  <rect x="166" y="516" width="298" height="182" rx="24" fill="none" stroke="#1d1d1f" stroke-width="32"/>
+  <rect x="544" y="500" width="330" height="214" rx="32" fill="#1d1d1f"/>
+  <path d="M296 714h38l8 44h-54zM690 714h38l8 44h-54z" fill="#1d1d1f"/><rect x="262" y="756" width="106" height="16" rx="8" fill="#1d1d1f"/><rect x="656" y="756" width="106" height="16" rx="8" fill="#1d1d1f"/>
+  <path d="${swoosh(10, 30)}" fill="#1d1d1f"/>
 </svg>
 `;
 

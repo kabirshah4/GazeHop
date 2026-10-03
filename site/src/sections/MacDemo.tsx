@@ -101,7 +101,7 @@ export function MacDemo() {
 
           {/* GazeHop HUD */}
           <div className="glass-dark absolute left-[var(--hud-x)] top-0 z-20 flex -translate-x-1/2 items-center gap-[calc(var(--hu)*0.9)] rounded-full py-[calc(var(--hu)*0.7)] pl-[calc(var(--hu)*0.8)] pr-[calc(var(--hu)*1.4)] text-[calc(var(--hu)*1.15)] shadow-[0_12px_30px_-10px_rgba(0,0,0,.45)]">
-            <EyeGlyph gaze={gaze} />
+            <HopGlyph gaze={gaze} />
             <span className="whitespace-nowrap font-medium tracking-[-0.01em]">
               Looking at <span className="text-white/65">{looking === "L" ? "Studio Display" : "Built-in Display"}</span>
             </span>
@@ -135,7 +135,7 @@ function Display({ side, focused, app, aspect, children }: { side: "L" | "R"; fo
         <span className="font-semibold">{focused ? app : side === "L" ? "Notes" : "Messages"}</span>
         <span className="text-black/60">File</span><span className="text-black/60">Edit</span><span className="text-black/60">View</span>
         <span className="ml-auto flex items-center gap-[calc(var(--u)*0.9)]">
-          <MenuEye />
+          <MenuHop />
           <span>Fri 9:41</span>
         </span>
       </div>
@@ -190,21 +190,32 @@ function Pointer({ side, q }: { side: "L" | "R"; q: number }) {
   );
 }
 
-function EyeGlyph({ gaze }: { gaze: number }) {
+/** GazeHop's mark: two screens and the hop between them. The screen being looked at fills in. */
+function HopGlyph({ gaze }: { gaze: number }) {
   return (
     <svg viewBox="0 0 28 18" className="h-[calc(var(--hu)*1.5)] w-auto" aria-hidden="true">
-      <path d="M2 9C7 1.5 21 1.5 26 9C21 16.5 7 16.5 2 9Z" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" />
-      <circle cx={10.5 + gaze * 7} cy="9" r="3.6" fill="#fff" />
+      <HopPaths gaze={gaze} ink="#fff" />
     </svg>
   );
 }
 
-function MenuEye() {
+function MenuHop() {
   return (
-    <svg viewBox="0 0 20 16" className="h-[calc(var(--u)*1)] w-auto" aria-hidden="true">
-      <path d="M1.5 8 C5.5 14.6 14.5 14.6 18.5 8 C14.5 1.4 5.5 1.4 1.5 8 Z" fill="none" stroke="#1d1d1f" strokeWidth="1.6" />
-      <circle cx="10" cy="8" r="3.3" fill="#1d1d1f" />
+    <svg viewBox="0 0 28 18" className="h-[calc(var(--u)*1)] w-auto" aria-hidden="true">
+      <HopPaths gaze={1} ink="#1d1d1f" />
     </svg>
+  );
+}
+
+function HopPaths({ gaze, ink }: { gaze: number; ink: string }) {
+  return (
+    <>
+      <rect x="1.8" y="7.6" width="9.6" height="6.6" rx="1.5" fill={ink} fillOpacity={1 - gaze} stroke={ink} strokeWidth="1.6" />
+      <rect x="16.6" y="7.6" width="9.6" height="6.6" rx="1.5" fill={ink} fillOpacity={gaze} stroke={ink} strokeWidth="1.6" />
+      <path d="M6 15h1.6v1.6H6zM20.8 15h1.6v1.6h-1.6z" fill={ink} />
+      <rect x="4.6" y="16.4" width="4.2" height="1.4" rx=".7" fill={ink} /><rect x="19.4" y="16.4" width="4.2" height="1.4" rx=".7" fill={ink} />
+      <path d="M6.4 5.6C10.6 -0.6 16.6 -0.8 21.6 4.8M18.5 3.9L21.6 4.8L21.7 1.6" fill="none" stroke={ink} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </>
   );
 }
 

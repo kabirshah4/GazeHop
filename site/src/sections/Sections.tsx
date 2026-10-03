@@ -467,7 +467,7 @@ const STEPS: Step[] = [
   { title: "Camera & Accessibility", badge: <Badge bg="linear-gradient(#4CD964,#28A745)"><I d="M15 10l4.5-2.5v9L15 14M4 7h11v10H4z" /></Badge>,
     body: <>Allow <b>Camera</b> when asked, then turn on GazeHop in <b>Privacy &amp; Security › Accessibility</b>.</>, mock: <MockToggles /> },
   { title: "Calibrate", badge: <LogoMark className="size-[26px]" />,
-    body: <>Follow the dot on each screen for a few seconds. When the eye appears in your menu bar, you're set.</>, mock: <MockCalibrate /> },
+    body: <>Follow the dot on each screen for a few seconds. When the GazeHop icon appears in your menu bar, you're set.</>, mock: <MockCalibrate /> },
 ];
 
 export function InstallGuide() {

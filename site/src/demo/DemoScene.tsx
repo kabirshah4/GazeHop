@@ -118,7 +118,7 @@ function Screen({ r, focused, menuBar = false, children }: { r: { x: number; y: 
             <div className="flex h-9 items-center gap-6 bg-black/35 px-4 text-[17px] text-white/85 backdrop-blur">
               <span className="font-semibold">Notes</span><span className="text-white/60">File</span><span className="text-white/60">Edit</span>
               <span className="ml-auto flex items-center gap-5">
-                <svg viewBox="0 0 20 16" width="24" height="19"><path d="M1.5 8 C5.5 14.6 14.5 14.6 18.5 8 C14.5 1.4 5.5 1.4 1.5 8 Z" fill="none" stroke="#fff" strokeWidth="1.6" /><circle cx="10" cy="8" r="3.4" fill="#fff" /></svg>
+                <svg viewBox="0 0 28 18" width="27" height="17"><rect x="1.8" y="9.3" width="10.4" height="6.9" rx="1.6" fill="none" stroke="currentColor" strokeWidth="1.6"/><rect x="15.8" y="9.3" width="10.4" height="6.9" rx="1.6" fill="currentColor" stroke="currentColor" strokeWidth="1.6"/><path d="M7 6.8Q14 -2.6 21 6.8" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"/></svg>
                 <span>Fri 9:41</span>
               </span>
             </div>
