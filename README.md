@@ -140,6 +140,20 @@ tail -f ~/Library/Logs/GazeHop.log
 
 Switch attempts are always logged.
 
+## Privacy
+
+GazeHop has no accounts, servers, analytics, or crash reporting.
+
+- **Camera:** frames are analysed in memory on your Mac to find head direction and eye position,
+  then discarded. Nothing is saved, recorded, or uploaded.
+- **No network:** GazeHop makes no network connections at all.
+- **Stored on your Mac only:** your settings and calibration (a few numbers per screen, not
+  images), in GazeHop's preferences.
+- **Debug log:** if you turn on detailed debug logging, `~/Library/Logs/GazeHop.log` can contain
+  app names and window titles. It never leaves your Mac; delete it anytime.
+
+The code is open, so you can check all of this yourself.
+
 ## License
 
 MIT
