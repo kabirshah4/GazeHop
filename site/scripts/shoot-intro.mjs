@@ -13,10 +13,10 @@ for (const ms of [400, 900, 1800, 3600]) {
   if (wait > 0) await new Promise((r) => setTimeout(r, wait));
   await page.screenshot({ path: `${out}-${ms}.png` });
 }
-const overlayGone = await page.evaluate(() => !document.querySelector(".shader-frame"));
+const overlayGone = await page.evaluate(() => !document.querySelector(".fixed.inset-0.z-\\[60\\]"));
 // Second visit in the same session: no intro
 await page.reload({ waitUntil: "domcontentloaded" });
 await new Promise((r) => setTimeout(r, 300));
-const replayed = await page.evaluate(() => !!document.querySelector(".shader-frame"));
+const replayed = await page.evaluate(() => !!document.querySelector(".fixed.inset-0.z-\\[60\\]"));
 console.log(JSON.stringify({ overlayGoneAfter3_6s: overlayGone, replayedOnReload: replayed, errors }));
 await browser.close();
