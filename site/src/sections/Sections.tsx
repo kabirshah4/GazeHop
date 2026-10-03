@@ -81,9 +81,12 @@ export function HowItWorks() {
       </div>
 
       <div ref={railRef} className="relative">
-        {/* Progress rail */}
-        <div className="pointer-events-none absolute inset-y-16 left-[max(14px,calc(50vw-604px))] hidden w-px bg-white/[.08] lg:block min-[1800px]:left-[calc(50vw-700px)]" aria-hidden="true">
-          <motion.div className="absolute inset-x-0 top-0 h-full origin-top bg-gradient-to-b from-[color:var(--color-cyan)] via-[color:var(--color-track)] to-transparent" style={{ scaleY: fill }} />
+        {/* Progress rail. Positioned inside the same centred column as the scenes (not by viewport
+            width), so the rail and the step markers line up exactly, with or without a scrollbar. */}
+        <div className="wrap pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
+          <div className="absolute inset-y-16 left-4 w-px bg-white/[.08]">
+            <motion.div className="absolute inset-x-0 top-0 h-full origin-top bg-gradient-to-b from-[color:var(--color-cyan)] via-[color:var(--color-track)] to-transparent" style={{ scaleY: fill }} />
+          </div>
         </div>
 
         <Scene n={1} title="Calibrate once." body="Follow a dot to a few spots on each screen. GazeHop learns where your head and eyes point for every display you have, in about ten seconds a screen.">
@@ -107,16 +110,32 @@ export function HowItWorks() {
 
 function Scene({ n, title, body, flip = false, children }: { n: number; title: string; body: string; flip?: boolean; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLParagraphElement>(null);
+  const [markerTop, setMarkerTop] = useState<number | null>(null);
   const reduce = useReducedMotion();
   const inView = useInView(ref, { margin: "-45% 0px -45% 0px" });
+
+  // Line the rail marker up with this step's "Step N of 3" label.
+  useEffect(() => {
+    const scene = ref.current, label = labelRef.current;
+    if (!scene || !label) return;
+    const measure = () => {
+      const s = scene.getBoundingClientRect(), l = label.getBoundingClientRect();
+      setMarkerTop(l.top - s.top + l.height / 2);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(scene);
+    return () => ro.disconnect();
+  }, []);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const drift = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [60, -60]);
   return (
     <div ref={ref} className="wrap relative z-10 grid min-h-[64vh] items-center gap-10 py-12 md:grid-cols-2 md:gap-20 lg:pl-20">
       {/* Marker on the rail */}
-      <span className={`absolute left-[10px] top-1/2 hidden size-[9px] -translate-y-1/2 rounded-full border transition-all duration-500 lg:block min-[1240px]:left-[11.5px] min-[1800px]:left-[15.5px] ${inView ? "border-[color:var(--color-cyan)] bg-[color:var(--color-cyan)] shadow-[0_0_0_5px_rgba(195,210,230,.12)]" : "border-white/25 bg-[color:var(--color-bg)]"}`} aria-hidden="true" />
+      <span style={markerTop == null ? undefined : { top: markerTop }} className={`absolute left-[16.5px] top-1/2 hidden size-[9px] -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-500 lg:block ${inView ? "border-[color:var(--color-cyan)] bg-[color:var(--color-cyan)] shadow-[0_0_0_5px_rgba(195,210,230,.12)]" : "border-white/25 bg-[color:var(--color-bg)]"}`} aria-hidden="true" />
       <div className={flip ? "md:order-2" : ""}>
-        <p className="mb-5 font-mono text-[13px] text-[color:var(--color-cyan)]">
+        <p ref={labelRef} className="mb-5 font-mono text-[13px] text-[color:var(--color-cyan)]">
           <DecryptedText text={`Step ${n} of 3`} animateOn="view" sequential speed={45} revealDirection="start" encryptedClassName="text-white/30" />
         </p>
         <WordsIn as="h3" text={title} className="t-h2" />
