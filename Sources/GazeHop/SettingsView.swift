@@ -242,8 +242,11 @@ private struct GeneralPane: View {
 
     var body: some View {
         Form {
-            Section { StatusHero(state: AppState.shared, settings: settings, actions: actions) }
-                .listRowInsets(EdgeInsets())
+            // The hero lives in a normal section so it lines up with every section below; its sky
+            // reaches past the row's 10 pt inset to fill the section box edge to edge.
+            Section {
+                StatusHero(state: AppState.shared, settings: settings, actions: actions)
+            }
 
             Section {
                 Toggle(isOn: $settings.waitForTypingPause) {
@@ -329,8 +332,13 @@ private struct StatusHero: View {
             }
         }
         .foregroundStyle(.white)
-        .padding(20)
-        .background(Dawn.hero)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 6)
+        .background {
+            Dawn.hero
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .padding(-10)
+        }
         .accessibilityElement(children: .combine)
     }
 }
