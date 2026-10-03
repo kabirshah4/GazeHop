@@ -101,7 +101,7 @@ export function MacDemo() {
 
           {/* GazeHop HUD */}
           <div className="glass-dark absolute left-[var(--hud-x)] top-0 z-20 flex -translate-x-1/2 items-center gap-[calc(var(--hu)*0.9)] rounded-full py-[calc(var(--hu)*0.7)] pl-[calc(var(--hu)*0.8)] pr-[calc(var(--hu)*1.4)] text-[calc(var(--hu)*1.15)] shadow-[0_12px_30px_-10px_rgba(0,0,0,.45)]">
-            <HopGlyph gaze={gaze} />
+            <HopGlyph />
             <span className="whitespace-nowrap font-medium tracking-[-0.01em]">
               Looking at <span className="text-white/65">{looking === "L" ? "Studio Display" : "Built-in Display"}</span>
             </span>
@@ -190,11 +190,11 @@ function Pointer({ side, q }: { side: "L" | "R"; q: number }) {
   );
 }
 
-/** GazeHop's mark: two screens and the hop between them. The screen being looked at fills in. */
-function HopGlyph({ gaze }: { gaze: number }) {
+/** GazeHop's small mark: the logo's monitor with the caret (the hop arc is left off at this size). */
+function HopGlyph() {
   return (
     <svg viewBox="0 0 28 18" className="h-[calc(var(--hu)*1.5)] w-auto" aria-hidden="true">
-      <HopPaths gaze={gaze} ink="#fff" />
+      <HopPaths ink="#fff" />
     </svg>
   );
 }
@@ -202,19 +202,17 @@ function HopGlyph({ gaze }: { gaze: number }) {
 function MenuHop() {
   return (
     <svg viewBox="0 0 28 18" className="h-[calc(var(--u)*1)] w-auto" aria-hidden="true">
-      <HopPaths gaze={1} ink="#1d1d1f" />
+      <HopPaths ink="#1d1d1f" />
     </svg>
   );
 }
 
-function HopPaths({ gaze, ink }: { gaze: number; ink: string }) {
+function HopPaths({ ink }: { ink: string }) {
   return (
     <>
-      <rect x="1.8" y="7.6" width="9.6" height="6.6" rx="1.5" fill={ink} fillOpacity={1 - gaze} stroke={ink} strokeWidth="1.6" />
-      <rect x="16.6" y="7.6" width="9.6" height="6.6" rx="1.5" fill={ink} fillOpacity={gaze} stroke={ink} strokeWidth="1.6" />
-      <path d="M6 15h1.6v1.6H6zM20.8 15h1.6v1.6h-1.6z" fill={ink} />
-      <rect x="4.6" y="16.4" width="4.2" height="1.4" rx=".7" fill={ink} /><rect x="19.4" y="16.4" width="4.2" height="1.4" rx=".7" fill={ink} />
-      <path d="M6.4 5.6C10.6 -0.6 16.6 -0.8 21.6 4.8M18.5 3.9L21.6 4.8L21.7 1.6" fill="none" stroke={ink} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="5.2" y="1.6" width="17.6" height="11.2" rx="2.2" fill="none" stroke={ink} strokeWidth="1.6" />
+      <rect x="13.2" y="4.2" width="1.6" height="6" rx=".8" fill={ink} />
+      <path d="M13 12.8h2l.6 2.2h-3.2z" fill={ink} /><rect x="10.2" y="14.9" width="7.6" height="1.5" rx=".75" fill={ink} />
     </>
   );
 }

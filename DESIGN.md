@@ -315,7 +315,7 @@ Springs with zero bounce throughout: 0.35s for UI state (sidebar selection, pane
 - **Don't** use emerald or teal greens; green appears only as status green and switch green, for status.
 - **Don't** show fabricated testimonials, ratings, user counts, press logos or metrics.
 - **Don't** use the Apple logo or imply Apple affiliation.
-- **Don't** draw an eye anywhere (logo, menu bar, HUD, illustrations): it reads as being watched. The mark is two screens and the hop between them.
+- **Don't** draw an eye anywhere (logo, menu bar, HUD, illustrations): it reads as being watched. The mark is one monitor with a caret, and the hop arriving on it.
 - **Don't** put uppercase eyebrow labels above headings.
 - **Don't** use gradient text; gradients belong to backgrounds, cards, badges and wallpapers.
 - **Don't** use the hero-metric template (big number, small label, repeated).

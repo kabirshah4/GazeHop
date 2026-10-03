@@ -35,8 +35,8 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
      to the GazeHop message. Confirm with your password.
 4. Allow **Camera** when asked, then turn on GazeHop in **System Settings › Privacy & Security ›
    Accessibility**.
-5. Follow the calibration dots on each screen. Done: the GazeHop icon in the menu bar (two
-   screens with an arc) means it's on.
+5. Follow the calibration dots on each screen. Done: the GazeHop icon in the menu bar (a small
+   monitor) means it's on.
 
 ## Known limitations
 
@@ -75,7 +75,7 @@ On first launch:
 2. Enable GazeHop in **System Settings › Privacy & Security › Accessibility**.
 3. Follow the calibration dots on each screen.
 
-GazeHop shows up in the menu bar (next to the battery and clock) as two small screens with an arc. You can add
+GazeHop shows up in the menu bar (next to the battery and clock) as a small monitor icon. You can add
 the name next to it in **Settings › General**.
 
 > **Why the signing script?** macOS ties Camera and Accessibility permission to an app's code

@@ -1,6 +1,6 @@
-// Generates the GazeHop logo SVGs, in the website's style (light macOS, dawn sky, focus hopping between screens):
+// Generates the GazeHop logo SVGs, in the website's style (light macOS, dawn sky, focus hopping onto a screen):
 //   brand/logo-mark.svg  full-colour app icon: continuous-corner tile filled with the hero's dawn
-//                        sky; a dim screen, a lit screen with the blue caret, and the hop between them
+//                        sky; one monitor with the blue caret, and the hop arriving on it from the left
 //   brand/logo-tight.svg same tile cropped to its edges (favicons: no macOS icon margin)
 //   brand/logo-square.svg full-bleed square (apple-touch-icon: iOS rounds the corners itself)
 //   brand/logo-mono.svg  single-colour version for small/one-ink uses
@@ -25,11 +25,9 @@ function squircle(cx, cy, size, n = 5, steps = 256) {
 
 const TILE = squircle(512, 512, 824);
 const q = (t, a, c, b) => (1 - t) ** 2 * a + 2 * (1 - t) * t * c + t * t * b;
-// The hop: leaves above the dim screen, arcs over, lands on the lit one
-const P = [[300, 470], [500, 84], [709, 462]];
-const pt = (t) => [q(t, P[0][0], P[1][0], P[2][0]), q(t, P[0][1], P[1][1], P[2][1])];
-/** Tapered swoosh as a filled outline: thin where it leaves, full where it lands, round tip. */
-function swoosh(w0, w1) {
+/** Tapered swoosh along a quadratic, as a filled outline: thin where it leaves, full where it lands. */
+function swoosh(P, w0, w1) {
+  const pt = (t) => [q(t, P[0][0], P[1][0], P[2][0]), q(t, P[0][1], P[1][1], P[2][1])];
   const N = 80, L = [], R = [];
   for (let i = 0; i <= N; i++) {
     const t = i / N, [x, y] = pt(t), [x2, y2] = pt(Math.min(1, t + 0.001)), [x1, y1] = pt(Math.max(0, t - 0.001));
@@ -38,9 +36,11 @@ function swoosh(w0, w1) {
   }
   return `M${L.join("L")}A${w1} ${w1} 0 0 0 ${R[0]}L${R.join("L")}Z`;
 }
-const HOP = swoosh(4, 28);
-const monitor = (x, op) => `<rect x="${x}" y="500" width="330" height="214" rx="32" fill="#fff"${op}/>
-    <path d="M${x + 146} 714h38l8 44h-54z" fill="#fff"${op}/><rect x="${x + 112}" y="756" width="106" height="16" rx="8" fill="#fff"${op}/>`;
+// One monitor (screen top-left at 300,420), the caret where focus lands, and the hop arriving from the left
+const HOP_PATH = [[190, 520], [250, 180], [470, 380]];
+const SCREEN = `<rect x="300" y="420" width="460" height="296" rx="41" />`;
+const STAND = `<path d="M502.4 716h55.2l11.5 59.2h-78.2z"/><rect x="451.6" y="772.2" width="156.4" height="20.7" rx="10.4"/>`;
+const CARET = `<rect x="509.2" y="503" width="41.6" height="130" rx="20.8"/>`;
 
 const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
   <defs>
@@ -54,8 +54,8 @@ const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org
     <linearGradient id="sheen" x1="0" y1="100" x2="0" y2="560" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="hop" x1="300" y1="0" x2="709" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".55" stop-color="#fff"/>
+    <linearGradient id="hop" x1="190" y1="0" x2="490" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".6" stop-color="#fff"/>
     </linearGradient>
     <filter id="lift" x="-30%" y="-30%" width="160%" height="170%">
       <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#0B1E5C" flood-opacity=".30"/>
@@ -66,21 +66,17 @@ const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org
   <path d="${tile}" fill="url(#sun)"/>
   <path d="${tile}" fill="url(#sheen)"/>
 
-  <g filter="url(#lift)">
-    ${monitor(150, ' fill-opacity=".36"')}
-    ${monitor(544, "")}
-  </g>
-  <rect x="692" y="552" width="34" height="110" rx="17" fill="#0071E3"/>
-  <path d="${HOP}" fill="url(#hop)"/>
+  <g filter="url(#lift)" fill="#fff">${SCREEN}${STAND}</g>
+  <g fill="#0071E3">${CARET}</g>
+  <path d="${swoosh(HOP_PATH, 4, 30)}" fill="url(#hop)"/>
 </svg>
 `;
 
-// One ink: dim screen as an outline, lit screen solid, the hop above (same as the menu bar icon)
-const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="120 60 784 744" aria-hidden="true">
-  <rect x="166" y="516" width="298" height="182" rx="24" fill="none" stroke="#1d1d1f" stroke-width="32"/>
-  <rect x="544" y="500" width="330" height="214" rx="32" fill="#1d1d1f"/>
-  <path d="M296 714h38l8 44h-54zM690 714h38l8 44h-54z" fill="#1d1d1f"/><rect x="262" y="756" width="106" height="16" rx="8" fill="#1d1d1f"/><rect x="656" y="756" width="106" height="16" rx="8" fill="#1d1d1f"/>
-  <path d="${swoosh(10, 30)}" fill="#1d1d1f"/>
+// One ink: the monitor solid with the caret cut out, and the hop (same as the menu bar icon)
+const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="150 150 724 724" aria-hidden="true">
+  <defs><mask id="gazehop-caret" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+    <rect width="1024" height="1024" fill="#fff"/><g fill="#000">${CARET}</g></mask></defs>
+  <g fill="#1d1d1f"><g mask="url(#gazehop-caret)">${SCREEN}</g>${STAND}<path d="${swoosh(HOP_PATH, 5, 32)}"/></g>
 </svg>
 `;
 

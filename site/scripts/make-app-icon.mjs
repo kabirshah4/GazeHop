@@ -18,7 +18,7 @@ execFileSync("iconutil", ["-c", "icns", iconset, "-o", "../Resources/AppIcon.icn
 await sharp(svg, { density: 384 }).resize(512).png().toFile("../docs/logo.png");
 await sharp(svg, { density: 384 }).resize(512).png().toFile("public/icon.png");
 // Favicons carry a version in the name: browsers cache favicons hard, so a new design needs a new URL.
-const V = "v5";
+const V = "v6";
 const tight = "brand/logo-tight.svg";
 const png32 = await sharp(tight, { density: 384 }).resize(32).png().toBuffer();
 const png48 = await sharp(tight, { density: 384 }).resize(48).png().toBuffer();
