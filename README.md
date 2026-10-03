@@ -21,12 +21,45 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
 - **Switching:** the Accessibility API brings back the last window you used on that display
   (or the frontmost window there, so no setup clicks are needed), raises it, and (optionally) moves the pointer there so scrolling works too.
 
-## Requirements
+## Install (no coding needed)
+
+1. Download **GazeHop-x.y.zip** from the [latest release](https://github.com/kabirshah4/GazeHop/releases/latest)
+   and double-click it to unzip.
+2. Drag **GazeHop.app** into your **Applications** folder.
+3. Open it. macOS will say it *can't verify* the app, because GazeHop isn't notarized by
+   Apple (that needs a paid developer account). To open it anyway:
+   - Click **Done** (not *Move to Trash*).
+   - Open **System Settings › Privacy & Security**, scroll down, and click **Open Anyway** next
+     to the GazeHop message. Confirm with your password.
+4. Allow **Camera** when asked, then turn on GazeHop in **System Settings › Privacy & Security ›
+   Accessibility**.
+5. Follow the calibration dots on each screen. Done: the eye icon in the menu bar means it's
+   watching.
+
+## Known limitations
+
+- **Early version.** Tested on one Mac (Apple Silicon, macOS 27) with two side-by-side displays
+  and a built-in webcam. 3+ screens, external webcams, and Intel Macs should work but haven't
+  been tested much.
+- **Screen layout matters.** Screens at clearly different angles from you work best. Two screens
+  almost directly in line are hard to tell apart.
+- **Recalibrate when things move**: your chair, the camera, or the screens.
+- **Lighting and glasses.** Dim rooms, strong backlight, or reflective glasses make eye tracking
+  noisier; head direction still works.
+- **Not notarized**, so macOS shows a warning the first time (see Install).
+- **Full-screen games** lose focus if you glance at another screen; press **⌘F1** to pause.
+
+Found a problem? [Open an issue](https://github.com/kabirshah4/GazeHop/issues) with your Mac,
+macOS version, number of screens, and webcam.
+
+## Build from source
+
+### Requirements
 
 - macOS 14 or later, two or more displays (any number; Sidecar iPads count too), a webcam
 - Xcode command-line tools (Swift 5.9+) to build
 
-## Build and run
+### Build and run
 
 ```sh
 ./scripts/make-signing-cert.sh   # once: lets macOS remember permissions across rebuilds
