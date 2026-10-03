@@ -125,12 +125,14 @@ swift test
 
 ## Icons
 
-The app icon and menu bar icon are drawn in code. To regenerate the app icon after editing
-`scripts/make-icon.swift`:
+The logo lives in `site/brand/logo-mark.svg`. To regenerate the app icon, README logo and
+website favicons from it:
 
 ```sh
-swift scripts/make-icon.swift   # writes Resources/AppIcon.icns and docs/icon.png
+cd site && npm install && node scripts/make-app-icon.mjs
 ```
+
+The menu bar icon is drawn in code (`Sources/GazeHop/MenuBarIcon.swift`).
 
 ## Debugging
 

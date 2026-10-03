@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A2235"/>
+      <stop offset="1" stop-color="#0B0F19"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".18"/>
+      <stop offset=".5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="iris" cx=".42" cy=".38" r=".7">
+      <stop offset="0" stop-color="#5EEAD4"/>
+      <stop offset=".55" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#047857"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="28"/>
+    </filter>
+  </defs>
+  <!-- tile on the macOS icon grid -->
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#tile)"/>
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#rim)"/>
+  <rect x="101.5" y="101.5" width="821" height="821" rx="184.5" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="3"/>
+  <!-- eye -->
+  <path d="M232 512 C 340 330, 684 330, 792 512 C 684 694, 340 694, 232 512 Z" fill="none" stroke="#F5F7FA" stroke-width="44" stroke-linejoin="round"/>
+  <!-- iris, glancing right -->
+  <circle cx="560" cy="512" r="118" fill="#10B981" opacity=".55" filter="url(#glow)"/>
+  <circle cx="560" cy="512" r="112" fill="url(#iris)"/>
+  <!-- pupil is a text caret -->
+  <rect x="545" y="438" width="30" height="148" rx="10" fill="#0B0F19"/>
+  <rect x="517" y="438" width="86" height="24" rx="10" fill="#0B0F19"/>
+  <rect x="517" y="562" width="86" height="24" rx="10" fill="#0B0F19"/>
+  <circle cx="500" cy="466" r="15" fill="#ffffff" opacity=".85"/>
+</svg>

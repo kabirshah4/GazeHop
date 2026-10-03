@@ -1,41 +1,47 @@
 @import "tailwindcss";
-@import "@fontsource/martian-mono/400.css";
-@import "@fontsource/martian-mono/600.css";
-@import "@fontsource-variable/hanken-grotesk";
+@import "@fontsource-variable/inter";
 
-/* GazeHop tokens. Cobalt and caret yellow come from the app icon; LED green is used only
-   for the camera indicator. */
+/* GazeHop, dark edition. Green and cyan are reserved for tracking state: if something glows,
+   it means "watching", "calibrated" or "on-device". */
 @theme {
-  --color-paper: #F3F4F8;      /* cool display white, page background */
-  --color-card: #FFFFFF;
-  --color-ink: #12142B;        /* text, dark stages */
-  --color-ink-2: #1C1F3D;
-  --color-muted: #5B6075;
-  --color-hairline: #DADDE8;
-  --color-cobalt: #3343E8;     /* focus ring, links, primary action */
-  --color-cobalt-deep: #2420B8;
-  --color-caret: #FFD43B;      /* the caret: where your typing goes */
-  --color-led: #2BD46A;        /* camera indicator only */
+  --color-bg: #0B0F19;          /* rich dark blue-gray page */
+  --color-bg-2: #0E1422;        /* raised sections */
+  --color-panel: #111827;       /* cards */
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-2: rgba(255, 255, 255, 0.14);
+  --color-fg: #F5F7FA;
+  --color-fg-2: #A3ACBD;        /* secondary text */
+  --color-fg-3: #6B7486;        /* captions */
+  --color-track: #10B981;       /* active tracking */
+  --color-cyan: #06B6D4;        /* calibrated / focus */
 
-  --font-display: "Martian Mono", ui-monospace, Menlo, monospace;
-  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter Variable", system-ui, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
 
-  --ease-hop: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  @keyframes shimmer-slide { to { transform: translate(calc(100cqw - 100%), 0); } }
+  @keyframes spin-around {
+    0% { transform: translateZ(0) rotate(0); }
+    15%, 35% { transform: translateZ(0) rotate(90deg); }
+    65%, 85% { transform: translateZ(0) rotate(270deg); }
+    100% { transform: translateZ(0) rotate(360deg); }
+  }
 }
 
 @layer base {
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; color-scheme: dark; }
   body {
-    background: var(--color-paper);
-    color: var(--color-ink);
+    background: var(--color-bg);
+    color: var(--color-fg);
     font-family: var(--font-sans);
-    font-size: 17px;
-    line-height: 1.55;
+    font-size: clamp(16px, 0.35vw + 14.8px, 18px);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  ::selection { background: var(--color-caret); color: var(--color-ink); }
-  :focus-visible { outline: 2px solid var(--color-cobalt); outline-offset: 3px; border-radius: 6px; }
+  ::selection { background: rgba(16, 185, 129, 0.35); color: #fff; }
+  :focus-visible { outline: 2px solid var(--color-cyan); outline-offset: 3px; border-radius: 8px; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
@@ -43,17 +49,29 @@
 }
 
 @layer components {
-  .display { font-family: var(--font-display); letter-spacing: -0.04em; line-height: 1.08; }
-  .eyebrow { font-family: var(--font-display); font-size: 12px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--color-muted); }
-  .wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: 20px; }
+  .wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: 20px; }
   @media (min-width: 768px) { .wrap { padding-inline: 32px; } }
+  @media (min-width: 1800px) { .wrap { max-width: 1440px; } }
 
-  /* The blinking text caret, GazeHop's signature mark */
-  .caret { display: inline-block; width: 0.55ch; height: 1.05em; margin-left: 0.06em; vertical-align: -0.14em;
-           background: var(--color-caret); border-radius: 2px; animation: blink 1.05s steps(1) infinite; }
+  /* Fluid type scale: phone to 5K monitor */
+  .t-hero { font-size: clamp(42px, 7.2vw + 6px, 132px); line-height: 0.98; letter-spacing: -0.045em; font-weight: 700; }
+  .t-h2 { font-size: clamp(30px, 3.4vw + 12px, 64px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 680; }
+  .t-h3 { font-size: clamp(20px, 0.6vw + 16px, 24px); line-height: 1.25; letter-spacing: -0.015em; font-weight: 620; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-fg-3); }
+
+  /* Pulsing "active tracking" dot */
+  .pulse-dot { position: relative; display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: var(--color-track); }
+  .pulse-dot::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; background: var(--color-track); opacity: .45; animation: pulse 2s ease-out infinite; }
+  @keyframes pulse { from { transform: scale(.6); opacity: .55; } to { transform: scale(2.2); opacity: 0; } }
+
+  .caret { display: inline-block; width: 0.08em; min-width: 3px; height: 0.95em; margin-left: 0.04em; vertical-align: -0.1em; background: var(--color-track); border-radius: 2px; animation: blink 1.05s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
-  .keycap { font-family: var(--font-display); font-size: 0.8em; display: inline-flex; align-items: center; gap: 0.2em;
-            padding: 0.15em 0.5em; border: 1px solid var(--color-hairline); border-bottom-width: 3px; border-radius: 7px;
-            background: var(--color-card); color: var(--color-ink); white-space: nowrap; }
+  .kbd { font-family: var(--font-mono); font-size: .82em; display: inline-flex; align-items: center; padding: .12em .5em; border: 1px solid var(--color-line-2); border-bottom-width: 2px; border-radius: 7px; background: rgba(255,255,255,.04); white-space: nowrap; }
+
+  /* Spotlight card: a soft light follows the pointer (set --mx/--my from JS) */
+  .spot { position: relative; isolation: isolate; }
+  .spot::before { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(6, 182, 212, .10), transparent 60%); }
+  .spot:hover::before { opacity: 1; }
 }

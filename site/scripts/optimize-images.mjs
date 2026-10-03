@@ -7,10 +7,7 @@ mkdirSync("public/img", { recursive: true });
 
 // name, source, crop as fractions of the source {top, height} (full width kept)
 const shots = [
-  ["webcam", "raw/webcam-a.png", { top: 0, height: 1 }],
-  ["three-screens", "raw/three-b.png", { top: 0.1, height: 0.9 }],
   ["controller", "raw/gaming-b.png", { top: 0.42, height: 0.58 }],
-  ["keyboard", "raw/desk-c.png", { top: 0.3, height: 0.7 }],
 ];
 
 for (const [name, src, crop] of shots) {
@@ -23,20 +20,18 @@ for (const [name, src, crop] of shots) {
   console.log(`${name}: ${region.width}x${region.height}`);
 }
 
-// Social preview: keyboard shot, darkened, with icon and the headline.
+// Social preview: new dark brand, logo mark, headline.
 const W = 1200, H = 630;
-const bg = await sharp("raw/desk-c.png").extract({ left: 0, top: 380, width: 2048, height: 1075 > 1152 - 380 ? 1152 - 380 : 1075 })
-  .resize(W, H, { fit: "cover" }).modulate({ brightness: 0.55 }).toBuffer();
-const icon = await sharp("public/icon.png").resize(150).toBuffer();
-const text = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-  <style>.h{font:700 66px Menlo, monospace; fill:#fff} .s{font:500 30px Helvetica, Arial, sans-serif; fill:#C9CDF5}</style>
-  <text x="80" y="330" class="h">Look at a screen.</text>
-  <text x="80" y="410" class="h">Your keyboard <tspan fill="#FFD43B">follows.</tspan></text>
-  <text x="80" y="500" class="s">GazeHop · free, open-source macOS menu bar app</text>
+const bg = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <defs><radialGradient id="g" cx="50%" cy="0%" r="90%"><stop offset="0" stop-color="#143229"/><stop offset=".55" stop-color="#0B0F19"/></radialGradient></defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <style>.h{font:700 70px "SF Pro Display", Helvetica, Arial, sans-serif; fill:#F5F7FA; letter-spacing:-2.5px} .s{font:500 28px "SF Pro Text", Helvetica, Arial, sans-serif; fill:#A3ACBD}</style>
+  <text x="80" y="345" class="h">Look at a screen, and</text>
+  <text x="80" y="428" class="h">your keyboard follows.</text>
+  <circle cx="90" cy="512" r="7" fill="#10B981"/>
+  <text x="110" y="522" class="s">GazeHop · free and open source for macOS</text>
 </svg>`);
-await sharp(bg).composite([{ input: icon, left: 64, top: 60 }, { input: text, left: 0, top: 0 }]).jpeg({ quality: 82, mozjpeg: true }).toFile("public/og.jpg");
+const mark = await sharp("brand/logo-mark.svg", { density: 300 }).resize(180).png().toBuffer();
+await sharp(bg).composite([{ input: mark, left: 58, top: 60 }]).jpeg({ quality: 86, mozjpeg: true }).toFile("public/og.jpg");
 
-// Favicons
-await sharp("public/icon.png").resize(32).png().toFile("public/favicon-32.png");
-await sharp("public/icon.png").resize(180).png().toFile("public/apple-touch-icon.png");
-console.log("og.jpg + favicons written");
+console.log("og.jpg written");

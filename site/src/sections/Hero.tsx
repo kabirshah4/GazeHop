@@ -1,224 +1,162 @@
-import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { Eye } from "../components/Eye";
-import { DownloadButton } from "../components/Chrome";
-import { REPO } from "../lib/links";
-import { useHeadGaze, type GazeStatus, type Side } from "../lib/useHeadGaze";
+import { AnimatedGridPattern } from "../components/magicui/animated-grid-pattern";
+import { BorderBeam } from "../components/magicui/border-beam";
+import { DownloadButton, GitHubButton } from "../components/Chrome";
+import { BASE } from "../lib/links";
 
-const LINE_1 = "Look at a screen.";
-const LINE_2 = "Your keyboard follows.";
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   const reduce = useReducedMotion();
-  const [live, setLive] = useState(false);
-
-  // Scripted demo state
-  const [typed1, setTyped1] = useState(reduce ? LINE_1 : "");
-  const [typed2, setTyped2] = useState(reduce ? LINE_2 : "");
-  const [focus, setFocus] = useState<Side>(reduce ? "second" : "first");
-  const [look, setLook] = useState<Side>(reduce ? "second" : "first");
-  const [dwell, setDwell] = useState(0);
-
-  useEffect(() => {
-    if (reduce || live) return;
-    let cancelled = false;
-    const run = async () => {
-      const type = async (line: string, set: (s: string) => void) => {
-        for (let i = 1; i <= line.length && !cancelled; i++) { set(line.slice(0, i)); await sleep(48 + Math.random() * 40); }
-      };
-      const hop = async (to: Side) => {
-        setLook(to);
-        for (let t = 0; t <= 10 && !cancelled; t++) { setDwell(t / 10); await sleep(40); }
-        if (cancelled) return;
-        setFocus(to);
-        setDwell(0);
-      };
-      await sleep(500);
-      if (typed1 !== LINE_1) await type(LINE_1, setTyped1);
-      await sleep(650);
-      await hop("second");
-      await sleep(250);
-      if (typed2 !== LINE_2) await type(LINE_2, setTyped2);
-      // Idle: keep glancing back and forth so the hop stays visible.
-      while (!cancelled) {
-        await sleep(2600);
-        if (cancelled) break;
-        await hop("first");
-        await sleep(2600);
-        if (cancelled) break;
-        await hop("second");
-      }
-    };
-    run();
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce, live]);
-
-  // Live camera mode
-  const gaze = useHeadGaze(live);
-  const area1 = useRef<HTMLTextAreaElement>(null);
-  const area2 = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => {
-    if (!live || gaze.status !== "tracking") return;
-    (gaze.side === "first" ? area1 : area2).current?.focus({ preventScroll: true });
-  }, [live, gaze.side, gaze.status]);
-
-  const activeFocus: Side = live ? gaze.side : focus;
-  const activeLook = live ? (gaze.lean > 0.4 ? -1 : gaze.lean < -0.4 ? 1 : 0) : look === "first" ? -1 : 1;
+  const rise = (delay: number) => ({
+    initial: reduce ? false : { opacity: 0, y: 18, filter: "blur(6px)" },
+    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+    transition: { duration: 0.9, delay, ease },
+  });
 
   return (
-    <section className="relative overflow-hidden pb-20 pt-10 md:pb-28 md:pt-14" aria-labelledby="hero-title">
-      <h1 id="hero-title" className="sr-only">GazeHop: look at a screen, and your keyboard follows. A free macOS menu bar app.</h1>
+    <section className="relative overflow-hidden pb-10 pt-12 md:pt-16" aria-labelledby="hero-title">
+      <AnimatedGridPattern
+        numSquares={18} maxOpacity={0.07} duration={4} width={56} height={56}
+        className="fill-[color:var(--color-track)]/30 stroke-white/[.05] [mask-image:radial-gradient(70%_60%_at_50%_30%,#000_30%,transparent_80%)]"
+      />
+      <div className="pointer-events-none absolute left-1/2 top-[-20%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(16,185,129,.16),transparent)]" aria-hidden="true" />
 
-      <div className="wrap">
-        <p className="eyebrow mb-8 flex items-center justify-center gap-2 md:mb-10">
-          <span>Free for macOS</span><span aria-hidden="true">/</span><span>Open source</span>
-        </p>
+      <div className="wrap relative z-10 flex flex-col items-center text-center">
+        <motion.p {...rise(0)} className="inline-flex items-center gap-2.5 rounded-full border border-[color:var(--color-line-2)] bg-white/[.03] px-3.5 py-1.5 text-[13px] text-[color:var(--color-fg-2)]">
+          <span className="pulse-dot" /> Active tracking
+          <span className="h-3 w-px bg-white/15" aria-hidden="true" />
+          Free and open source for macOS
+        </motion.p>
 
-        {/* The stage: two screens with the camera and eye between them */}
-        <div className="relative mx-auto max-w-[1080px]">
-          <div className="pointer-events-none absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-[62%] max-md:hidden">
-            <Webcam on={live && gaze.status !== "off"} />
-          </div>
+        {/* The 3D eye lands here and follows your pointer */}
+        <div data-eye="pointer" className="my-8 size-[clamp(120px,13vw,230px)] md:my-10" aria-hidden="true" />
 
-          <div className="grid items-stretch gap-5 md:grid-cols-[1fr_auto_1fr] md:gap-4">
-            <Screen title="Notes" focused={activeFocus === "first"}>
-              {live ? (
-                <textarea ref={area1} aria-label="First screen" placeholder="Look here and type." className="h-full min-h-[7.5rem] w-full resize-none bg-transparent outline-none placeholder:text-[color:var(--color-muted)]/60" />
-              ) : (
-                <Line text={typed1} showCaret={activeFocus === "first"} />
-              )}
-            </Screen>
+        <motion.h1 {...rise(0.1)} id="hero-title" className="t-hero max-w-[14ch] text-balance">
+          Look at a screen, and your keyboard follows<span className="caret" aria-hidden="true" />
+        </motion.h1>
 
-            <div className="flex items-center justify-center md:w-24">
-              <Eye look={activeLook as -1 | 0 | 1} dwell={live ? 0 : dwell} />
+        <motion.p {...rise(0.2)} className="mt-7 max-w-[60ch] text-[clamp(17px,0.6vw+14px,21px)] leading-relaxed text-[color:var(--color-fg-2)]">
+          GazeHop is a tiny menu bar app for Macs with two or more screens. Your webcam sees which screen
+          you're looking at, and keyboard focus moves to the last window you used there.
+        </motion.p>
+
+        <motion.div {...rise(0.3)} className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
+          <DownloadButton />
+          <GitHubButton />
+        </motion.div>
+        <motion.p {...rise(0.35)} className="mt-4 text-[13px] text-[color:var(--color-fg-3)]">
+          macOS 14 or later · Any Mac with a camera · MIT license
+        </motion.p>
+      </div>
+
+      <motion.div {...rise(0.45)} className="wrap relative z-10 mt-16 md:mt-20">
+        <DemoVideo />
+      </motion.div>
+    </section>
+  );
+}
+
+function DemoVideo() {
+  return (
+    <figure className="mx-auto max-w-[1100px]">
+      <div className="relative overflow-hidden rounded-[18px] border border-[color:var(--color-line-2)] bg-[color:var(--color-panel)] shadow-[0_40px_120px_-40px_rgba(16,185,129,.35),0_30px_80px_-30px_rgba(0,0,0,.8)]">
+        <div className="flex items-center gap-2 border-b border-[color:var(--color-line)] px-4 py-3">
+          <span className="size-3 rounded-full bg-[#FF5F57]" /><span className="size-3 rounded-full bg-[#FEBC2E]" /><span className="size-3 rounded-full bg-[#28C840]" />
+          <span className="ml-3 text-[12px] text-[color:var(--color-fg-3)]">GazeHop in 15 seconds</span>
+        </div>
+        <video
+          className="block aspect-video w-full bg-black"
+          src={`${BASE}demo.mp4`}
+          poster={`${BASE}demo-poster.jpg`}
+          autoPlay muted loop playsInline preload="metadata"
+          aria-label="Animation: typing on the left screen, looking at the right screen, and the typing continuing there without a click"
+        />
+        <BorderBeam size={140} duration={9} colorFrom="#10B981" colorTo="#06B6D4" borderWidth={1.5} />
+      </div>
+      <figcaption className="mt-3 text-center text-[13px] text-[color:var(--color-fg-3)]">
+        Animated walkthrough of the switching flow. No clicks between screens.
+      </figcaption>
+    </figure>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Zero-knowledge privacy banner, styled like a certificate            */
+/* ------------------------------------------------------------------ */
+
+export function PrivacyCertificate() {
+  const rows: [string, string][] = [
+    ["Processing", "Apple Vision framework, on your Mac"],
+    ["Camera frames", "Read in memory, discarded instantly"],
+    ["Storage", "None. Calibration is a few numbers per screen"],
+    ["Network", "None. The app contains no networking code"],
+  ];
+  return (
+    <section id="privacy" className="scroll-mt-20 py-16 md:py-24" aria-labelledby="privacy-title">
+      <div className="wrap relative z-10">
+        <div className="relative mx-auto max-w-[1100px] rounded-[22px] border border-[color:var(--color-track)]/35 bg-[color:var(--color-bg-2)] p-2">
+          <div className="relative overflow-hidden rounded-[16px] border border-dashed border-white/12 px-6 py-10 md:px-12 md:py-12">
+            <Guilloche />
+            <div className="relative grid items-center gap-10 md:grid-cols-[auto_1fr] md:gap-14">
+              <Seal />
+              <div>
+                <p className="eyebrow mb-3 !text-[color:var(--color-track)]">Zero-knowledge privacy</p>
+                <h2 id="privacy-title" className="t-h2">100% on-device. No network code.</h2>
+                <p className="mt-4 max-w-[62ch] text-[color:var(--color-fg-2)]">
+                  GazeHop processes camera frames purely in memory using Apple's local Vision framework and
+                  discards them instantly. Nothing is recorded, stored or uploaded, and there are no accounts or analytics.
+                </p>
+                <dl className="mt-8 grid gap-x-10 gap-y-4 border-t border-white/10 pt-6 sm:grid-cols-2">
+                  {rows.map(([k, v]) => (
+                    <div key={k}>
+                      <dt className="eyebrow mb-1">{k}</dt>
+                      <dd className="text-[15px]">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-8 text-[14px] text-[color:var(--color-fg-3)]">
+                  Verified by: you. <a className="font-semibold text-[color:var(--color-track)] hover:underline" href="https://github.com/kabirshah4/GazeHop/tree/main/Sources/GazeHop">Read every line of the source →</a>
+                </p>
+              </div>
             </div>
-
-            <Screen title="Messages" focused={activeFocus === "second"}>
-              {live ? (
-                <textarea ref={area2} aria-label="Second screen" placeholder="Now look here and keep typing." className="h-full min-h-[7.5rem] w-full resize-none bg-transparent outline-none placeholder:text-[color:var(--color-muted)]/60" />
-              ) : (
-                <Line text={typed2} showCaret={activeFocus === "second"} accent />
-              )}
-            </Screen>
           </div>
         </div>
-
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-12 max-w-[640px] text-center md:mt-14"
-        >
-          <p className="text-[19px] leading-relaxed text-[color:var(--color-ink)]/80 md:text-[21px]">
-            GazeHop is a menu bar app for Macs with more than one screen. Your webcam sees which screen
-            you're looking at, and keyboard focus moves there. No clicking first, nothing sent anywhere.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <DownloadButton />
-            <a href={REPO} className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-[color:var(--color-hairline)] bg-[color:var(--color-card)] px-5 py-3 font-semibold hover:border-[color:var(--color-ink)]/30">
-              View source on GitHub
-            </a>
-          </div>
-          <p className="mt-4 text-[14px] text-[color:var(--color-muted)]">Free, MIT license. macOS 14 or later, any Mac with a camera.</p>
-
-          <div className="mt-8 hidden md:block">
-            {!live ? (
-              <button onClick={() => setLive(true)} className="group inline-flex items-center gap-2 text-[15px] font-semibold text-[color:var(--color-cobalt)]">
-                <span className="size-2 rounded-full bg-[color:var(--color-led)] shadow-[0_0_0_3px_rgba(43,212,106,.2)]" />
-                Try it here with your camera
-                <span className="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-              </button>
-            ) : (
-              <LiveStatus status={gaze.status} lean={gaze.lean} onStop={() => setLive(false)} />
-            )}
-            {!live && <p className="mt-1.5 text-[13px] text-[color:var(--color-muted)]">Runs in this tab. Your video never leaves your browser.</p>}
-          </div>
-        </motion.div>
       </div>
     </section>
   );
 }
 
-function Screen({ title, focused, children }: { title: string; focused: boolean; children: React.ReactNode }) {
+function Seal() {
+  const text = "ON-DEVICE · OPEN SOURCE · NO NETWORK CODE · ";
   return (
-    <div className="relative">
-      <div
-        className={`relative flex aspect-[16/10] flex-col overflow-hidden rounded-[14px] border bg-[color:var(--color-card)] transition-[box-shadow,border-color] duration-300 ease-[var(--ease-hop)] ${
-          focused
-            ? "border-[color:var(--color-cobalt)] shadow-[0_0_0_3px_rgba(51,67,232,.18),0_24px_60px_-28px_rgba(36,32,184,.55)]"
-            : "border-[color:var(--color-hairline)] shadow-[0_18px_40px_-30px_rgba(18,20,43,.35)]"
-        }`}
-      >
-        <div className="flex items-center gap-2 border-b border-[color:var(--color-hairline)] px-3.5 py-2.5">
-          {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => (
-            <span key={c} className="size-2.5 rounded-full transition-colors" style={{ background: focused ? c : "var(--color-hairline)" }} />
-          ))}
-          <span className={`ml-2 text-[12px] font-medium transition-colors ${focused ? "text-[color:var(--color-ink)]" : "text-[color:var(--color-muted)]/70"}`}>{title}</span>
-          <span className={`ml-auto font-[family-name:var(--font-display)] text-[10px] uppercase tracking-wide transition-opacity ${focused ? "text-[color:var(--color-cobalt)] opacity-100" : "opacity-0"}`}>
-            Focused
-          </span>
-        </div>
-        <div className="flex flex-1 items-center px-5 py-4 md:px-7">{children}</div>
+    <div className="relative mx-auto size-40 shrink-0 md:size-48" aria-hidden="true">
+      <svg viewBox="0 0 200 200" className="absolute inset-0 animate-[spin_40s_linear_infinite] motion-reduce:animate-none">
+        <defs><path id="seal-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" /></defs>
+        <text fill="#10B981" fontSize="12.5" letterSpacing="3" fontFamily="SF Mono, ui-monospace, monospace">
+          <textPath href="#seal-circle">{text.repeat(2)}</textPath>
+        </text>
+      </svg>
+      <div className="absolute inset-[22%] grid place-items-center rounded-full border border-[color:var(--color-track)]/50 bg-[radial-gradient(circle_at_35%_30%,rgba(16,185,129,.25),rgba(11,15,25,.9))] shadow-[0_0_40px_rgba(16,185,129,.25)]">
+        <svg viewBox="0 0 24 24" className="size-10 text-[color:var(--color-track)]" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />
+          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+          <circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none" />
+        </svg>
       </div>
-      {/* Monitor stand */}
-      <div className="mx-auto h-4 w-16 bg-gradient-to-b from-[color:var(--color-hairline)] to-transparent max-md:hidden" aria-hidden="true" />
     </div>
   );
 }
 
-function Line({ text, showCaret, accent = false }: { text: string; showCaret: boolean; accent?: boolean }) {
+/** Fine engraved line pattern, like the background of a certificate */
+function Guilloche() {
+  const paths = Array.from({ length: 18 }, (_, i) => {
+    const a = 18 + i * 4;
+    return `M0 ${60 + i * 2} C 200 ${60 - a}, 400 ${60 + a}, 600 ${60 + i * 2} S 1000 ${60 - a}, 1200 ${60 + i * 2}`;
+  });
   return (
-    <p className="display text-[clamp(26px,3.4vw,46px)] font-semibold text-[color:var(--color-ink)]" aria-hidden="true">
-      {accent && text.includes("follows") ? (
-        <>
-          {text.replace("follows.", "")}
-          <span className="text-[color:var(--color-cobalt)]">{text.slice(text.indexOf("follows"))}</span>
-        </>
-      ) : (
-        text
-      )}
-      {showCaret && <span className="caret" />}
-    </p>
-  );
-}
-
-function Webcam({ on }: { on: boolean }) {
-  return (
-    <div className="flex items-center gap-2 rounded-[10px] bg-[color:var(--color-ink)] px-3 py-1.5 shadow-lg">
-      <span className="size-3 rounded-full bg-[radial-gradient(circle_at_35%_35%,#4b55a8,#0b0c1d_60%)] ring-1 ring-white/15" />
-      <span className={`size-1.5 rounded-full transition-colors ${on ? "bg-[color:var(--color-led)] shadow-[0_0_8px_var(--color-led)]" : "bg-white/20"}`} />
-    </div>
-  );
-}
-
-const STATUS_TEXT: Record<GazeStatus, string> = {
-  off: "",
-  loading: "Loading the face model (about 4 MB)",
-  calibrating: "Look straight ahead for a moment",
-  tracking: "Turn your head toward a screen, then type",
-  "no-face": "Can't see a face. Check your lighting and that you're in frame.",
-  denied: "Camera access is blocked. Allow it in your browser's site settings, then try again.",
-  error: "The demo couldn't start in this browser. Try a recent Chrome, Edge or Safari.",
-};
-
-function LiveStatus({ status, lean, onStop }: { status: GazeStatus; lean: number; onStop: () => void }) {
-  return (
-    <div className="inline-flex flex-col items-center gap-3">
-      <div className="flex items-center gap-3 text-[15px]">
-        <span className={`size-2 rounded-full ${status === "tracking" ? "bg-[color:var(--color-led)] shadow-[0_0_8px_var(--color-led)]" : "bg-[color:var(--color-caret)]"}`} />
-        <span>{STATUS_TEXT[status]}</span>
-        <button onClick={onStop} className="rounded-md border border-[color:var(--color-hairline)] px-2.5 py-1 text-[13px] font-semibold hover:border-[color:var(--color-ink)]/30">
-          Turn camera off
-        </button>
-      </div>
-      {status === "tracking" && (
-        <div className="relative h-1.5 w-48 rounded-full bg-[color:var(--color-hairline)]" aria-hidden="true">
-          <div className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--color-cobalt)] transition-[left] duration-100"
-               style={{ left: `${50 - lean * 45}%` }} />
-        </div>
-      )}
-    </div>
+    <svg className="pointer-events-none absolute inset-x-0 top-0 h-40 w-full opacity-[.07]" viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true">
+      {paths.map((d, i) => <path key={i} d={d} fill="none" stroke="#10B981" strokeWidth="1" />)}
+    </svg>
   );
 }
