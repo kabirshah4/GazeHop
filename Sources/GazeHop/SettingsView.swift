@@ -63,6 +63,11 @@ struct Badge: View {
     }
 }
 
+/// Opens System Settings › Displays (arrange screens, resolution, which display is main).
+private func openDisplaysSettings() {
+    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Displays-Settings.extension")!)
+}
+
 // MARK: - Root
 
 struct SettingsView: View {
@@ -209,8 +214,14 @@ private struct TrackingPane: View {
 
     var body: some View {
         Form {
-            Section("Live") {
+            Section {
                 LiveGazeView(state: state, excluded: settings.excludedDisplays)
+            } header: {
+                HStack {
+                    Text("Live")
+                    Spacer()
+                    Button("Open Displays Settings…", action: openDisplaysSettings).font(.callout)
+                }
             }
 
             Section {
@@ -315,8 +326,12 @@ private struct ScreensPane: View {
                 ScreenMap(highlight: state.looking, excluded: settings.excludedDisplays, calibrated: state.calibrated, height: 160) { id in
                     toggle(id)
                 }
-                Text("Click a screen to turn switching to it on or off. The highlight shows where you're looking.")
-                    .font(.caption).foregroundStyle(.secondary)
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Click a screen to turn switching to it on or off. The highlight shows where you're looking.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Open Displays Settings…", action: openDisplaysSettings)
+                }
             }
 
             Section("Switch focus to") {
