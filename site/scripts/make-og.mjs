@@ -1,24 +1,5 @@
-// Crops and compresses the Higgsfield source images in raw/ into public/img/*.webp,
-// and builds the 1200x630 social preview (public/og.png). Run: npm run images
+// Builds the 1200x630 social preview (public/og.jpg). Run: npm run og
 import sharp from "sharp";
-import { mkdirSync } from "node:fs";
-
-mkdirSync("public/img", { recursive: true });
-
-// name, source, crop as fractions of the source {top, height} (full width kept)
-const shots = [
-  ["controller", "raw/gaming-b.png", { top: 0.42, height: 0.58 }],
-];
-
-for (const [name, src, crop] of shots) {
-  const img = sharp(src);
-  const { width, height } = await img.metadata();
-  const region = { left: 0, top: Math.round(height * crop.top), width, height: Math.round(height * crop.height) };
-  for (const w of [800, 1600]) {
-    await sharp(src).extract(region).resize({ width: w }).webp({ quality: 74 }).toFile(`public/img/${name}-${w}.webp`);
-  }
-  console.log(`${name}: ${region.width}x${region.height}`);
-}
 
 // Social preview: new dark brand, logo mark, headline.
 const W = 1200, H = 630;

@@ -2,11 +2,13 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "../styles.css";
 import { Footer, Nav } from "./Chrome";
+import { SmoothScroll } from "./SmoothScroll";
 
 /** Shared layout for the plain text pages (privacy, terms). */
 export function renderDoc(eyebrow: string, title: string, updated: string, body: React.ReactNode) {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
+      <SmoothScroll />
       <Nav />
       <main className="wrap max-w-[780px] py-16 md:py-24">
         <p className="eyebrow mb-4">{eyebrow}</p>

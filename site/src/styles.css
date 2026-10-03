@@ -31,6 +31,7 @@
 
 @layer base {
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; color-scheme: dark; }
+  html.has-lenis { scroll-behavior: auto; }
   body {
     background: var(--color-bg);
     color: var(--color-fg);

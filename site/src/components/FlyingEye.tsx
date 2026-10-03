@@ -149,6 +149,7 @@ export function FlyingEye() {
     let first = true;
     let saccade = { x: 0, y: 0, until: 0 };
     let raf = 0;
+    let wasVisible = true;
     let last = performance.now();
 
     const tick = (now: number) => {
@@ -213,7 +214,9 @@ export function FlyingEye() {
       lids.scale.y = Math.max(0.04, open);
       catchlight.visible = open > 0.5;
 
-      renderer.render(scene, camera);
+      // Skip GPU work while the eye is off-screen (render one last frame to clear it)
+      if (root.visible || wasVisible) renderer.render(scene, camera);
+      wasVisible = root.visible;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

@@ -4,7 +4,7 @@ import { BorderBeam } from "../components/magicui/border-beam";
 import { NumberTicker } from "../components/magicui/number-ticker";
 import { DownloadButton, GitHubButton, LogoMark } from "../components/Chrome";
 import { eyeBus } from "../components/FlyingEye";
-import { DOWNLOAD, ISSUES, SOURCE, img } from "../lib/links";
+import { DOWNLOAD, ISSUES, SOURCE } from "../lib/links";
 import { useHeadGaze, type GazeStatus } from "../lib/useHeadGaze";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -199,7 +199,6 @@ export function Quarter() {
 /* ------------------------------------------------------------------ */
 
 export function Features() {
-  const pad = img("controller");
   return (
     <section className="py-24 md:py-32" aria-labelledby="features-title">
       <div className="wrap relative z-10">
@@ -217,8 +216,9 @@ export function Features() {
           <Card className="md:col-span-2" title="Pause from anywhere" body="Gaming on one screen, video on the other? Press the shortcut and glances stop moving focus.">
             <div className="flex h-full items-center justify-center gap-2 text-[26px]"><span className="kbd">⌘</span><span className="kbd">F1</span></div>
           </Card>
-          <Card className="md:col-span-4" title="Leave some screens out" body="Turn off any display you only watch, like a TV or a stream on a side monitor. GazeHop never moves your keyboard there."
-                media={<img {...pad} sizes="(min-width: 768px) 60vw, 100vw" loading="lazy" decoding="async" alt="A game controller on a dark desk lit orange and teal by two monitors" className="aspect-[21/9] w-full object-cover opacity-90" />} />
+          <Card className="md:col-span-4" title="Leave some screens out" body="Turn off any display you only watch, like a TV or a stream on a side monitor. GazeHop never moves your keyboard there.">
+            <ExcludeArt />
+          </Card>
           <Card className="md:col-span-3" title="Tune how it feels" body="Look time, strictness, smoothing and the pause shortcut live in Settings, and apply the moment you change them.">
             <SlidersArt />
           </Card>
@@ -265,6 +265,28 @@ function MultiScreenArt() {
         <div key={i} className="flex flex-col items-center" style={{ transform: `perspective(600px) rotateY(${(1 - i) * 18}deg)` }}>
           <div className={`h-20 w-32 rounded-[8px] border transition-all duration-300 md:h-24 md:w-40 ${on === i ? "border-[color:var(--color-track)] bg-[color:var(--color-track)]/10 shadow-[0_0_30px_rgba(16,185,129,.35)]" : "border-white/15 bg-white/[.03]"}`} />
           <div className="h-3 w-1.5 bg-white/15" /><div className="h-1 w-10 rounded bg-white/15" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ExcludeArt() {
+  const screens: [string, string, boolean][] = [["Studio Display", "Editor", true], ["DELL U2723", "Browser", true], ["Living room TV", "Stream", false]];
+  return (
+    <div className="grid h-full grid-cols-3 items-end gap-4" aria-hidden="true">
+      {screens.map(([name, app, on]) => (
+        <div key={name} className="flex flex-col items-center gap-3">
+          <div className={`relative grid aspect-[16/10] w-full place-items-center rounded-[8px] border text-[11px] ${on ? "border-white/15 bg-white/[.04] text-[color:var(--color-fg-2)]" : "border-dashed border-white/15 text-[color:var(--color-fg-3)]"}`}>
+            {app}
+            {!on && <span className="absolute inset-0 rounded-[8px] bg-[repeating-linear-gradient(135deg,transparent_0_8px,rgba(255,255,255,.03)_8px_16px)]" />}
+          </div>
+          <div className="flex w-full items-center justify-between gap-2 text-[12px]">
+            <span className="truncate text-[color:var(--color-fg-2)]">{name}</span>
+            <span className={`relative h-[18px] w-8 shrink-0 rounded-full transition-colors ${on ? "bg-[color:var(--color-track)]" : "bg-white/15"}`}>
+              <span className={`absolute top-0.5 size-[14px] rounded-full bg-white shadow transition-[left] ${on ? "left-[16px]" : "left-0.5"}`} />
+            </span>
+          </div>
         </div>
       ))}
     </div>
