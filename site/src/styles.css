@@ -12,8 +12,8 @@
   --color-fg: #F5F7FA;
   --color-fg-2: #A3ACBD;        /* secondary text */
   --color-fg-3: #6B7486;        /* captions */
-  --color-track: #10B981;       /* active tracking */
-  --color-cyan: #06B6D4;        /* calibrated / focus */
+  --color-track: #8FA8C8;       /* active tracking */
+  --color-cyan: #C3D2E6;        /* calibrated / focus */
 
   --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter Variable", system-ui, sans-serif;
   --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
@@ -41,7 +41,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  ::selection { background: rgba(16, 185, 129, 0.35); color: #fff; }
+  ::selection { background: rgba(143,168,200, 0.35); color: #fff; }
   :focus-visible { outline: 2px solid var(--color-cyan); outline-offset: 3px; border-radius: 8px; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -73,6 +73,6 @@
   /* Spotlight card: a soft light follows the pointer (set --mx/--my from JS) */
   .spot { position: relative; isolation: isolate; }
   .spot::before { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; opacity: 0; transition: opacity .3s;
-    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(6, 182, 212, .10), transparent 60%); }
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(195,210,230, .10), transparent 60%); }
   .spot:hover::before { opacity: 1; }
 }

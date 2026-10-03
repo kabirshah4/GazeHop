@@ -10,12 +10,12 @@ type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
   children: ReactNode;
 };
 
-export function ShimmerLink({ shimmerColor = "#6EE7B7", background = "linear-gradient(180deg,#14b885,#0d9668)", borderRadius = "12px", className, children, ...props }: Props) {
+export function ShimmerLink({ shimmerColor = "#FFFFFF", background = "linear-gradient(180deg,#F4F6F9 0%,#D3DAE4 100%)", borderRadius = "12px", className, children, ...props }: Props) {
   return (
     <a
       style={{ "--spread": "90deg", "--shimmer-color": shimmerColor, "--radius": borderRadius, "--speed": "3s", "--cut": "0.06em", "--bg": background } as CSSProperties}
       className={cn(
-        "group relative z-0 inline-flex cursor-pointer items-center justify-center gap-2.5 overflow-hidden [border-radius:var(--radius)] border border-white/15 px-6 py-3.5 font-semibold whitespace-nowrap text-white [background:var(--bg)]",
+        "group relative z-0 inline-flex cursor-pointer items-center justify-center gap-2.5 overflow-hidden [border-radius:var(--radius)] border border-white/40 px-6 py-3.5 font-semibold whitespace-nowrap text-[#0B0F19] shadow-[0_10px_30px_-12px_rgba(200,214,232,.45)] [background:var(--bg)]",
         "transform-gpu transition-transform duration-300 ease-in-out active:translate-y-px",
         className,
       )}

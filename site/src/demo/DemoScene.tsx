@@ -45,7 +45,7 @@ export function DemoScene({ t }: { t: number }) {
       {/* Webcam with tracking light */}
       <div className="absolute left-1/2 top-[176px] flex -translate-x-1/2 items-center gap-3 rounded-[14px] bg-[#05070c] px-5 py-2.5 shadow-xl ring-1 ring-white/10">
         <span className="size-5 rounded-full bg-[radial-gradient(circle_at_35%_35%,#3b4a7a,#05070c_60%)] ring-1 ring-white/15" />
-        <span className="size-2.5 rounded-full bg-[#10B981] shadow-[0_0_12px_#10B981]" />
+        <span className="size-2.5 rounded-full bg-[#8FA8C8] shadow-[0_0_12px_#8FA8C8]" />
       </div>
 
       <Screen r={L} focused={focus === "L"} menuBar>
@@ -72,14 +72,14 @@ export function DemoScene({ t }: { t: number }) {
         <svg viewBox="0 0 200 110" width="150" height="82">
           <path d="M10 55 C 55 -5, 145 -5, 190 55 C 145 115, 55 115, 10 55 Z" fill="#0B0F19" stroke="#F5F7FA" strokeWidth="9" strokeLinejoin="round" />
           <g transform={`translate(${gaze * 34} 0)`}>
-            <circle cx="100" cy="55" r="30" fill="#10B981" />
+            <circle cx="100" cy="55" r="30" fill="#8FA8C8" />
             <rect x="96" y="36" width="8" height="38" rx="3" fill="#0B0F19" />
             <rect x="89" y="36" width="22" height="7" rx="3" fill="#0B0F19" />
             <rect x="89" y="67" width="22" height="7" rx="3" fill="#0B0F19" />
           </g>
         </svg>
         <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10">
-          <div className="h-full origin-left rounded-full bg-[#10B981]" style={{ transform: `scaleX(${dwell})` }} />
+          <div className="h-full origin-left rounded-full bg-[#8FA8C8]" style={{ transform: `scaleX(${dwell})` }} />
         </div>
       </div>
 
@@ -103,7 +103,7 @@ export function DemoScene({ t }: { t: number }) {
           <img src="/logo-mark.svg" width={200} height={200} alt="" />
           <p className="mt-6 text-[84px] font-bold tracking-[-0.045em] text-white">Look at a screen,</p>
           <p className="-mt-3 text-[84px] font-bold tracking-[-0.045em] text-white">and your keyboard follows.</p>
-          <p className="mt-8 flex items-center gap-3 text-[30px] text-[#A3ACBD]"><span className="size-3 rounded-full bg-[#10B981]" /> GazeHop · free and open source for macOS</p>
+          <p className="mt-8 flex items-center gap-3 text-[30px] text-[#A3ACBD]"><span className="size-3 rounded-full bg-[#8FA8C8]" /> GazeHop · free and open source for macOS</p>
         </div>
       )}
     </div>
@@ -129,7 +129,7 @@ function Screen({ r, focused, menuBar = false, children }: { r: { x: number; y: 
       </div>
       <div className="absolute h-[70px] w-[90px] bg-gradient-to-b from-[#1a1f2b] to-[#0d1018]" style={{ left: r.x + r.w / 2 - 45, top: r.y + r.h + 14 }} />
       <div className="absolute h-[14px] w-[260px] rounded-[7px] bg-[#1a1f2b]" style={{ left: r.x + r.w / 2 - 130, top: r.y + r.h + 82 }} />
-      {focused && <div className="pointer-events-none absolute rounded-[24px] ring-4 ring-[#10B981]/70 shadow-[0_0_80px_rgba(16,185,129,.35)]" style={{ left: r.x - 16, top: r.y - 16, width: r.w + 32, height: r.h + 32 }} />}
+      {focused && <div className="pointer-events-none absolute rounded-[24px] ring-4 ring-[#8FA8C8]/70 shadow-[0_0_80px_rgba(143,168,200,.35)]" style={{ left: r.x - 16, top: r.y - 16, width: r.w + 32, height: r.h + 32 }} />}
     </>
   );
 }
@@ -140,7 +140,7 @@ function Window({ title, focused, children }: { title: string; focused: boolean;
       <div className="flex items-center gap-2.5 border-b border-white/10 px-5 py-3.5">
         {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} className="size-3.5 rounded-full" style={{ background: focused ? c : "rgba(255,255,255,.18)" }} />)}
         <span className="ml-3 text-[22px] font-medium text-white/75">{title}</span>
-        {focused && <span className="ml-auto rounded-md bg-[#10B981]/15 px-3 py-1 font-mono text-[16px] uppercase tracking-wider text-[#10B981]">Focused</span>}
+        {focused && <span className="ml-auto rounded-md bg-[#8FA8C8]/15 px-3 py-1 font-mono text-[16px] uppercase tracking-wider text-[#8FA8C8]">Focused</span>}
       </div>
       <div className="flex-1 p-7">{children}</div>
     </div>
@@ -149,10 +149,10 @@ function Window({ title, focused, children }: { title: string; focused: boolean;
 
 function Bubble({ children, me = false }: { children: React.ReactNode; me?: boolean }) {
   return (
-    <p className={`w-fit max-w-[80%] rounded-[22px] px-6 py-3.5 text-[32px] ${me ? "ml-auto rounded-br-md bg-[#10B981] text-white" : "rounded-bl-md bg-white/10 text-white/90"}`}>{children}</p>
+    <p className={`w-fit max-w-[80%] rounded-[22px] px-6 py-3.5 text-[32px] ${me ? "ml-auto rounded-br-md bg-[#8FA8C8] text-white" : "rounded-bl-md bg-white/10 text-white/90"}`}>{children}</p>
   );
 }
 
 function Caret({ t }: { t: number }) {
-  return <span className="ml-0.5 inline-block h-[1em] w-[3px] translate-y-[3px] rounded bg-[#10B981]" style={{ opacity: Math.floor(t / 530) % 2 ? 0 : 1 }} />;
+  return <span className="ml-0.5 inline-block h-[1em] w-[3px] translate-y-[3px] rounded bg-[#8FA8C8]" style={{ opacity: Math.floor(t / 530) % 2 ? 0 : 1 }} />;
 }

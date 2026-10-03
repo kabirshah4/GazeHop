@@ -1,5 +1,8 @@
 import { motion, useReducedMotion } from "motion/react";
 import { AnimatedGridPattern } from "../components/magicui/animated-grid-pattern";
+import DecryptedText from "../components/reactbits/DecryptedText";
+import LightRays from "../components/reactbits/LightRays";
+import ShinyText from "../components/reactbits/ShinyText";
 import { BorderBeam } from "../components/magicui/border-beam";
 import { DownloadButton, GitHubButton } from "../components/Chrome";
 import { BASE } from "../lib/links";
@@ -20,11 +23,15 @@ export function Hero() {
         numSquares={18} maxOpacity={0.07} duration={4} width={56} height={56}
         className="fill-[color:var(--color-track)]/30 stroke-white/[.05] [mask-image:radial-gradient(70%_60%_at_50%_30%,#000_30%,transparent_80%)]"
       />
-      <div className="pointer-events-none absolute left-1/2 top-[-20%] h-[60vh] w-[80vw] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(16,185,129,.16),transparent)]" aria-hidden="true" />
+      {/* Soft silver light falling on the eye (React Bits LightRays) */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[110vh] opacity-80 [mask-image:linear-gradient(to_bottom,#000_55%,transparent)]" aria-hidden="true">
+        <LightRays raysOrigin="top-center" raysColor="#D4DEEB" raysSpeed={0.45} lightSpread={0.75} rayLength={1.25}
+                   fadeDistance={0.85} saturation={0.3} followMouse mouseInfluence={0.05} noiseAmount={0.04} />
+      </div>
 
       <div className="wrap relative z-10 flex flex-col items-center text-center">
         <motion.p {...rise(0)} className="inline-flex items-center gap-2.5 rounded-full border border-[color:var(--color-line-2)] bg-white/[.03] px-3.5 py-1.5 text-[13px] text-[color:var(--color-fg-2)]">
-          <span className="pulse-dot" /> Active tracking
+          <span className="pulse-dot" /> <ShinyText text="Active tracking" color="#A3ACBD" shineColor="#FFFFFF" speed={2.8} delay={1.2} />
           <span className="h-3 w-px bg-white/15" aria-hidden="true" />
           Free and open source for macOS
         </motion.p>
@@ -60,7 +67,7 @@ export function Hero() {
 function DemoVideo() {
   return (
     <figure className="mx-auto max-w-[1100px]">
-      <div className="relative overflow-hidden rounded-[18px] border border-[color:var(--color-line-2)] bg-[color:var(--color-panel)] shadow-[0_40px_120px_-40px_rgba(16,185,129,.35),0_30px_80px_-30px_rgba(0,0,0,.8)]">
+      <div className="relative overflow-hidden rounded-[18px] border border-[color:var(--color-line-2)] bg-[color:var(--color-panel)] shadow-[0_40px_120px_-40px_rgba(143,168,200,.35),0_30px_80px_-30px_rgba(0,0,0,.8)]">
         <div className="flex items-center gap-2 border-b border-[color:var(--color-line)] px-4 py-3">
           <span className="size-3 rounded-full bg-[#FF5F57]" /><span className="size-3 rounded-full bg-[#FEBC2E]" /><span className="size-3 rounded-full bg-[#28C840]" />
           <span className="ml-3 text-[12px] text-[color:var(--color-fg-3)]">GazeHop in 15 seconds</span>
@@ -72,7 +79,7 @@ function DemoVideo() {
           autoPlay muted loop playsInline preload="metadata"
           aria-label="Animation: typing on the left screen, looking at the right screen, and the typing continuing there without a click"
         />
-        <BorderBeam size={140} duration={9} colorFrom="#10B981" colorTo="#06B6D4" borderWidth={1.5} />
+        <BorderBeam size={140} duration={9} colorFrom="#8FA8C8" colorTo="#C3D2E6" borderWidth={1.5} />
       </div>
       <figcaption className="mt-3 text-center text-[13px] text-[color:var(--color-fg-3)]">
         Animated walkthrough of the switching flow. No clicks between screens.
@@ -101,7 +108,7 @@ export function PrivacyCertificate() {
             <div className="relative grid items-center gap-10 md:grid-cols-[auto_1fr] md:gap-14">
               <Seal />
               <div>
-                <p className="eyebrow mb-3 !text-[color:var(--color-track)]">Zero-knowledge privacy</p>
+                <p className="eyebrow mb-3"><ShinyText text="Zero-knowledge privacy" color="#8FA8C8" shineColor="#E6EDF7" speed={3} delay={1.5} /></p>
                 <h2 id="privacy-title" className="t-h2">100% on-device. No network code.</h2>
                 <p className="mt-4 max-w-[62ch] text-[color:var(--color-fg-2)]">
                   GazeHop processes camera frames purely in memory using Apple's local Vision framework and
@@ -111,7 +118,7 @@ export function PrivacyCertificate() {
                   {rows.map(([k, v]) => (
                     <div key={k}>
                       <dt className="eyebrow mb-1">{k}</dt>
-                      <dd className="text-[15px]">{v}</dd>
+                      <dd className="text-[15px]"><DecryptedText text={v} animateOn="view" sequential speed={18} encryptedClassName="text-white/25" /></dd>
                     </div>
                   ))}
                 </dl>
@@ -133,11 +140,11 @@ function Seal() {
     <div className="relative mx-auto size-40 shrink-0 md:size-48" aria-hidden="true">
       <svg viewBox="0 0 200 200" className="absolute inset-0 animate-[spin_40s_linear_infinite] motion-reduce:animate-none">
         <defs><path id="seal-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" /></defs>
-        <text fill="#10B981" fontSize="12.5" letterSpacing="3" fontFamily="SF Mono, ui-monospace, monospace">
+        <text fill="#8FA8C8" fontSize="12.5" letterSpacing="3" fontFamily="SF Mono, ui-monospace, monospace">
           <textPath href="#seal-circle">{text.repeat(2)}</textPath>
         </text>
       </svg>
-      <div className="absolute inset-[22%] grid place-items-center rounded-full border border-[color:var(--color-track)]/50 bg-[radial-gradient(circle_at_35%_30%,rgba(16,185,129,.25),rgba(11,15,25,.9))] shadow-[0_0_40px_rgba(16,185,129,.25)]">
+      <div className="absolute inset-[22%] grid place-items-center rounded-full border border-[color:var(--color-track)]/50 bg-[radial-gradient(circle_at_35%_30%,rgba(143,168,200,.25),rgba(11,15,25,.9))] shadow-[0_0_40px_rgba(143,168,200,.25)]">
         <svg viewBox="0 0 24 24" className="size-10 text-[color:var(--color-track)]" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
           <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />
           <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
@@ -156,7 +163,7 @@ function Guilloche() {
   });
   return (
     <svg className="pointer-events-none absolute inset-x-0 top-0 h-40 w-full opacity-[.07]" viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true">
-      {paths.map((d, i) => <path key={i} d={d} fill="none" stroke="#10B981" strokeWidth="1" />)}
+      {paths.map((d, i) => <path key={i} d={d} fill="none" stroke="#8FA8C8" strokeWidth="1" />)}
     </svg>
   );
 }

@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { BorderBeam } from "../components/magicui/border-beam";
 import { NumberTicker } from "../components/magicui/number-ticker";
+import DecryptedText from "../components/reactbits/DecryptedText";
+import LightRays from "../components/reactbits/LightRays";
+import ScrollReveal from "../components/reactbits/ScrollReveal";
+import ShinyText from "../components/reactbits/ShinyText";
+import SpotlightCard from "../components/reactbits/SpotlightCard";
 import { DownloadButton, GitHubButton, LogoMark } from "../components/Chrome";
 import { eyeBus } from "../components/FlyingEye";
 import { DOWNLOAD, ISSUES, SOURCE } from "../lib/links";
@@ -20,6 +25,36 @@ function Reveal({ children, className = "", delay = 0 }: { children: React.React
   );
 }
 
+/** Section label with a slow silver sheen (React Bits ShinyText). */
+export function Eyebrow({ children, className = "" }: { children: string; className?: string }) {
+  return (
+    <p className={`eyebrow mb-4 ${className}`}>
+      <ShinyText text={children} color="#6B7486" shineColor="#D7E0EC" speed={3.2} delay={1.4} />
+    </p>
+  );
+}
+
+/** Heading whose words rise out of a blur, one after another. */
+function WordsIn({ text, as: Tag = "h2", className = "", id }: { text: string; as?: "h2" | "h3"; className?: string; id?: string }) {
+  const reduce = useReducedMotion();
+  const words = text.split(" ");
+  return (
+    <Tag id={id} className={className} aria-label={text}>
+      {words.map((w, i) => (
+        <span key={i} className="inline-block overflow-hidden pb-[0.08em] align-bottom" aria-hidden="true">
+          <motion.span className="inline-block"
+            initial={reduce ? false : { y: "70%", opacity: 0, filter: "blur(10px)" }}
+            whileInView={{ y: "0%", opacity: 1, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.9, delay: i * 0.07, ease }}>
+            {w}{i < words.length - 1 ? "\u00a0" : ""}
+          </motion.span>
+        </span>
+      ))}
+    </Tag>
+  );
+}
+
 /** Shared clock so the mini screens hop in time with the 3D eye's "hop" glance. */
 function useHop(period = 1900) {
   const [side, setSide] = useState<0 | 1>(0);
@@ -31,46 +66,67 @@ function useHop(period = 1900) {
 }
 
 /* ------------------------------------------------------------------ */
-/* How it works: three full-height scenes the eye travels through      */
+/* How it works: three scenes on a progress rail the eye travels down  */
 /* ------------------------------------------------------------------ */
 
 export function HowItWorks() {
+  const railRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: railRef, offset: ["start 65%", "end 55%"] });
+  const fill = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
   return (
     <section id="how" className="scroll-mt-16" aria-labelledby="how-title">
       <div className="wrap relative z-10 pt-16 md:pt-24">
-        <Reveal>
-          <p className="eyebrow mb-4">How it works</p>
-          <h2 id="how-title" className="t-h2 max-w-[18ch]">Set it up once. Then forget it's there.</h2>
-        </Reveal>
+        <Eyebrow>How it works</Eyebrow>
+        <WordsIn id="how-title" text="Set it up once. Then forget it's there." className="t-h2 max-w-[18ch]" />
       </div>
 
-      <Scene n={1} title="Calibrate once." body="Follow a dot to a few spots on each screen. GazeHop learns where your head and eyes point for every display you have, in about ten seconds a screen.">
-        <CalibrationArt />
-      </Scene>
-
-      <Scene n={2} flip title="Look at a screen." body="Your webcam reads head direction and pupil position many times a second with Apple's Vision framework. Hold your look for a quarter of a second and GazeHop decides.">
-        <div className="relative">
-          <div data-eye="hop" className="mx-auto mb-6 size-[clamp(110px,11vw,170px)]" aria-hidden="true" />
-          <HopScreens />
+      <div ref={railRef} className="relative">
+        {/* Progress rail */}
+        <div className="pointer-events-none absolute inset-y-16 left-[max(14px,calc(50vw-604px))] hidden w-px bg-white/[.08] lg:block min-[1800px]:left-[calc(50vw-700px)]" aria-hidden="true">
+          <motion.div className="absolute inset-x-0 top-0 h-full origin-top bg-gradient-to-b from-[color:var(--color-cyan)] via-[color:var(--color-track)] to-transparent" style={{ scaleY: fill }} />
         </div>
-      </Scene>
 
-      <Scene n={3} title="Keep typing." body="The last window you used on that screen comes forward with keyboard focus, and the pointer follows so scrolling works too. No click needed.">
-        <TypingWindow />
-      </Scene>
+        <Scene n={1} title="Calibrate once." body="Follow a dot to a few spots on each screen. GazeHop learns where your head and eyes point for every display you have, in about ten seconds a screen.">
+          <CalibrationArt />
+        </Scene>
+
+        <Scene n={2} flip title="Look at a screen." body="Your webcam reads head direction and pupil position many times a second with Apple's Vision framework. Hold your look for a quarter of a second and GazeHop decides.">
+          <div className="relative">
+            <div data-eye="hop" className="mx-auto mb-6 size-[clamp(110px,11vw,170px)]" aria-hidden="true" />
+            <HopScreens />
+          </div>
+        </Scene>
+
+        <Scene n={3} title="Keep typing." body="The last window you used on that screen comes forward with keyboard focus, and the pointer follows so scrolling works too. No click needed.">
+          <TypingWindow />
+        </Scene>
+      </div>
     </section>
   );
 }
 
 function Scene({ n, title, body, flip = false, children }: { n: number; title: string; body: string; flip?: boolean; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const inView = useInView(ref, { margin: "-45% 0px -45% 0px" });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const drift = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [60, -60]);
   return (
-    <div className="wrap relative z-10 grid min-h-[60vh] items-center gap-10 py-12 md:grid-cols-2 md:gap-20">
-      <Reveal className={flip ? "md:order-2" : ""}>
-        <p className="mb-5 font-mono text-[13px] text-[color:var(--color-cyan)]">Step {n} of 3</p>
-        <h3 className="t-h2">{title}</h3>
-        <p className="mt-5 max-w-[46ch] text-[clamp(17px,0.5vw+14px,20px)] text-[color:var(--color-fg-2)]">{body}</p>
-      </Reveal>
-      <Reveal delay={0.1} className={flip ? "md:order-1" : ""}>{children}</Reveal>
+    <div ref={ref} className="wrap relative z-10 grid min-h-[64vh] items-center gap-10 py-12 md:grid-cols-2 md:gap-20">
+      {/* Marker on the rail */}
+      <span className={`absolute left-[10px] top-1/2 hidden size-[9px] -translate-y-1/2 rounded-full border transition-all duration-500 lg:block min-[1240px]:left-[11.5px] min-[1800px]:left-[15.5px] ${inView ? "border-[color:var(--color-cyan)] bg-[color:var(--color-cyan)] shadow-[0_0_0_5px_rgba(195,210,230,.12)]" : "border-white/25 bg-[color:var(--color-bg)]"}`} aria-hidden="true" />
+      <div className={flip ? "md:order-2" : ""}>
+        <p className="mb-5 font-mono text-[13px] text-[color:var(--color-cyan)]">
+          <DecryptedText text={`Step ${n} of 3`} animateOn="view" sequential speed={45} revealDirection="start" encryptedClassName="text-white/30" />
+        </p>
+        <WordsIn as="h3" text={title} className="t-h2" />
+        <ScrollReveal className="mt-5 max-w-[46ch] text-[clamp(17px,0.5vw+14px,20px)] text-[color:var(--color-fg-2)]" baseOpacity={0.15} blurStrength={3} wordAnimationEnd="center 55%">
+          {body}
+        </ScrollReveal>
+      </div>
+      <motion.div style={{ y: drift }} className={flip ? "md:order-1" : ""}>
+        <Reveal delay={0.1}>{children}</Reveal>
+      </motion.div>
     </div>
   );
 }
@@ -93,7 +149,7 @@ function CalibrationArt() {
             {pts.map(([x, y], k) => {
               const active = !reduce && i === s * 5 + k;
               return (
-                <span key={k} className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 ${active ? "size-4 bg-[color:var(--color-cyan)] shadow-[0_0_0_6px_rgba(6,182,212,.18),0_0_24px_rgba(6,182,212,.6)]" : "size-2 bg-white/20"}`}
+                <span key={k} className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 ${active ? "size-4 bg-[color:var(--color-cyan)] shadow-[0_0_0_6px_rgba(195,210,230,.18),0_0_24px_rgba(195,210,230,.6)]" : "size-2 bg-white/20"}`}
                       style={{ left: `${x}%`, top: `${y}%` }} />
               );
             })}
@@ -114,7 +170,7 @@ function HopScreens() {
       {[0, 1].map((s) => {
         const on = side === s;
         return (
-          <div key={s} className={`relative aspect-[16/10] rounded-[14px] border bg-[color:var(--color-panel)] p-4 transition-all duration-300 ${on ? "border-[color:var(--color-track)] shadow-[0_0_0_3px_rgba(16,185,129,.18),0_20px_60px_-20px_rgba(16,185,129,.45)]" : "border-[color:var(--color-line-2)] opacity-60"}`}>
+          <div key={s} className={`relative aspect-[16/10] rounded-[14px] border bg-[color:var(--color-panel)] p-4 transition-all duration-300 ${on ? "border-[color:var(--color-track)] shadow-[0_0_0_3px_rgba(143,168,200,.18),0_20px_60px_-20px_rgba(143,168,200,.45)]" : "border-[color:var(--color-line-2)] opacity-60"}`}>
             <div className="mb-3 flex gap-1.5">{["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} className="size-2 rounded-full" style={{ background: on ? c : "rgba(255,255,255,.15)" }} />)}</div>
             <div className="space-y-2">
               <div className="h-2 w-3/4 rounded bg-white/15" /><div className="h-2 w-1/2 rounded bg-white/10" />
@@ -146,7 +202,7 @@ function TypingWindow() {
     return () => { io.disconnect(); clearInterval(id); };
   }, [reduce]);
   return (
-    <div ref={ref} className="relative rounded-[16px] border border-[color:var(--color-track)] bg-[color:var(--color-panel)] shadow-[0_0_0_3px_rgba(16,185,129,.15),0_30px_80px_-30px_rgba(16,185,129,.5)]">
+    <div ref={ref} className="relative rounded-[16px] border border-[color:var(--color-track)] bg-[color:var(--color-panel)] shadow-[0_0_0_3px_rgba(143,168,200,.15),0_30px_80px_-30px_rgba(143,168,200,.5)]">
       <div className="flex items-center gap-2 border-b border-[color:var(--color-line)] px-4 py-3">
         {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} className="size-2.5 rounded-full" style={{ background: c }} />)}
         <span className="ml-2 text-[12px] text-[color:var(--color-fg-2)]">Messages</span>
@@ -170,9 +226,9 @@ export function Quarter() {
   const stats: [string, string][] = [["0.6 s", "between switches, so a quick glance back doesn't bounce focus"], ["1 face", "tracked at a time; people walking behind you are ignored"], ["0", "network connections. Ever."]];
   return (
     <section className="relative overflow-hidden border-y border-[color:var(--color-line)] bg-[color:var(--color-bg-2)] py-24 md:py-32" aria-labelledby="quarter-title">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_70%_at_50%_100%,rgba(6,182,212,.12),transparent)]" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_70%_at_50%_100%,rgba(195,210,230,.12),transparent)]" aria-hidden="true" />
       <div className="wrap relative z-10 text-center">
-        <p className="eyebrow mb-6">The only number you need</p>
+        <Eyebrow className="mb-6">The only number you need</Eyebrow>
         <h2 id="quarter-title" className="sr-only">250 milliseconds</h2>
         <p className="font-semibold leading-none tracking-[-0.06em] text-[clamp(110px,24vw,340px)]" aria-hidden="true">
           <NumberTicker value={250} className="!text-white !tracking-[-0.06em]" />
@@ -203,7 +259,7 @@ export function Features() {
     <section className="py-24 md:py-32" aria-labelledby="features-title">
       <div className="wrap relative z-10">
         <Reveal className="mb-14">
-          <p className="eyebrow mb-4">Built for real desks</p>
+          <Eyebrow>Built for real desks</Eyebrow>
           <h2 id="features-title" className="t-h2 max-w-[16ch]">Small app. Careful details.</h2>
         </Reveal>
         <div className="grid gap-4 md:grid-cols-6">
@@ -238,7 +294,7 @@ function Card({ title, body, children, media, className = "" }: { title: string;
     e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
   };
   return (
-    <Reveal className={className}>
+    <Reveal className={`min-w-0 ${className}`}>
       <article onPointerMove={onMove} className="spot flex h-full flex-col overflow-hidden rounded-[18px] border border-[color:var(--color-line)] bg-[color:var(--color-panel)]/70 transition-colors hover:border-[color:var(--color-line-2)]">
         {media}
         {children && <div className="min-h-44 flex-1 border-b border-[color:var(--color-line)] p-6">{children}</div>}
@@ -260,10 +316,10 @@ function MultiScreenArt() {
     return () => clearInterval(id);
   }, [reduce]);
   return (
-    <div className="flex h-full items-end justify-center gap-3 pt-2" aria-hidden="true">
+    <div className="flex h-full items-end justify-center gap-3 pt-2 [perspective:600px]" aria-hidden="true">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="flex flex-col items-center" style={{ transform: `perspective(600px) rotateY(${(1 - i) * 18}deg)` }}>
-          <div className={`h-20 w-32 rounded-[8px] border transition-all duration-300 md:h-24 md:w-40 ${on === i ? "border-[color:var(--color-track)] bg-[color:var(--color-track)]/10 shadow-[0_0_30px_rgba(16,185,129,.35)]" : "border-white/15 bg-white/[.03]"}`} />
+        <div key={i} className="flex min-w-0 max-w-40 flex-1 flex-col items-center" style={{ transform: `rotateY(${(1 - i) * 18}deg)` }}>
+          <div className={`aspect-[16/10] w-full rounded-[8px] border transition-all duration-300 ${on === i ? "border-[color:var(--color-track)] bg-[color:var(--color-track)]/10 shadow-[0_0_30px_rgba(143,168,200,.35)]" : "border-white/15 bg-white/[.03]"}`} />
           <div className="h-3 w-1.5 bg-white/15" /><div className="h-1 w-10 rounded bg-white/15" />
         </div>
       ))}
@@ -299,9 +355,9 @@ function FaceArt() {
       <g opacity=".35" stroke="#A3ACBD" strokeWidth="2" strokeDasharray="4 4" fill="none">
         <circle cx="34" cy="48" r="15" /><circle cx="168" cy="52" r="12" />
       </g>
-      <rect x="68" y="12" width="64" height="78" rx="14" fill="none" stroke="#10B981" strokeWidth="2.5" />
-      <circle cx="100" cy="48" r="21" fill="rgba(16,185,129,.12)" stroke="#F5F7FA" strokeWidth="2" />
-      <text x="100" y="104" textAnchor="middle" fontFamily="SF Mono, ui-monospace, monospace" fontSize="9" fill="#10B981" letterSpacing="1">TRACKING</text>
+      <rect x="68" y="12" width="64" height="78" rx="14" fill="none" stroke="#8FA8C8" strokeWidth="2.5" />
+      <circle cx="100" cy="48" r="21" fill="rgba(143,168,200,.12)" stroke="#F5F7FA" strokeWidth="2" />
+      <text x="100" y="104" textAnchor="middle" fontFamily="SF Mono, ui-monospace, monospace" fontSize="9" fill="#8FA8C8" letterSpacing="1">TRACKING</text>
     </svg>
   );
 }
@@ -377,7 +433,7 @@ export function TryIt() {
     <section className="hidden py-24 md:block md:py-32" aria-labelledby="try-title">
       <div className="wrap relative z-10">
         <Reveal className="mx-auto mb-12 max-w-[640px] text-center">
-          <p className="eyebrow mb-4">Try it without installing</p>
+          <Eyebrow>Try it without installing</Eyebrow>
           <h2 id="try-title" className="t-h2">Turn your head. Watch the cursor move.</h2>
           <p className="mt-5 text-[color:var(--color-fg-2)]">A browser version of the same idea. It runs in this tab, and your video never leaves your browser.</p>
         </Reveal>
@@ -385,7 +441,7 @@ export function TryIt() {
           {[a, b].map((r, i) => {
             const on = focused === (i === 0 ? "first" : "second");
             return (
-              <div key={i} className={`overflow-hidden rounded-[16px] border bg-[color:var(--color-panel)] transition-all duration-300 ${i === 1 ? "order-3" : ""} ${on ? "border-[color:var(--color-track)] shadow-[0_0_0_3px_rgba(16,185,129,.18)]" : "border-[color:var(--color-line-2)]"}`}>
+              <div key={i} className={`overflow-hidden rounded-[16px] border bg-[color:var(--color-panel)] transition-all duration-300 ${i === 1 ? "order-3" : ""} ${on ? "border-[color:var(--color-track)] shadow-[0_0_0_3px_rgba(143,168,200,.18)]" : "border-[color:var(--color-line-2)]"}`}>
                 <div className="flex items-center gap-2 border-b border-[color:var(--color-line)] px-4 py-2.5 text-[12px] text-[color:var(--color-fg-2)]">
                   {i === 0 ? "Left pane" : "Right pane"}
                   {on && <span className="ml-auto font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-track)]">Focused</span>}
@@ -424,19 +480,19 @@ const Badge = ({ bg, children }: { bg: string; children: React.ReactNode }) => (
 const I = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>;
 
 const STEPS: Step[] = [
-  { title: "Download", badge: <Badge bg="linear-gradient(#3b82f6,#1d4ed8)"><I d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" /></Badge>,
+  { title: "Download", badge: <Badge bg="linear-gradient(#5B7AA6,#34507A)"><I d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" /></Badge>,
     body: <>Download <b>GazeHop-x.y.zip</b> from the latest GitHub release and double-click it to unzip.</>,
     mock: <MockFile /> },
-  { title: "Move to Applications", badge: <Badge bg="linear-gradient(#60a5fa,#2563eb)"><I d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></Badge>,
+  { title: "Move to Applications", badge: <Badge bg="linear-gradient(#6F8DB8,#3E5C8A)"><I d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></Badge>,
     body: <>Drag <b>GazeHop.app</b> into your <b>Applications</b> folder.</>,
     mock: <MockFile apps /> },
   { title: "Open it once", badge: <Badge bg="linear-gradient(#9ca3af,#4b5563)"><I d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></Badge>,
     body: <>macOS says it can't verify the developer, because GazeHop isn't notarized. Click <b>Done</b>. This is expected for independent apps.</>,
     mock: <MockDialog /> },
-  { title: "Privacy & Security", badge: <Badge bg="linear-gradient(#3b82f6,#1e40af)"><I d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" /></Badge>,
+  { title: "Privacy & Security", badge: <Badge bg="linear-gradient(#5B7AA6,#2E4670)"><I d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" /></Badge>,
     body: <>Open <b>System Settings › Privacy &amp; Security</b>, scroll down, and click <b>Open Anyway</b> next to GazeHop. Confirm with your password.</>,
     mock: <MockOpenAnyway /> },
-  { title: "Camera & Accessibility", badge: <Badge bg="linear-gradient(#34d399,#059669)"><I d="M15 10l4.5-2.5v9L15 14M4 7h11v10H4z" /></Badge>,
+  { title: "Camera & Accessibility", badge: <Badge bg="linear-gradient(#7F97B5,#4A5F7A)"><I d="M15 10l4.5-2.5v9L15 14M4 7h11v10H4z" /></Badge>,
     body: <>Allow <b>Camera</b> when asked. Then turn on GazeHop in <b>Privacy &amp; Security › Accessibility</b> so it can bring windows forward.</>,
     mock: <MockToggles /> },
   { title: "Calibrate", badge: <span className="grid size-7 place-items-center"><LogoMark className="size-7" /></span>,
@@ -453,8 +509,8 @@ export function GatekeeperGuide() {
       <div className="wrap relative z-10">
         <Reveal className="mb-12 grid gap-6 md:grid-cols-[1.1fr_1fr] md:items-end">
           <div>
-            <p className="eyebrow mb-4">Install guide</p>
-            <h2 id="install-title" className="t-h2">Installing free and open-source software on macOS</h2>
+            <Eyebrow>Install guide</Eyebrow>
+            <WordsIn id="install-title" text="Installing free and open-source software on macOS" className="t-h2" />
           </div>
           <p className="text-[color:var(--color-fg-2)]">
             Independent apps on GitHub often aren't notarized, since Apple's developer program costs $99 a year.
@@ -469,12 +525,17 @@ export function GatekeeperGuide() {
               {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} className="size-3 rounded-full" style={{ background: c }} />)}
               <span className="mx-auto text-[13px] font-medium text-[color:var(--color-fg-2)]">Install GazeHop</span>
             </div>
+            <div className="h-[2px] bg-white/[.05]" aria-hidden="true">
+              <motion.div className="h-full origin-left bg-gradient-to-r from-[color:var(--color-track)] to-[color:var(--color-cyan)]"
+                          initial={false} animate={{ scaleX: (i + 1) / STEPS.length }} transition={{ duration: 0.6, ease }} />
+            </div>
             <div className="grid md:grid-cols-[280px_1fr]">
               <ol className="border-b border-[color:var(--color-line)] p-3 md:border-b-0 md:border-r" role="tablist" aria-label="Install steps">
                 {STEPS.map((s, k) => (
                   <li key={s.title}>
                     <button role="tab" aria-selected={i === k} onClick={() => setI(k)}
-                            className={`flex w-full items-center gap-3 rounded-[9px] px-2.5 py-2 text-left text-[14.5px] transition ${i === k ? "bg-[color:var(--color-cyan)]/15 text-white" : "text-[color:var(--color-fg-2)] hover:bg-white/[.04]"}`}>
+                            className={`relative flex w-full items-center gap-3 rounded-[9px] px-2.5 py-2 text-left text-[14.5px] transition-colors ${i === k ? "text-white" : "text-[color:var(--color-fg-2)] hover:bg-white/[.03]"}`}>
+                      {i === k && <motion.span layoutId="install-active" className="absolute inset-0 -z-10 rounded-[9px] bg-white/[.07] ring-1 ring-white/[.08]" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
                       {s.badge}
                       <span className="flex-1">{s.title}</span>
                       <span className="font-mono text-[11px] text-[color:var(--color-fg-3)]">{k + 1}</span>
@@ -482,20 +543,26 @@ export function GatekeeperGuide() {
                   </li>
                 ))}
               </ol>
-              <div className="grid gap-8 p-6 md:grid-cols-[1fr_1.1fr] md:p-10" role="tabpanel">
+              <AnimatePresence mode="wait" initial={false}>
+              <motion.div key={i} className="grid gap-8 p-6 md:grid-cols-[1fr_1.1fr] md:p-10" role="tabpanel"
+                          initial={{ opacity: 0, x: 18, filter: "blur(6px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                          exit={{ opacity: 0, x: -12, filter: "blur(6px)" }} transition={{ duration: 0.35, ease }}>
                 <div>
-                  <p className="font-mono text-[13px] text-[color:var(--color-cyan)]">Step {i + 1} of {STEPS.length}</p>
+                  <p className="font-mono text-[13px] text-[color:var(--color-cyan)]">
+                    <DecryptedText text={`Step ${i + 1} of ${STEPS.length}`} animateOn="view" sequential speed={35} encryptedClassName="text-white/30" />
+                  </p>
                   <h3 className="t-h3 mt-2 !text-[26px]">{STEPS[i].title}</h3>
                   <p className="mt-3 text-[color:var(--color-fg-2)] [&_b]:text-white">{STEPS[i].body}</p>
                   <div className="mt-6 flex gap-2">
                     <button disabled={i === 0} onClick={() => setI(i - 1)} className="rounded-[10px] border border-[color:var(--color-line-2)] px-4 py-2 text-[14px] font-semibold disabled:opacity-30">Back</button>
                     {i < STEPS.length - 1
                       ? <button onClick={() => setI(i + 1)} className="rounded-[10px] bg-white px-4 py-2 text-[14px] font-semibold text-[color:var(--color-bg)]">Next step</button>
-                      : <a href={DOWNLOAD} className="rounded-[10px] bg-[color:var(--color-track)] px-4 py-2 text-[14px] font-semibold text-white">Download GazeHop</a>}
+                      : <a href={DOWNLOAD} className="rounded-[10px] bg-white px-4 py-2 text-[14px] font-semibold text-[color:var(--color-bg)]">Download GazeHop</a>}
                   </div>
                 </div>
                 <div className="min-h-56 rounded-[14px] border border-[color:var(--color-line)] bg-black/30 p-5">{STEPS[i].mock}</div>
-              </div>
+              </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </Reveal>
@@ -524,7 +591,7 @@ function MockFile({ apps = false }: { apps?: boolean }) {
       {apps && <>
         <span className="text-2xl text-[color:var(--color-fg-3)]">→</span>
         <div className="flex flex-col items-center gap-2 text-[12px] text-[color:var(--color-fg-2)]">
-          <div className="grid size-16 place-items-center rounded-[14px] bg-gradient-to-b from-sky-400 to-blue-600"><I d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></div>Applications
+          <div className="grid size-16 place-items-center rounded-[14px] bg-gradient-to-b from-[#6F8DB8] to-[#34507A]"><I d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></div>Applications
         </div>
       </>}
     </div>
@@ -562,7 +629,7 @@ function MockOpenAnyway() {
 function MockToggles() {
   return (
     <div className="space-y-2 text-[13px]" aria-hidden="true">
-      {[["Camera", "linear-gradient(#34d399,#059669)"], ["Accessibility", "linear-gradient(#3b82f6,#1d4ed8)"]].map(([l, bg]) => (
+      {[["Camera", "linear-gradient(#7F97B5,#4A5F7A)"], ["Accessibility", "linear-gradient(#5B7AA6,#34507A)"]].map(([l, bg]) => (
         <div key={l} className="flex items-center gap-3 rounded-[10px] border border-white/10 bg-[#1f2330] p-3">
           <span className="size-6 rounded-[6px]" style={{ background: bg }} />
           <span className="flex-1">{l}</span>
@@ -590,31 +657,54 @@ const FAQ: [string, React.ReactNode][] = [
 
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
+  const reduce = useReducedMotion();
+  const t = (d: number) => (reduce ? { duration: 0 } : { duration: d, ease });
   return (
     <section id="faq" className="scroll-mt-16 py-24 md:py-32" aria-labelledby="faq-title">
       <div className="wrap relative z-10 grid gap-12 md:grid-cols-[1fr_1.6fr]">
-        <Reveal>
-          <p className="eyebrow mb-4">Questions</p>
-          <h2 id="faq-title" className="t-h2">Before you install.</h2>
-        </Reveal>
-        <div className="divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
+        <div className="md:sticky md:top-28 md:self-start">
+          <Eyebrow>Questions</Eyebrow>
+          <WordsIn id="faq-title" text="Before you install." className="t-h2" />
+          <ScrollReveal className="mt-5 max-w-[34ch] text-[color:var(--color-fg-2)]" baseOpacity={0.2} blurStrength={2} wordAnimationEnd="center 60%">
+            Straight answers about the camera, permissions and the macOS warning.
+          </ScrollReveal>
+          <a href={ISSUES} className="mt-7 inline-flex items-center gap-2 text-[14px] font-semibold text-[color:var(--color-cyan)] hover:underline">Ask something else on GitHub <span aria-hidden="true">→</span></a>
+        </div>
+
+        <motion.ul className="space-y-3" initial={reduce ? false : "hidden"} whileInView="show" viewport={{ once: true, margin: "-60px" }}
+                   variants={{ show: { transition: { staggerChildren: 0.07 } } }}>
           {FAQ.map(([q, a], k) => {
             const isOpen = open === k;
             return (
-              <div key={q}>
-                <h3>
-                  <button className="flex w-full items-center justify-between gap-6 py-5 text-left text-[18px] font-semibold" aria-expanded={isOpen} aria-controls={`faq-${k}`} onClick={() => setOpen(isOpen ? null : k)}>
-                    {q}
-                    <span className="grid size-7 shrink-0 place-items-center rounded-lg border border-[color:var(--color-line-2)] text-[color:var(--color-fg-2)]" aria-hidden="true">
-                      <span className={`block transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`}>+</span>
-                    </span>
-                  </button>
-                </h3>
-                <div id={`faq-${k}`} hidden={!isOpen} className="pb-6 pr-12 text-[color:var(--color-fg-2)]">{a}</div>
-              </div>
+              <motion.li key={q} variants={{ hidden: { opacity: 0, y: 18, filter: "blur(6px)" }, show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease } } }}>
+                <SpotlightCard className="rounded-[16px]! border-white/[.08]! bg-white/[.02]! p-0! transition-colors hover:border-white/[.14]!" spotlightColor="rgba(195, 210, 230, 0.07)">
+                  <motion.span aria-hidden="true" className="absolute inset-y-4 left-0 w-[2px] origin-top rounded-full bg-[color:var(--color-cyan)]"
+                               initial={false} animate={{ scaleY: isOpen ? 1 : 0, opacity: isOpen ? 1 : 0 }} transition={t(0.5)} />
+                  <h3>
+                    <button className="relative flex w-full items-center justify-between gap-6 px-6 py-5 text-left text-[17.5px] font-semibold"
+                            aria-expanded={isOpen} aria-controls={`faq-${k}`} onClick={() => setOpen(isOpen ? null : k)}>
+                      {q}
+                      <span className={`grid size-8 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${isOpen ? "border-[color:var(--color-cyan)]/50 text-white" : "border-white/[.12] text-[color:var(--color-fg-2)]"}`} aria-hidden="true">
+                        <motion.span className="block text-[18px] leading-none" initial={false} animate={{ rotate: isOpen ? 45 : 0 }} transition={t(0.35)}>+</motion.span>
+                      </span>
+                    </button>
+                  </h3>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div id={`faq-${k}`} key="answer" className="overflow-hidden"
+                                  initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={t(0.45)}>
+                        <motion.div className="px-6 pb-6 pr-14 text-[color:var(--color-fg-2)]"
+                                    initial={reduce ? false : { y: -6, filter: "blur(4px)" }} animate={{ y: 0, filter: "blur(0px)" }} transition={t(0.5)}>
+                          {a}
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </SpotlightCard>
+              </motion.li>
             );
           })}
-        </div>
+        </motion.ul>
       </div>
     </section>
   );
@@ -625,19 +715,22 @@ export function FinalCTA() {
     <section className="pb-24 md:pb-32">
       <div className="wrap relative z-10">
         <Reveal>
-          <div className="relative overflow-hidden rounded-[26px] border border-[color:var(--color-line-2)] bg-[radial-gradient(80%_100%_at_50%_0%,rgba(16,185,129,.18),transparent_70%),var(--color-bg-2)] px-6 py-16 text-center md:py-24">
-            <div data-eye="pointer" className="mx-auto mb-8 size-24 md:size-28" aria-hidden="true" />
-            <h2 className="t-h2 mx-auto max-w-[18ch]">Stop typing into the wrong window<span className="caret" aria-hidden="true" /></h2>
-            <p className="mx-auto mt-5 max-w-xl text-[color:var(--color-fg-2)]">Free for macOS. About a minute to set up.</p>
-            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="relative overflow-hidden rounded-[26px] border border-[color:var(--color-line-2)] bg-[color:var(--color-bg-2)] px-6 py-16 text-center md:py-24">
+            <div className="pointer-events-none absolute inset-0 opacity-70" aria-hidden="true">
+              <LightRays raysOrigin="top-center" raysColor="#C9D6E8" raysSpeed={0.5} lightSpread={0.8} rayLength={1.3}
+                         fadeDistance={0.9} saturation={0.35} followMouse mouseInfluence={0.06} />
+            </div>
+            <div data-eye="pointer" className="relative mx-auto mb-8 size-24 md:size-28" aria-hidden="true" />
+            <WordsIn text="Stop typing into the wrong window." className="t-h2 relative mx-auto max-w-[18ch]" />
+            <p className="relative mx-auto mt-5 max-w-xl text-[color:var(--color-fg-2)]">Free for macOS. About a minute to set up.</p>
+            <div className="relative mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <DownloadButton />
               <GitHubButton label="Star on GitHub" />
             </div>
-            <BorderBeam size={180} duration={10} colorFrom="#10B981" colorTo="#06B6D4" borderWidth={1.5} />
+            <BorderBeam size={180} duration={12} colorFrom="#8FA8C8" colorTo="#E6EDF7" borderWidth={1} />
           </div>
         </Reveal>
       </div>
     </section>
   );
 }
-
