@@ -1,3 +1,5 @@
+// Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
+
 import AppKit
 
 /// Walks through each screen: shows a "look here" target, waits for the eyes to settle,

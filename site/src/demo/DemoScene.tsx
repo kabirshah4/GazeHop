@@ -102,7 +102,7 @@ export function DemoScene({ t }: { t: number }) {
           <img src="/logo-mark.svg" width={200} height={200} alt="" />
           <p className="mt-6 text-[84px] font-bold tracking-[-0.045em] text-white">Look at a screen,</p>
           <p className="-mt-3 text-[84px] font-bold tracking-[-0.045em] text-white">and your keyboard follows.</p>
-          <p className="mt-8 flex items-center gap-3 text-[30px] text-[#A3ACBD]"><span className="size-3 rounded-full bg-[#8FA8C8]" /> GazeHop · free and open source for macOS</p>
+          <p className="mt-8 flex items-center gap-3 text-[30px] text-[#A3ACBD]"><span className="size-3 rounded-full bg-[#8FA8C8]" /> GazeHop · free for macOS</p>
         </div>
       )}
     </div>

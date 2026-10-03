@@ -1,3 +1,5 @@
+// Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
+
 import Foundation
 
 /// Nearest-centroid classifier over z-scored gaze features, trained by calibration.

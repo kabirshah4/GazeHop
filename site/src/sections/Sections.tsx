@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { DownloadButton, LogoMark } from "../components/Chrome";
-import { DOWNLOAD, ISSUES, SOURCE } from "../lib/links";
+import { DOWNLOAD, ISSUES, SOURCE, LICENSE } from "../lib/links";
 import { useHeadGaze, type GazeStatus } from "../lib/useHeadGaze";
 import { Sky } from "./Hero";
 
@@ -314,7 +314,7 @@ export function Privacy() {
       <path key="a" d="M4 6h16v10H4zM9 20h6M12 16v4" />],
     ["No network code", "GazeHop contains no code that talks to the internet. No accounts, no analytics, no telemetry.",
       <g key="b"><circle cx="12" cy="12" r="8" /><path d="M5 5l14 14" /></g>],
-    ["Open source", "Every line is on GitHub under the MIT license, so you can check all of this yourself.",
+    ["Source you can read", "Every line of the app is published on GitHub, so you can check all of this yourself.",
       <path key="c" d="M9 7l-5 5 5 5M15 7l5 5-5 5" />],
   ];
   return (
@@ -357,7 +357,7 @@ export function Specs() {
     ["Network connections", "None"],
     ["Requirements", "macOS 14 or later, any built-in or external camera"],
     ["Permissions", "Camera, and Accessibility to bring windows forward"],
-    ["Price and license", "Free, MIT license"],
+    ["Price and license", "Free to use, including at work. Source available; all rights reserved"],
   ];
   return (
     <section className="py-24 md:py-32" aria-labelledby="specs-title">
@@ -457,9 +457,9 @@ const I = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" className="size-[15
 
 const STEPS: Step[] = [
   { title: "Download", badge: <Badge bg="linear-gradient(#4FA0FF,#0A6CF0)"><I d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" /></Badge>,
-    body: <>Download GazeHop from the latest GitHub release and double-click the zip to unzip it.</>, mock: <MockFile /> },
+    body: <>Download <b>GazeHop.dmg</b> and double-click it. A window opens with GazeHop and your Applications folder.</>, mock: <MockFile /> },
   { title: "Move to Applications", badge: <Badge bg="linear-gradient(#64B5FF,#2D7FF0)"><I d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></Badge>,
-    body: <>Drag <b>GazeHop</b> into your <b>Applications</b> folder.</>, mock: <MockFile apps /> },
+    body: <>In that window, drag <b>GazeHop</b> onto the <b>Applications</b> folder. Then eject the disk image.</>, mock: <MockFile apps /> },
   { title: "Open it once", badge: <Badge bg="linear-gradient(#A0A0A6,#6E6E73)"><I d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></Badge>,
     body: <>macOS says it can't verify the developer, because GazeHop isn't notarized. Click <b>Done</b>. This is normal for independent apps.</>, mock: <MockDialog /> },
   { title: "Privacy & Security", badge: <Badge bg="linear-gradient(#5E8BFF,#2F5BE0)"><I d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" /></Badge>,
@@ -484,7 +484,7 @@ export function InstallGuide() {
     <section id="install" className="scroll-mt-14 py-24 md:py-32" aria-labelledby="install-title">
       <div className="wrap">
         <Reveal className="mb-10 grid gap-5 md:mb-14 md:grid-cols-[1.1fr_1fr] md:items-end">
-          <h2 id="install-title" className="t-h2 max-w-[16ch]">Installing an open‑source Mac app</h2>
+          <h2 id="install-title" className="t-h2 max-w-[16ch]">Installing a Mac app from outside the App Store</h2>
           <p className="text-[17px] text-[color:var(--color-ink-2)]">
             Independent apps on GitHub often aren't notarized, since Apple's developer program costs $99 a year. macOS asks you to confirm
             them once. It takes a minute, and you can <a className="text-[color:var(--color-blue)] hover:underline" href={SOURCE}>read the source</a> first.
@@ -543,7 +543,7 @@ export function InstallGuide() {
 function MockFile({ apps = false }: { apps?: boolean }) {
   return (
     <div className="flex items-center gap-6 text-[12px] text-[color:var(--color-ink-2)]" aria-hidden="true">
-      <div className="flex flex-col items-center gap-2"><LogoMark className="size-16" />GazeHop</div>
+      <div className="flex flex-col items-center gap-2"><LogoMark className="size-16" />{apps ? "GazeHop" : "GazeHop.dmg"}</div>
       {apps && <>
         <span className="text-xl text-black/30">→</span>
         <div className="flex flex-col items-center gap-2">
@@ -614,12 +614,12 @@ function MockCalibrate() {
 
 const FAQ: [string, React.ReactNode][] = [
   ["Does GazeHop record or upload video?", "No. Each camera frame is read in memory to find your head direction and eye position, then discarded. The app contains no networking code."],
-  ["Why isn't it notarized?", <>Notarization needs Apple's $99 a year developer program. GazeHop is free and open source, so for now you confirm it once in System Settings (see the <a className="text-[color:var(--color-blue)] hover:underline" href="#install">install guide</a>), or build it from source.</>],
+  ["Why isn't it notarized?", <>Notarization needs Apple's $99 a year developer program. GazeHop is free, so for now you confirm it once in System Settings (see the <a className="text-[color:var(--color-blue)] hover:underline" href="#install">install guide</a>).</>],
   ["Which Macs does it work on?", "Any Mac on macOS 14 or later with a camera, built in or external, and two or more displays."],
   ["Why does it need Accessibility access?", "macOS only lets an app bring another app's window to the front with Accessibility permission. GazeHop uses it for exactly that, and never reads what you type."],
   ["Does it work with glasses?", "Usually. Strong reflections make eye tracking noisier, but head direction still works, and the two are combined."],
   ["How accurate is it?", "Best when your screens sit at clearly different angles from you. Recalibrate after moving your chair, camera or screens, and adjust look time and strictness in Settings if switching feels too eager or too slow."],
-  ["What does it cost?", <>Nothing. It's MIT licensed. Found a bug? <a className="text-[color:var(--color-blue)] hover:underline" href={ISSUES}>Open an issue</a>.</>],
+  ["What does it cost?", <>Nothing. GazeHop is free to use, at home or at work. The code is published so you can read it, but it isn't open source: see the <a className="text-[color:var(--color-blue)] hover:underline" href={LICENSE}>license</a>. Found a bug? <a className="text-[color:var(--color-blue)] hover:underline" href={ISSUES}>Open an issue</a>.</>],
 ];
 
 export function Faq() {

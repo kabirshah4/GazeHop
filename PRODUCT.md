@@ -12,13 +12,14 @@ types a lot across screens. Their job: keep working without clicking a window fi
 look at another screen.
 
 ## Product Purpose
-GazeHop is a free, open-source macOS menu bar app. The webcam estimates which screen you're looking at
+GazeHop is a free macOS menu bar app with published (source-available) code. The webcam estimates which screen you're looking at
 (head direction plus eye position, Apple's Vision framework, on-device) and moves keyboard focus to the
 last window you used on that screen. Success: you stop typing into the window you just left.
 
 ## Positioning
-Focus follows your eyes, entirely on your Mac: no network code, no accounts, open source so the privacy
-claim is verifiable. Free and MIT licensed.
+Focus follows your eyes, entirely on your Mac: no network code, no accounts, and the source is published so the
+privacy claim is verifiable. Free to use; copyright Kabir Shah, all rights reserved (see LICENSE). Never call it
+"open source".
 
 ## Operating Context
 Multi-monitor desks (2 to 6+ displays, Sidecar counts). Calibrate once per setup, then it runs in the
@@ -42,7 +43,7 @@ the monitor with the caret cut out. Never an eye: it feels like being watched. H
 Must not use Apple's logo or imply Apple affiliation.
 
 ## Evidence on Hand
-- Public source code (github.com/kabirshah4/GazeHop), MIT license.
+- Public, source-available code (github.com/kabirshah4/GazeHop); all rights reserved.
 - 15 s rendered demo video (site/public/demo.mp4) and the in-browser camera demo.
 - Privacy facts: no network code, frames discarded, calibration stored locally and deletable.
 - None yet: testimonials, ratings, press, user counts. Do not fabricate any.

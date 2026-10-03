@@ -69,15 +69,15 @@ export function Footer() {
       <div className="wrap grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div className="space-y-3">
           <Logo />
-          <p className="max-w-xs">A free, open-source menu bar app for Macs with more than one screen.</p>
+          <p className="max-w-xs">A free menu bar app for Macs with more than one screen.</p>
         </div>
         <Col title="Product" links={[["Download", DOWNLOAD], ["How it works", `${BASE}#how`], ["Install guide", `${BASE}#install`], ["FAQ", `${BASE}#faq`]]} />
-        <Col title="Open source" links={[["Source code", REPO], ["Report a problem", ISSUES], ["MIT license", LICENSE]]} />
+        <Col title="Source" links={[["Source code", REPO], ["Report a problem", ISSUES], ["License", LICENSE], ["Third-party notices", `${BASE}third-party-notices.txt`]]} />
         <Col title="Legal" links={[["Privacy", `${BASE}privacy`], ["Terms", `${BASE}terms`]]} />
       </div>
       <div className="wrap mt-10 flex flex-col gap-2 border-t border-[color:var(--color-line)] pt-5 md:flex-row md:justify-between">
-        <p>Built by <a className="text-[color:var(--color-ink-2)] hover:underline" href="https://github.com/kabirshah4">@kabirshah4</a>. Questions? <a className="text-[color:var(--color-ink-2)] hover:underline" href={ISSUES}>Open an issue</a>.</p>
-        <p>Not affiliated with Apple. Mac and macOS are trademarks of Apple Inc.</p>
+        <p>© 2026 Kabir Shah. All rights reserved. Built by <a className="text-[color:var(--color-ink-2)] hover:underline" href="https://github.com/kabirshah4">@kabirshah4</a>. Questions? <a className="text-[color:var(--color-ink-2)] hover:underline" href={ISSUES}>Open an issue</a>.</p>
+        <p>GazeHop is a trademark of Kabir Shah. Not affiliated with Apple; Mac and macOS are trademarks of Apple Inc.</p>
       </div>
     </footer>
   );

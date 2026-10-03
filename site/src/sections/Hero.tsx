@@ -9,7 +9,7 @@ import { MacDemo } from "./MacDemo";
   OWN-WORLD: macOS light: Apple grey ground, white continuous-corner cards with hairlines, frosted
   glass only for menu bar / HUD / nav, system blue as the one accent, New York serif for the hero line,
   SF Pro everywhere else. Dawn sky in the hero and the close.
-  STORY: see focus follow a glance -> understand the mechanism -> trust it (on-device, open source)
+  STORY: see focus follow a glance -> understand the mechanism -> trust it (on-device, source you can read)
   -> download.
   FIRST VIEWPORT: frosted nav; serif headline centred on the sky; one-line explanation; white pill
   "Download for Mac" with "View the source" beside it; the two-display desktop rises out of the sky.
@@ -43,7 +43,7 @@ export function Hero() {
           </a>
           <a href={REPO} className="btn text-white hover:underline hover:underline-offset-4">View the source <span aria-hidden="true">›</span></a>
         </motion.div>
-        <motion.p {...rise(0.22)} className="mt-4 text-[14px] text-white">Free and open source · macOS 14 or later</motion.p>
+        <motion.p {...rise(0.22)} className="mt-4 text-[14px] text-white">Free · source available · macOS 14 or later</motion.p>
       </div>
 
       <motion.div

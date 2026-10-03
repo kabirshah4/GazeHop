@@ -25,9 +25,9 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
 
 ## Install (no coding needed)
 
-1. Download **GazeHop-x.y.zip** from the [latest release](https://github.com/kabirshah4/GazeHop/releases/latest)
-   and double-click it to unzip.
-2. Drag **GazeHop.app** into your **Applications** folder.
+1. Download **[GazeHop.dmg](https://github.com/kabirshah4/GazeHop/releases/latest/download/GazeHop.dmg)**
+   and double-click it to open.
+2. Drag **GazeHop** onto the **Applications** folder in the window that opens.
 3. Open it. macOS will say it *can't verify* the app, because GazeHop isn't notarized by
    Apple (that needs a paid developer account). To open it anyway:
    - Click **Done** (not *Move to Trash*).
@@ -180,7 +180,14 @@ npm run deploy     # build + wrangler deploy
 
 ## License
 
-GazeHop's own code is MIT licensed. Some website components have their own licenses; see
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Copyright © 2026 Kabir Shah. All rights reserved.
 
-MIT
+GazeHop is **free to use** (at home or at work), and its source code is published so you can see
+how it works and check the privacy claims. It is **not open source**: you may not copy,
+redistribute, modify or reuse the code without permission. See [LICENSE](LICENSE) for the full
+terms. Versions released before 3 October 2026 were MIT licensed, and those copies keep their
+MIT rights.
+
+The website uses some third-party components under their own licenses; see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). "GazeHop" and its logo are trademarks of
+Kabir Shah. Not affiliated with Apple.

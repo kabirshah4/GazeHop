@@ -1,3 +1,5 @@
+// Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
+
 import Foundation
 
 /// Live app state for the Settings window (status, gaze readout). Updated on the main thread.

@@ -1,3 +1,5 @@
+// Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
+
 import AppKit
 
 /// GazeHop's menu bar glyph: the logo's monitor with the text caret cut out (the hop arc from the

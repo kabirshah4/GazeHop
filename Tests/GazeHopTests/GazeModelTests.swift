@@ -1,3 +1,5 @@
+// Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
+
 import XCTest
 @testable import GazeHop
 

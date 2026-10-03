@@ -1,6 +1,6 @@
 ---
 name: GazeHop
-description: Look at a screen, and your keyboard follows. A light, native macOS landing for a free, open-source menu bar app.
+description: Look at a screen, and your keyboard follows. A light, native macOS landing for a free, source-available menu bar app.
 colors:
   system-blue: "#0071E3"
   system-blue-hover: "#0077ED"

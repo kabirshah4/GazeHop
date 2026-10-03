@@ -1,3 +1,5 @@
+// Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
+
 import AppKit
 import AVFoundation
 import ServiceManagement
@@ -450,7 +452,7 @@ private struct PermissionsPane: View {
             Section {
                 Label("No network code. Nothing leaves this Mac.", systemImage: "network.slash")
                 Label("No camera images are saved. Calibration is a few numbers per screen.", systemImage: "camera.metering.unknown")
-                Label("Open source, so you can check all of this.", systemImage: "chevron.left.forwardslash.chevron.right")
+                Label("Source code is published, so you can check all of this.", systemImage: "chevron.left.forwardslash.chevron.right")
             } header: { Text("Privacy") }
         }
         .formStyle(.grouped)
@@ -549,7 +551,7 @@ private struct AboutPane: View {
             .buttonStyle(.bordered)
             .padding(.top, 8)
             Spacer()
-            Text("Free and open source under the MIT license.").font(.caption).foregroundStyle(.tertiary).padding(.bottom, 18)
+            Text("Free to use. © 2026 Kabir Shah. All rights reserved.").font(.caption).foregroundStyle(.tertiary).padding(.bottom, 18)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

@@ -16,7 +16,7 @@ const bg = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org
   <style>.h{font:400 76px "New York", "Iowan Old Style", Georgia, serif; fill:#fff; letter-spacing:-1.5px} .s{font:500 27px "SF Pro Text", Helvetica, Arial, sans-serif; fill:#fff; fill-opacity:.92}</style>
   <text x="600" y="300" text-anchor="middle" class="h">Look at a screen, and</text>
   <text x="600" y="388" text-anchor="middle" class="h">your keyboard follows.</text>
-  <text x="600" y="462" text-anchor="middle" class="s">GazeHop · free and open source for macOS</text>
+  <text x="600" y="462" text-anchor="middle" class="s">GazeHop · free for macOS</text>
 </svg>`);
 const mark = await sharp("brand/logo-tight.svg", { density: 300 }).resize(120).png().toBuffer();
 await sharp(bg).composite([{ input: mark, left: (W - 120) / 2, top: 74 }]).jpeg({ quality: 88, mozjpeg: true }).toFile("public/og.jpg");

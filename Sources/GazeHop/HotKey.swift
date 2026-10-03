@@ -1,3 +1,5 @@
+// Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
+
 import Carbon
 
 /// System-wide keyboard shortcut via Carbon's RegisterEventHotKey (no extra permission needed).

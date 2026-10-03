@@ -28,5 +28,5 @@ renderDoc("Privacy", "Privacy", "4 October 2026", <>
   <p>This site sets no cookies and runs no analytics or trackers. Fonts, images, video and the face model for the camera demo are served from this site, not from third parties. The camera demo on the home page runs entirely in your browser tab: your video is never sent anywhere, and the camera turns off when you leave the page or press "Turn camera off". The site is hosted on Cloudflare, which processes standard request data (such as IP addresses) to deliver and protect the site, as described in Cloudflare's privacy policy.</p>
 
   <h2>Check it yourself</h2>
-  <p>GazeHop is open source. You can <a href={SOURCE}>read the code</a> to confirm everything on this page. Questions? <a href={ISSUES}>Open an issue on GitHub</a>.</p>
+  <p>GazeHop's source code is published on GitHub, so you can <a href={SOURCE}>read the code</a> to confirm everything on this page. Questions? <a href={ISSUES}>Open an issue on GitHub</a>.</p>
 </>);
