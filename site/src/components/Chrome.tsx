@@ -31,7 +31,7 @@ export function GitHubGlyph({ className = "" }: { className?: string }) {
 
 export function DownloadButton({ label = "Download for Mac", className = "" }: { label?: string; className?: string }) {
   return (
-    <a href={DOWNLOAD} className={`btn btn-blue ${className}`}>
+    <a href={DOWNLOAD} download="GazeHop.dmg" className={`btn btn-blue ${className}`}>
       <DownloadGlyph className="size-[17px]" />
       {label}
     </a>
@@ -56,7 +56,7 @@ export function Nav() {
             <a key={h} href={`${BASE}${h}`} className="hidden rounded-full px-3 py-1.5 transition-colors hover:text-[color:var(--color-ink)] md:block">{l}</a>
           ))}
           <a href={REPO} className="rounded-full p-2 transition-colors hover:text-[color:var(--color-ink)]" aria-label="GazeHop on GitHub"><GitHubGlyph className="size-[18px]" /></a>
-          <a href={DOWNLOAD} className="btn btn-blue ml-1 !px-4 !py-[6px] !text-[14px]">Download</a>
+          <a href={DOWNLOAD} download="GazeHop.dmg" className="btn btn-blue ml-1 !px-4 !py-[6px] !text-[14px]">Download</a>
         </div>
       </nav>
     </header>

@@ -15,3 +15,8 @@
 
 /vendor/*
   Cache-Control: public, max-age=2592000
+
+/download/*
+  Content-Type: application/x-apple-diskimage
+  Content-Disposition: attachment; filename="GazeHop.dmg"
+  Cache-Control: public, max-age=300

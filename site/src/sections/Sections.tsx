@@ -519,7 +519,7 @@ export function InstallGuide() {
                       <button disabled={i === 0} onClick={() => setI(i - 1)} className="btn btn-quiet !py-2 !text-[14px] disabled:opacity-40">Back</button>
                       {i < STEPS.length - 1
                         ? <button onClick={() => setI(i + 1)} className="btn btn-blue !py-2 !text-[14px]">Next</button>
-                        : <a href={DOWNLOAD} className="btn btn-blue !py-2 !text-[14px]">Download GazeHop</a>}
+                        : <a href={DOWNLOAD} download="GazeHop.dmg" className="btn btn-blue !py-2 !text-[14px]">Download GazeHop</a>}
                     </div>
                   </div>
                   <div className="grid min-h-56 place-items-center rounded-[14px] bg-[color:var(--color-ground)] p-5">{STEPS[i].mock}</div>

@@ -38,7 +38,7 @@ export function Hero() {
           GazeHop sees which display you're looking at and moves keyboard focus there. No clicking first.
         </motion.p>
         <motion.div {...rise(0.16)} className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
-          <a href={DOWNLOAD} className="btn bg-white !text-[color:var(--color-ink)] shadow-[0_8px_24px_-10px_rgba(20,30,90,.55)] hover:bg-white/90">
+          <a href={DOWNLOAD} download="GazeHop.dmg" className="btn bg-white !text-[color:var(--color-ink)] shadow-[0_8px_24px_-10px_rgba(20,30,90,.55)] hover:bg-white/90">
             <DownloadGlyph className="size-[17px]" /> Download for Mac
           </a>
           <a href={REPO} className="btn text-white hover:underline hover:underline-offset-4">View the source <span aria-hidden="true">›</span></a>
