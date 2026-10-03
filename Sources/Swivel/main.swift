@@ -35,7 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationDidFinishLaunching(_ note: Notification) {
         // `--preview`: Settings window only, with sample live data. No camera, focus changes,
-        // hotkey or menu bar item, so it can run next to a real GazeHop for screenshots and design work.
+        // hotkey or menu bar item, so it can run next to a real Swivel for screenshots and design work.
         if CommandLine.arguments.contains("--preview") {
             let ids = NSScreen.screens.map(\.displayID)
             state.calibrated = Set(ids)
@@ -49,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             return
         }
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.autosaveName = "GazeHop"
+        statusItem.autosaveName = "Swivel"
         statusItem.button?.imagePosition = .imageLeft
         buildMenu()
 
@@ -122,7 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         menu.addItem(.separator())
-        menu.addItem(withTitle: "Quit GazeHop", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        menu.addItem(withTitle: "Quit Swivel", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         for item in menu.items where item.action != nil && item.action != #selector(NSApplication.terminate(_:)) {
             item.target = self
         }
@@ -133,8 +133,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusLine.title = text
         guard let button = statusItem.button else { return }
         button.image = MenuBarIcon.image(icon)
-        button.title = settings.showNameInMenuBar ? " GazeHop" : ""
-        button.toolTip = "GazeHop: \(text)"
+        button.title = settings.showNameInMenuBar ? " Swivel" : ""
+        button.toolTip = "Swivel: \(text)"
         state.statusText = text
         state.icon = icon
     }
@@ -257,7 +257,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
               now.timeIntervalSince(lastSwitch) * 1000 >= settings.cooldownMs,
               CGEventSource.buttonState(.combinedSessionState, button: .left) == false,  // not mid-drag
               !settings.excludedDisplays.contains(c.display),
-              // Never take focus away from GazeHop's own windows (Settings, calibration).
+              // Never take focus away from Swivel's own windows (Settings, calibration).
               !NSApp.isActive,
               // Never move focus while a password field (secure input) is active.
               !IsSecureEventInputEnabled(),

@@ -3,7 +3,7 @@
 @import "@fontsource/eb-garamond/400.css";
 @import "@fontsource/eb-garamond/400-italic.css";
 
-/* GazeHop, macOS edition. Light, calm, native. One accent: system blue. Glass only where macOS
+/* Swivel, macOS edition. Light, calm, native. One accent: system blue. Glass only where macOS
    itself uses it (menu bar, HUD, navigation). */
 @theme {
   --color-ground: #F5F5F7;      /* Apple page grey */

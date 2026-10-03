@@ -14,7 +14,7 @@ struct SettingsActions {
 
 // MARK: - Brand
 
-/// GazeHop's dawn sky (the app icon and website), used for hero surfaces and screen wallpapers.
+/// Swivel's dawn sky (the app icon and website), used for hero surfaces and screen wallpapers.
 enum Dawn {
     static let deep = Color(red: 0.137, green: 0.314, blue: 0.753)   // #2350C0
     static let blue = Color(red: 0.227, green: 0.408, blue: 0.847)   // #3A68D8
@@ -64,9 +64,9 @@ enum Pane: String, CaseIterable, Identifiable {
     var blurb: String {
         switch self {
         case .general: return ""
-        case .tracking: return "How quickly focus follows your glance, and how sure GazeHop needs to be."
-        case .screens: return "Choose which screens GazeHop can switch to."
-        case .permissions: return "What GazeHop needs from macOS, and what it never does."
+        case .tracking: return "How quickly focus follows your glance, and how sure Swivel needs to be."
+        case .screens: return "Choose which screens Swivel can switch to."
+        case .permissions: return "What Swivel needs from macOS, and what it never does."
         case .advanced: return "Diagnostics and calibration data."
         case .about: return ""
         }
@@ -211,7 +211,7 @@ private struct SidebarStatus: View {
             }
             .buttonStyle(.plain)
             .background(.quaternary, in: Circle())
-            .help(state.paused ? "Resume GazeHop" : "Pause GazeHop")
+            .help(state.paused ? "Resume Swivel" : "Pause Swivel")
             .accessibilityLabel(state.paused ? "Resume" : "Pause")
         }
         .padding(.leading, 12).padding(.trailing, 6).padding(.vertical, 6)
@@ -268,7 +268,7 @@ private struct GeneralPane: View {
             Section {
                 Toggle(isOn: $settings.waitForTypingPause) {
                     Text("Wait until I stop typing")
-                    Text("Focus never moves mid-word. GazeHop also never switches while a password field is active.")
+                    Text("Focus never moves mid-word. Swivel also never switches while a password field is active.")
                 }
                 Toggle(isOn: $settings.movePointer) {
                     Text("Bring the pointer along")
@@ -292,7 +292,7 @@ private struct GeneralPane: View {
 
             Section {
                 LaunchAtLoginRow(settings: settings)
-                Toggle("Show “GazeHop” next to the menu bar icon", isOn: $settings.showNameInMenuBar)
+                Toggle("Show “Swivel” next to the menu bar icon", isOn: $settings.showNameInMenuBar)
             } header: { Text("Startup and menu bar") }
         }
         .formStyle(.grouped)
@@ -314,7 +314,7 @@ private struct StatusHero: View {
 
     private var detail: String {
         if state.paused { return "Focus stays where you put it until you resume." }
-        if state.icon == .attention { return "Open GazeHop's menu to fix this." }
+        if state.icon == .attention { return "Open Swivel's menu to fix this." }
         if !state.faceVisible { return "Waiting to see your face." }
         if let id = state.looking, let s = NSScreen.screens.first(where: { $0.displayID == id }) { return "Looking at \(s.localizedName)" }
         return "Focus follows your glance."
@@ -404,9 +404,9 @@ private struct LaunchAtLoginRow: View {
         let status = settings.launchAtLoginStatus
         Toggle(isOn: Binding(get: { status == .enabled || status == .requiresApproval },
                              set: { settings.setLaunchAtLogin($0) })) {
-            Text("Open GazeHop when you log in")
+            Text("Open Swivel when you log in")
             if status == .requiresApproval {
-                Text("macOS needs your OK: allow GazeHop in Login Items.")
+                Text("macOS needs your OK: allow Swivel in Login Items.")
             }
         }
         if status == .requiresApproval {
@@ -489,7 +489,7 @@ private struct TrackingPane: View {
                                   value: $settings.dwellMs, range: 100...1000, step: 50, low: "Quicker", high: "Longer") { "\(Int($0)) ms" }
                         SliderRow(title: "Time between switches", detail: "Stops a quick glance back from bouncing focus.",
                                   value: $settings.cooldownMs, range: 200...2000, step: 100, low: "Shorter", high: "Longer") { String(format: "%.1f s", $0 / 1000) }
-                        SliderRow(title: "Strictness", detail: "Raise it if GazeHop switches when you don't mean to.",
+                        SliderRow(title: "Strictness", detail: "Raise it if Swivel switches when you don't mean to.",
                                   value: $settings.strictness, range: 0.05...0.6, step: 0.05, low: "Looser", high: "Stricter") { "\(Int(($0 * 100).rounded()))%" }
                         SliderRow(title: "Smoothing", detail: "Higher is steadier, lower reacts faster.",
                                   value: $settings.smoothing, range: 0...0.9, step: 0.05, low: "Faster", high: "Steadier") { "\(Int(($0 * 100).rounded()))%" }
@@ -571,7 +571,7 @@ private extension Comparable {
     func clamped(to r: ClosedRange<Self>) -> Self { min(max(self, r.lowerBound), r.upperBound) }
 }
 
-/// What GazeHop sees right now: which screen you're looking at, and how sure it is.
+/// What Swivel sees right now: which screen you're looking at, and how sure it is.
 private struct LiveGazeView: View {
     @ObservedObject var state: AppState
     let excluded: Set<UInt32>
@@ -614,7 +614,7 @@ private struct LiveGazeView: View {
     }
 }
 
-/// Five bars, like signal strength: how clearly GazeHop can tell which screen you're on.
+/// Five bars, like signal strength: how clearly Swivel can tell which screen you're on.
 private struct ConfidenceMeter: View {
     let value: Double
     @Environment(\.accessibilityReduceMotion) private var reduce
@@ -663,7 +663,7 @@ private struct ScreensPane: View {
                 }
             } header: { Text("Switch focus to") } footer: {
                 if settings.excludedDisplays.count == screens.count - 1, screens.count > 1 {
-                    Text("Only one screen is on, so GazeHop has nowhere to switch to.").font(.caption).foregroundStyle(Dawn.warn)
+                    Text("Only one screen is on, so Swivel has nowhere to switch to.").font(.caption).foregroundStyle(Dawn.warn)
                 }
             }
 
@@ -760,7 +760,7 @@ private struct UncalibratedNotice: View {
                 } label: {
                     Label {
                         Text(missing == 1 ? "1 screen isn't calibrated yet" : "\(missing) screens aren't calibrated yet")
-                        Text("GazeHop can't switch to a screen until it knows what looking at it looks like.")
+                        Text("Swivel can't switch to a screen until it knows what looking at it looks like.")
                     } icon: { Image(systemName: "exclamationmark.circle.fill").foregroundStyle(Dawn.warn) }
                 }
             }
@@ -768,7 +768,7 @@ private struct UncalibratedNotice: View {
     }
 }
 
-/// Displays drawn in their real arrangement, each with GazeHop's dawn wallpaper.
+/// Displays drawn in their real arrangement, each with Swivel's dawn wallpaper.
 private struct ScreenMap: View {
     let highlight: UInt32?
     let excluded: Set<UInt32>
@@ -874,7 +874,7 @@ private struct PermissionsPane: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(missing == 0 ? "All set" : missing == 1 ? "1 permission needed" : "2 permissions needed")
                             .font(.headline)
-                        Text(missing == 0 ? "GazeHop has everything it needs." : "GazeHop can't switch focus until you allow it below.")
+                        Text(missing == 0 ? "Swivel has everything it needs." : "Swivel can't switch focus until you allow it below.")
                             .font(.callout).foregroundStyle(.secondary)
                     }
                 }
@@ -888,19 +888,19 @@ private struct PermissionsPane: View {
                               state: camera == .notDetermined ? "Not asked yet" : "Not allowed",
                               url: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")
                 PermissionRow(title: "Accessibility", symbol: "accessibility", tint: [Color(red: 0.25, green: 0.6, blue: 1.0), Color(red: 0.0, green: 0.44, blue: 0.89)],
-                              detail: "Brings the window on the screen you look at to the front. GazeHop never reads what you type.",
+                              detail: "Brings the window on the screen you look at to the front. Swivel never reads what you type.",
                               granted: accessibility,
                               state: "Not allowed",
                               url: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
-            } header: { Text("GazeHop needs") }
+            } header: { Text("Swivel needs") }
 
             Section {
                 PrivacyRow(symbol: "network.slash", tint: [Color(red: 0.42, green: 0.45, blue: 0.95), Color(red: 0.27, green: 0.29, blue: 0.78)],
-                           title: "Nothing leaves this Mac", detail: "GazeHop has no network code, accounts or analytics.")
+                           title: "Nothing leaves this Mac", detail: "Swivel has no network code, accounts or analytics.")
                 PrivacyRow(symbol: "camera.metering.none", tint: [Color(white: 0.6), Color(white: 0.42)],
                            title: "No images are kept", detail: "Calibration is a few numbers per screen, not pictures.")
                 PrivacyRow(symbol: "chevron.left.forwardslash.chevron.right", tint: [Dawn.blue, Dawn.deep],
-                           title: "Check it yourself", detail: "GazeHop's source code is published on GitHub.")
+                           title: "Check it yourself", detail: "Swivel's source code is published on GitHub.")
             } header: { Text("Privacy") }
         }
         .formStyle(.grouped)
@@ -991,7 +991,7 @@ private struct AdvancedPane: View {
             .confirmationDialog("Delete calibration data?", isPresented: $confirmDelete) {
                 Button("Delete", role: .destructive, action: actions.forgetCalibration)
             } message: {
-                Text("GazeHop stops switching until you calibrate again.")
+                Text("Swivel stops switching until you calibrate again.")
             }
         }
         .formStyle(.grouped)
@@ -1009,12 +1009,12 @@ private struct AboutPane: View {
             Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 128, height: 128)
                 .shadow(color: Dawn.deep.opacity(0.35), radius: 18, y: 10)
                 .accessibilityHidden(true)
-            Text("GazeHop").font(.largeTitle.weight(.semibold)).padding(.top, 14)
+            Text("Swivel").font(.largeTitle.weight(.semibold)).padding(.top, 14)
             Text("Version \(version)").font(.callout).foregroundStyle(.secondary).padding(.top, 2)
             Text("Look at a screen, and your keyboard follows.")
                 .font(.system(.title3, design: .serif)).foregroundStyle(.secondary).padding(.top, 14)
             HStack(spacing: 10) {
-                Link(destination: URL(string: "https://gazehop.gazehop-site.workers.dev")!) { Label("Website", systemImage: "safari") }
+                Link(destination: URL(string: "https://swivel.gazehop-site.workers.dev")!) { Label("Website", systemImage: "safari") }
                 Link(destination: URL(string: "https://github.com/kabirshah4/GazeHop")!) { Label("Source Code", systemImage: "chevron.left.forwardslash.chevron.right") }
                 Link(destination: URL(string: "https://github.com/kabirshah4/GazeHop/issues")!) { Label("Report a Problem", systemImage: "exclamationmark.bubble") }
             }
@@ -1024,7 +1024,7 @@ private struct AboutPane: View {
             Spacer()
             VStack(spacing: 3) {
                 Text("Free to use. © 2026 Kabir Shah. All rights reserved.")
-                Link("License and third-party notices", destination: URL(string: "https://gazehop.gazehop-site.workers.dev/terms")!)
+                Link("License and third-party notices", destination: URL(string: "https://swivel.gazehop-site.workers.dev/terms")!)
             }
             .font(.caption).foregroundStyle(.tertiary)
             .padding(.bottom, 18)
@@ -1035,7 +1035,7 @@ private struct AboutPane: View {
 
 // MARK: - Window
 
-/// Hosts SettingsView in a normal window (GazeHop has no Dock icon, so we manage it ourselves).
+/// Hosts SettingsView in a normal window (Swivel has no Dock icon, so we manage it ourselves).
 final class SettingsWindowController {
     private var window: NSWindow?
     private let actions: SettingsActions
@@ -1046,7 +1046,7 @@ final class SettingsWindowController {
         if window == nil {
             let host = NSHostingController(rootView: SettingsView(actions: actions))
             let w = NSWindow(contentViewController: host)
-            w.title = "GazeHop Settings"
+            w.title = "Swivel Settings"
             w.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
@@ -1054,7 +1054,7 @@ final class SettingsWindowController {
             w.setContentSize(NSSize(width: 860, height: 640))
             w.contentMinSize = NSSize(width: 840, height: 580)
             w.center()
-            w.setFrameAutosaveName("GazeHopSettings")
+            w.setFrameAutosaveName("SwivelSettings")
             window = w
         }
         NSApp.activate(ignoringOtherApps: true)

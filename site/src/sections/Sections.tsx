@@ -32,12 +32,12 @@ export function HowItHelps() {
     <section id="how" className="scroll-mt-14 pb-24 pt-10 md:pb-32 md:pt-16" aria-labelledby="how-title">
       <div className="wrap">
         <Reveal className="mb-10 md:mb-14">
-          <h2 id="how-title" className="t-h2 max-w-[16ch]">How GazeHop helps at your desk</h2>
+          <h2 id="how-title" className="t-h2 max-w-[16ch]">How Swivel helps at your desk</h2>
         </Reveal>
         <div className="grid gap-5 md:grid-cols-2">
           <Reveal>
             <article className="relative flex h-full flex-col overflow-hidden rounded-[28px] bg-[linear-gradient(160deg,#3A73F0_0%,#5D8FF5_55%,#86A9F7_100%)] p-8 text-white shadow-[0_24px_50px_-30px_rgba(30,70,200,.7)] md:p-10">
-              <h3 className="t-h3 max-w-[18ch]">GazeHop <span className="serif-em rounded-[0.35em] bg-white/20 px-[0.18em]">sees</span> which screen you're looking at</h3>
+              <h3 className="t-h3 max-w-[18ch]">Swivel <span className="serif-em rounded-[0.35em] bg-white/20 px-[0.18em]">sees</span> which screen you're looking at</h3>
               <p className="mt-3 max-w-[40ch] text-[17px] text-white/90">Your webcam reads head direction and eye position many times a second, with Apple's Vision framework, on your Mac.</p>
               <SeeArt />
             </article>
@@ -134,19 +134,19 @@ export function Details() {
           <h2 id="details-title" className="t-h2 max-w-[18ch]">Made for real desks, not demos</h2>
         </Reveal>
         <div className="grid gap-5 md:grid-cols-3">
-          <Tile className="md:col-span-2" title="Two screens or six." body="Calibrate each display once. Unplug one and GazeHop ignores it until it's back. Turn off any screen you only watch, like a TV.">
+          <Tile className="md:col-span-2" title="Two screens or six." body="Calibrate each display once. Unplug one and Swivel ignores it until it's back. Turn off any screen you only watch, like a TV.">
             <ScreensArt />
           </Tile>
           <Tile title="Pause in a keystroke." body="Gaming on one screen, a video on the other? Pause from any app, resume the same way.">
             <div className="flex h-full items-center justify-center gap-3 py-6 text-[34px]"><span className="kbd">⌘</span><span className="kbd">F1</span></div>
           </Tile>
-          <Tile title="One face, not the whole room." body="GazeHop locks onto you and ignores anyone walking past behind you.">
+          <Tile title="One face, not the whole room." body="Swivel locks onto you and ignores anyone walking past behind you.">
             <FaceArt />
           </Tile>
-          <Tile className="md:col-span-2" title="Tune how it feels." body="These are the same controls as GazeHop's Settings. Try them: the preview follows your changes.">
+          <Tile className="md:col-span-2" title="Tune how it feels." body="These are the same controls as Swivel's Settings. Try them: the preview follows your changes.">
             <SlidersArt />
           </Tile>
-          <Tile className="md:col-span-3" title="Never mid-password, never mid-word." body="GazeHop won't move focus while a password field is active, and by default waits for a pause in your typing. It never takes focus from its own windows, either.">
+          <Tile className="md:col-span-3" title="Never mid-password, never mid-word." body="Swivel won't move focus while a password field is active, and by default waits for a pause in your typing. It never takes focus from its own windows, either.">
             <SafetyArt />
           </Tile>
         </div>
@@ -312,7 +312,7 @@ export function Privacy() {
   const points: [string, string, React.ReactNode][] = [
     ["Processed on your Mac", "Each camera frame is read in memory to find head direction and eye position, then discarded. Nothing is recorded or saved.",
       <path key="a" d="M4 6h16v10H4zM9 20h6M12 16v4" />],
-    ["No network code", "GazeHop contains no code that talks to the internet. No accounts, no analytics, no telemetry.",
+    ["No network code", "Swivel contains no code that talks to the internet. No accounts, no analytics, no telemetry.",
       <g key="b"><circle cx="12" cy="12" r="8" /><path d="M5 5l14 14" /></g>],
     ["Source you can read", "Every line of the app is published on GitHub, so you can check all of this yourself.",
       <path key="c" d="M9 7l-5 5 5 5M15 7l5 5-5 5" />],
@@ -325,7 +325,7 @@ export function Privacy() {
             <svg viewBox="0 0 24 24" className="size-9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
           </span>
           <h2 id="privacy-title" className="t-h2">Your camera feed never leaves your Mac.</h2>
-          <p className="t-lead mx-auto mt-5 max-w-[48ch]">GazeHop only measures where you're looking. It doesn't identify you, and it doesn't keep or send anything.</p>
+          <p className="t-lead mx-auto mt-5 max-w-[48ch]">Swivel only measures where you're looking. It doesn't identify you, and it doesn't keep or send anything.</p>
         </Reveal>
         <div className="mx-auto mt-14 grid max-w-[980px] gap-10 md:grid-cols-3">
           {points.map(([t, d, icon], i) => (
@@ -457,23 +457,23 @@ const I = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" className="size-[15
 
 const STEPS: Step[] = [
   { title: "Download", badge: <Badge bg="linear-gradient(#4FA0FF,#0A6CF0)"><I d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" /></Badge>,
-    body: <>Download <b>GazeHop.dmg</b> and double-click it. A window opens with GazeHop and your Applications folder. Want to check the file? Compare it with the <a className="text-[color:var(--color-blue)] hover:underline" href={`${BASE}download/GazeHop.dmg.sha256`}>SHA-256 checksum</a>.</>, mock: <MockFile /> },
+    body: <>Download <b>Swivel.dmg</b> and double-click it. A window opens with Swivel and your Applications folder. Want to check the file? Compare it with the <a className="text-[color:var(--color-blue)] hover:underline" href={`${BASE}download/Swivel.dmg.sha256`}>SHA-256 checksum</a>.</>, mock: <MockFile /> },
   { title: "Move to Applications", badge: <Badge bg="linear-gradient(#64B5FF,#2D7FF0)"><I d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></Badge>,
-    body: <>In that window, drag <b>GazeHop</b> onto the <b>Applications</b> folder. Then eject the disk image.</>, mock: <MockFile apps /> },
+    body: <>In that window, drag <b>Swivel</b> onto the <b>Applications</b> folder. Then eject the disk image.</>, mock: <MockFile apps /> },
   { title: "Open it once", badge: <Badge bg="linear-gradient(#A0A0A6,#6E6E73)"><I d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></Badge>,
-    body: <>macOS says it can't verify the developer, because GazeHop isn't notarized. Click <b>Done</b>. This is normal for independent apps.</>, mock: <MockDialog /> },
+    body: <>macOS says it can't verify the developer, because Swivel isn't notarized. Click <b>Done</b>. This is normal for independent apps.</>, mock: <MockDialog /> },
   { title: "Privacy & Security", badge: <Badge bg="linear-gradient(#5E8BFF,#2F5BE0)"><I d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" /></Badge>,
-    body: <>Open <b>System Settings › Privacy &amp; Security</b>, scroll down, and click <b>Open Anyway</b> next to GazeHop.</>, mock: <MockOpenAnyway /> },
+    body: <>Open <b>System Settings › Privacy &amp; Security</b>, scroll down, and click <b>Open Anyway</b> next to Swivel.</>, mock: <MockOpenAnyway /> },
   { title: "Camera & Accessibility", badge: <Badge bg="linear-gradient(#4CD964,#28A745)"><I d="M15 10l4.5-2.5v9L15 14M4 7h11v10H4z" /></Badge>,
-    body: <>Allow <b>Camera</b> when asked, then turn on GazeHop in <b>Privacy &amp; Security › Accessibility</b>.</>, mock: <MockToggles /> },
+    body: <>Allow <b>Camera</b> when asked, then turn on Swivel in <b>Privacy &amp; Security › Accessibility</b>.</>, mock: <MockToggles /> },
   { title: "Calibrate", badge: <LogoMark className="size-[26px]" />,
-    body: <>Follow the dot on each screen for a few seconds. When the GazeHop icon appears in your menu bar, you're set.</>, mock: <MockCalibrate /> },
+    body: <>Follow the dot on each screen for a few seconds. When the Swivel icon appears in your menu bar, you're set.</>, mock: <MockCalibrate /> },
 ];
 
 export function InstallGuide() {
   const [i, setI] = useState(0);
   const [copied, setCopied] = useState(false);
-  const cmd = "xattr -dr com.apple.quarantine /Applications/GazeHop.app";
+  const cmd = "xattr -dr com.apple.quarantine /Applications/Swivel.app";
   const copy = async () => {
     try { await navigator.clipboard.writeText(cmd); } catch {
       const ta = document.createElement("textarea"); ta.value = cmd; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
@@ -494,7 +494,7 @@ export function InstallGuide() {
           <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_0_0_.5px_rgba(0,0,0,.2),0_30px_70px_-30px_rgba(0,0,0,.35)]">
             <div className="flex items-center gap-2 border-b border-black/[.07] bg-[#F6F6F7] px-4 py-3">
               {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} className="size-3 rounded-full" style={{ background: c }} />)}
-              <span className="mx-auto pr-14 text-[13px] font-semibold text-black/70">Install GazeHop</span>
+              <span className="mx-auto pr-14 text-[13px] font-semibold text-black/70">Install Swivel</span>
             </div>
             <div className="grid md:grid-cols-[250px_1fr]">
               <ol className="border-b border-black/[.06] bg-[#F6F6F7]/70 p-2.5 md:border-b-0 md:border-r" role="tablist" aria-label="Install steps">
@@ -519,7 +519,7 @@ export function InstallGuide() {
                       <button disabled={i === 0} onClick={() => setI(i - 1)} className="btn btn-quiet !py-2 !text-[14px] disabled:opacity-40">Back</button>
                       {i < STEPS.length - 1
                         ? <button onClick={() => setI(i + 1)} className="btn btn-blue !py-2 !text-[14px]">Next</button>
-                        : <a href={DOWNLOAD} download="GazeHop.dmg" className="btn btn-blue !py-2 !text-[14px]">Download GazeHop</a>}
+                        : <a href={DOWNLOAD} download="Swivel.dmg" className="btn btn-blue !py-2 !text-[14px]">Download Swivel</a>}
                     </div>
                   </div>
                   <div className="grid min-h-56 place-items-center rounded-[14px] bg-[color:var(--color-ground)] p-5">{STEPS[i].mock}</div>
@@ -543,7 +543,7 @@ export function InstallGuide() {
 function MockFile({ apps = false }: { apps?: boolean }) {
   return (
     <div className="flex items-center gap-6 text-[12px] text-[color:var(--color-ink-2)]" aria-hidden="true">
-      <div className="flex flex-col items-center gap-2"><LogoMark className="size-16" />{apps ? "GazeHop" : "GazeHop.dmg"}</div>
+      <div className="flex flex-col items-center gap-2"><LogoMark className="size-16" />{apps ? "Swivel" : "Swivel.dmg"}</div>
       {apps && <>
         <span className="text-xl text-black/30">→</span>
         <div className="flex flex-col items-center gap-2">
@@ -558,8 +558,8 @@ function MockDialog() {
   return (
     <div className="w-[250px] rounded-[14px] bg-white/95 p-5 text-center text-[13px] shadow-[0_0_0_.5px_rgba(0,0,0,.15),0_20px_40px_-15px_rgba(0,0,0,.35)]" aria-hidden="true">
       <LogoMark className="mx-auto mb-3 size-12" />
-      <p className="font-semibold">"GazeHop" Not Opened</p>
-      <p className="mt-1 text-[11px] text-[color:var(--color-ink-3)]">Apple could not verify "GazeHop" is free of malware.</p>
+      <p className="font-semibold">"Swivel" Not Opened</p>
+      <p className="mt-1 text-[11px] text-[color:var(--color-ink-3)]">Apple could not verify "Swivel" is free of malware.</p>
       <div className="mt-4 grid gap-1.5">
         <span className="rounded-[7px] bg-black/[.06] py-1.5">Move to Trash</span>
         <span className="rounded-[7px] bg-[color:var(--color-blue)] py-1.5 font-semibold text-white">Done</span>
@@ -573,7 +573,7 @@ function MockOpenAnyway() {
     <div className="w-full max-w-[330px] space-y-2 text-[13px]" aria-hidden="true">
       <p className="text-[12px] text-[color:var(--color-ink-3)]">Privacy &amp; Security</p>
       <div className="rounded-[12px] bg-white p-4 shadow-[0_0_0_1px_rgba(0,0,0,.06)]">
-        <p className="text-[color:var(--color-ink-2)]">"GazeHop" was blocked to protect your Mac.</p>
+        <p className="text-[color:var(--color-ink-2)]">"Swivel" was blocked to protect your Mac.</p>
         <div className="mt-3 flex justify-end"><span className="rounded-[7px] bg-[color:var(--color-blue)] px-3 py-1.5 font-semibold text-white">Open Anyway</span></div>
       </div>
     </div>
@@ -586,7 +586,7 @@ function MockToggles() {
       {[["Camera", "linear-gradient(#4CD964,#28A745)"], ["Accessibility", "linear-gradient(#5E8BFF,#2F5BE0)"]].map(([l, bg]) => (
         <div key={l} className="flex items-center gap-3 p-3">
           <span className="size-6 rounded-[6px]" style={{ background: bg }} />
-          <span className="flex-1">{l} · GazeHop</span>
+          <span className="flex-1">{l} · Swivel</span>
           <span className="relative h-[22px] w-[38px] rounded-full bg-[#34C759]"><span className="absolute right-[2px] top-[2px] size-[18px] rounded-full bg-white shadow" /></span>
         </div>
       ))}
@@ -613,13 +613,13 @@ function MockCalibrate() {
 /* ------------------------------------------------------------------ */
 
 const FAQ: [string, React.ReactNode][] = [
-  ["Does GazeHop record or upload video?", "No. Each camera frame is read in memory to find your head direction and eye position, then discarded. The app contains no networking code."],
-  ["Why isn't it notarized?", <>Notarization needs Apple's $99 a year developer program. GazeHop is free, so for now you confirm it once in System Settings (see the <a className="text-[color:var(--color-blue)] hover:underline" href="#install">install guide</a>).</>],
+  ["Does Swivel record or upload video?", "No. Each camera frame is read in memory to find your head direction and eye position, then discarded. The app contains no networking code."],
+  ["Why isn't it notarized?", <>Notarization needs Apple's $99 a year developer program. Swivel is free, so for now you confirm it once in System Settings (see the <a className="text-[color:var(--color-blue)] hover:underline" href="#install">install guide</a>).</>],
   ["Which Macs does it work on?", "Any Mac on macOS 14 or later with a camera, built in or external, and two or more displays."],
-  ["Why does it need Accessibility access?", "macOS only lets an app bring another app's window to the front with Accessibility permission. GazeHop uses it for exactly that, and never reads what you type."],
+  ["Why does it need Accessibility access?", "macOS only lets an app bring another app's window to the front with Accessibility permission. Swivel uses it for exactly that, and never reads what you type."],
   ["Does it work with glasses?", "Usually. Strong reflections make eye tracking noisier, but head direction still works, and the two are combined."],
   ["How accurate is it?", "Best when your screens sit at clearly different angles from you. Recalibrate after moving your chair, camera or screens, and adjust look time and strictness in Settings if switching feels too eager or too slow."],
-  ["What does it cost?", <>Nothing. GazeHop is free to use, at home or at work. The code is published so you can read it, but it isn't open source: see the <a className="text-[color:var(--color-blue)] hover:underline" href={LICENSE}>license</a>. Found a bug? <a className="text-[color:var(--color-blue)] hover:underline" href={ISSUES}>Open an issue</a>.</>],
+  ["What does it cost?", <>Nothing. Swivel is free to use, at home or at work. The code is published so you can read it, but it isn't open source: see the <a className="text-[color:var(--color-blue)] hover:underline" href={LICENSE}>license</a>. Found a bug? <a className="text-[color:var(--color-blue)] hover:underline" href={ISSUES}>Open an issue</a>.</>],
 ];
 
 export function Faq() {

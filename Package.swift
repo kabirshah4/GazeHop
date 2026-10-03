@@ -2,10 +2,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "GazeHop",
+    name: "Swivel",
     platforms: [.macOS(.v14)],
     targets: [
-        .executableTarget(name: "GazeHop", path: "Sources/GazeHop"),
-        .testTarget(name: "GazeHopTests", dependencies: ["GazeHop"], path: "Tests/GazeHopTests"),
+        .executableTarget(name: "Swivel", path: "Sources/Swivel"),
+        .testTarget(name: "SwivelTests", dependencies: ["Swivel"], path: "Tests/SwivelTests"),
     ]
 )

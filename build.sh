@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds GazeHop.app in ./build (universal: Apple silicon + Intel)
+# Builds Swivel.app in ./build (universal: Apple silicon + Intel)
 # Signs with "GazeHop Local Signing" if present (see scripts/make-signing-cert.sh) so macOS
 # remembers Camera/Accessibility permissions across rebuilds; otherwise signs ad-hoc.
 set -e
@@ -7,8 +7,8 @@ cd "$(dirname "$0")"
 # Universal binary: runs natively on Apple silicon and Intel Macs
 ARCHS="--arch arm64 --arch x86_64"
 swift build -c release $ARCHS
-BIN="$(swift build -c release $ARCHS --show-bin-path)/GazeHop"
-APP=build/GazeHop.app
+BIN="$(swift build -c release $ARCHS --show-bin-path)/Swivel"
+APP=build/Swivel.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/"

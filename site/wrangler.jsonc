@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "gazehop",
+  "name": "swivel",
   "compatibility_date": "2026-10-01",
   // worker.js only runs for video (byte ranges for Safari); all other paths are plain static assets.
   "main": "worker.js",

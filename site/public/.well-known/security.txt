@@ -1,7 +1,7 @@
-# Found a security problem in GazeHop or this website? Please report it privately.
+# Found a security problem in Swivel or this website? Please report it privately.
 Contact: https://github.com/kabirshah4/GazeHop/security/advisories/new
 Contact: https://github.com/kabirshah4/GazeHop/issues
 Expires: 2027-10-03T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://gazehop.gazehop-site.workers.dev/.well-known/security.txt
-Policy: https://gazehop.gazehop-site.workers.dev/terms
+Canonical: https://swivel.gazehop-site.workers.dev/.well-known/security.txt
+Policy: https://swivel.gazehop-site.workers.dev/terms

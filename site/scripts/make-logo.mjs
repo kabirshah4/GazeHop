@@ -1,4 +1,4 @@
-// Generates the GazeHop logo SVGs, in the website's style (light macOS, dawn sky, focus hopping onto a screen):
+// Generates the Swivel logo SVGs, in the website's style (light macOS, dawn sky, focus hopping onto a screen):
 //   brand/logo-mark.svg  full-colour app icon: continuous-corner tile filled with the hero's dawn
 //                        sky; one monitor with the blue caret, and the hop arriving on it from the left
 //   brand/logo-tight.svg same tile cropped to its edges (favicons: no macOS icon margin)
@@ -74,9 +74,9 @@ const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org
 
 // One ink: the monitor solid with the caret cut out, and the hop (same as the menu bar icon)
 const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="150 150 724 724" aria-hidden="true">
-  <defs><mask id="gazehop-caret" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+  <defs><mask id="swivel-caret" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
     <rect width="1024" height="1024" fill="#fff"/><g fill="#000">${CARET}</g></mask></defs>
-  <g fill="#1d1d1f"><g mask="url(#gazehop-caret)">${SCREEN}</g>${STAND}<path d="${swoosh(HOP_PATH, 5, 32)}"/></g>
+  <g fill="#1d1d1f"><g mask="url(#swivel-caret)">${SCREEN}</g>${STAND}<path d="${swoosh(HOP_PATH, 5, 32)}"/></g>
 </svg>
 `;
 

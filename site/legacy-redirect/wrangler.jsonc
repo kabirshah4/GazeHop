@@ -1,0 +1,8 @@
+{
+  // Deploys over the old "gazehop" worker so gazehop.gazehop-site.workers.dev redirects to the new site.
+  // Deploy: cd site/legacy-redirect && npx wrangler deploy
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "gazehop",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01"
+}

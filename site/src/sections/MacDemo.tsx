@@ -8,7 +8,7 @@ import { useInView, useReducedMotion } from "motion/react";
  * container units (--u = 1% of the stage), so it scales like an image.
  */
 const LOOP = 11500;
-const NOTE_1 = "Ship GazeHop on Friday.";
+const NOTE_1 = "Ship Swivel on Friday.";
 const NOTE_2 = " Then tell the team.";
 const REPLY = "sounds good, sending it now";
 
@@ -99,7 +99,7 @@ export function MacDemo() {
             </div>
           </div>
 
-          {/* GazeHop HUD */}
+          {/* Swivel HUD */}
           <div className="glass-dark absolute left-[var(--hud-x)] top-0 z-20 flex -translate-x-1/2 items-center gap-[calc(var(--hu)*0.9)] rounded-full py-[calc(var(--hu)*0.7)] pl-[calc(var(--hu)*0.8)] pr-[calc(var(--hu)*1.4)] text-[calc(var(--hu)*1.15)] shadow-[0_12px_30px_-10px_rgba(0,0,0,.45)]">
             <HopGlyph />
             <span className="whitespace-nowrap font-medium tracking-[-0.01em]">
@@ -112,7 +112,7 @@ export function MacDemo() {
         </div>
       </div>
       <figcaption className="mt-5 text-center text-[13px] text-[color:var(--color-ink-3)]">
-        Illustration of GazeHop at work. It runs quietly in your menu bar; the HUD here just shows what it sees.
+        Illustration of Swivel at work. It runs quietly in your menu bar; the HUD here just shows what it sees.
       </figcaption>
     </figure>
   );
@@ -180,7 +180,7 @@ function Caret() {
 }
 
 function Pointer({ side, q }: { side: "L" | "R"; q: number }) {
-  // GazeHop brings the pointer along: it enters from the edge facing the other display
+  // Swivel brings the pointer along: it enters from the edge facing the other display
   // and glides to the newly focused window (q: 0 = just arrived, 1 = settled).
   const left = side === "R" ? 4 + q * 42 : 94 - q * 48;
   return (
@@ -190,7 +190,7 @@ function Pointer({ side, q }: { side: "L" | "R"; q: number }) {
   );
 }
 
-/** GazeHop's small mark: the logo's monitor with the caret (the hop arc is left off at this size). */
+/** Swivel's small mark: the logo's monitor with the caret (the hop arc is left off at this size). */
 function HopGlyph() {
   return (
     <svg viewBox="0 0 28 18" className="h-[calc(var(--hu)*1.5)] w-auto" aria-hidden="true">

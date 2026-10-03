@@ -19,14 +19,14 @@
 /vendor/*
   Cache-Control: public, max-age=2592000
 
-/download/GazeHop.dmg
+/download/Swivel.dmg
   Content-Type: application/x-apple-diskimage
-  Content-Disposition: attachment; filename="GazeHop.dmg"
+  Content-Disposition: attachment; filename="Swivel.dmg"
   Cache-Control: public, max-age=300
 
 /.well-known/security.txt
   Content-Type: text/plain; charset=utf-8
 
-/download/GazeHop.dmg.sha256
+/download/Swivel.dmg.sha256
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=300

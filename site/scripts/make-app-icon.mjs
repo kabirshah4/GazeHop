@@ -1,4 +1,4 @@
-// Renders brand/logo-mark.svg into every icon GazeHop needs:
+// Renders brand/logo-mark.svg into every icon Swivel needs:
 //   ../Resources/AppIcon.icns (macOS app), ../docs/logo.png (README), public/ favicons.
 // Run: node scripts/make-app-icon.mjs
 import sharp from "sharp";
@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const svg = "brand/logo-mark.svg";
-const iconset = join(mkdtempSync(join(tmpdir(), "gazehop-")), "AppIcon.iconset");
+const iconset = join(mkdtempSync(join(tmpdir(), "swivel-")), "AppIcon.iconset");
 execFileSync("mkdir", ["-p", iconset]);
 for (const base of [16, 32, 128, 256, 512]) {
   await sharp(svg, { density: 384 }).resize(base).png().toFile(join(iconset, `icon_${base}x${base}.png`));

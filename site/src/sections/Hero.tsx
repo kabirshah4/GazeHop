@@ -4,7 +4,7 @@ import { DOWNLOAD, REPO } from "../lib/links";
 import { MacDemo } from "./MacDemo";
 
 /*
-  THESIS: The page is a Mac. The first viewport shows GazeHop doing its job on a two-display desktop,
+  THESIS: The page is a Mac. The first viewport shows Swivel doing its job on a two-display desktop,
   instead of describing it. Refuses the dark dev-tool landing and the generic SaaS hero.
   OWN-WORLD: macOS light: Apple grey ground, white continuous-corner cards with hairlines, frosted
   glass only for menu bar / HUD / nav, system blue as the one accent, New York serif for the hero line,
@@ -35,10 +35,10 @@ export function Hero() {
           Look at a screen, and your keyboard follows.
         </motion.h1>
         <motion.p {...rise(0.08)} className="mt-6 max-w-[38ch] text-[clamp(18px,1.5vw,22px)] leading-[1.4] tracking-[-0.015em] text-white/90">
-          GazeHop sees which display you're looking at and moves keyboard focus there. No clicking first.
+          Swivel sees which display you're looking at and moves keyboard focus there. No clicking first.
         </motion.p>
         <motion.div {...rise(0.16)} className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
-          <a href={DOWNLOAD} download="GazeHop.dmg" className="btn bg-white !text-[color:var(--color-ink)] shadow-[0_8px_24px_-10px_rgba(20,30,90,.55)] hover:bg-white/90">
+          <a href={DOWNLOAD} download="Swivel.dmg" className="btn bg-white !text-[color:var(--color-ink)] shadow-[0_8px_24px_-10px_rgba(20,30,90,.55)] hover:bg-white/90">
             <DownloadGlyph className="size-[17px]" /> Download for Mac
           </a>
           <a href={REPO} className="btn text-white hover:underline hover:underline-offset-4">View the source <span aria-hidden="true">›</span></a>

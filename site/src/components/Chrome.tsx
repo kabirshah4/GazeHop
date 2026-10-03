@@ -6,9 +6,9 @@ export function LogoMark({ className = "size-7" }: { className?: string }) {
 
 export function Logo() {
   return (
-    <a href={BASE} className="flex items-center gap-2" aria-label="GazeHop home">
+    <a href={BASE} className="flex items-center gap-2" aria-label="Swivel home">
       <LogoMark className="size-[26px] rounded-[6px]" />
-      <span className="font-[family-name:var(--font-display)] text-[17px] font-semibold tracking-[-0.02em]">GazeHop</span>
+      <span className="font-[family-name:var(--font-display)] text-[17px] font-semibold tracking-[-0.02em]">Swivel</span>
     </a>
   );
 }
@@ -31,7 +31,7 @@ export function GitHubGlyph({ className = "" }: { className?: string }) {
 
 export function DownloadButton({ label = "Download for Mac", className = "" }: { label?: string; className?: string }) {
   return (
-    <a href={DOWNLOAD} download="GazeHop.dmg" className={`btn btn-blue ${className}`}>
+    <a href={DOWNLOAD} download="Swivel.dmg" className={`btn btn-blue ${className}`}>
       <DownloadGlyph className="size-[17px]" />
       {label}
     </a>
@@ -55,8 +55,8 @@ export function Nav() {
           {[["How it works", "#how"], ["Privacy", "#privacy"], ["Install", "#install"], ["FAQ", "#faq"]].map(([l, h]) => (
             <a key={h} href={`${BASE}${h}`} className="hidden rounded-full px-3 py-1.5 transition-colors hover:text-[color:var(--color-ink)] md:block">{l}</a>
           ))}
-          <a href={REPO} className="rounded-full p-2 transition-colors hover:text-[color:var(--color-ink)]" aria-label="GazeHop on GitHub"><GitHubGlyph className="size-[18px]" /></a>
-          <a href={DOWNLOAD} download="GazeHop.dmg" className="btn btn-blue ml-1 !px-4 !py-[6px] !text-[14px]">Download</a>
+          <a href={REPO} className="rounded-full p-2 transition-colors hover:text-[color:var(--color-ink)]" aria-label="Swivel on GitHub"><GitHubGlyph className="size-[18px]" /></a>
+          <a href={DOWNLOAD} download="Swivel.dmg" className="btn btn-blue ml-1 !px-4 !py-[6px] !text-[14px]">Download</a>
         </div>
       </nav>
     </header>
@@ -77,7 +77,7 @@ export function Footer() {
       </div>
       <div className="wrap mt-10 flex flex-col gap-2 border-t border-[color:var(--color-line)] pt-5 md:flex-row md:justify-between">
         <p>© 2026 Kabir Shah. All rights reserved. Built by <a className="text-[color:var(--color-ink-2)] hover:underline" href="https://github.com/kabirshah4">@kabirshah4</a>. Questions? <a className="text-[color:var(--color-ink-2)] hover:underline" href={ISSUES}>Open an issue</a>.</p>
-        <p>GazeHop is a trademark of Kabir Shah. Not affiliated with Apple; Mac and macOS are trademarks of Apple Inc.</p>
+        <p>Swivel (formerly GazeHop) is not affiliated with Apple. Mac and macOS are trademarks of Apple Inc.</p>
       </div>
     </footer>
   );
@@ -97,7 +97,7 @@ function Col({ title, links }: { title: string; links: [string, string][] }) {
 export function StickyMobileCTA() {
   return (
     <div className="glass-light fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--color-line)] p-3 md:hidden">
-      <DownloadButton label="Get GazeHop for your Mac" className="w-full" />
+      <DownloadButton label="Get Swivel for your Mac" className="w-full" />
     </div>
   );
 }

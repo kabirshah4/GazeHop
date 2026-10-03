@@ -1,7 +1,7 @@
 // Copyright © 2026 Kabir Shah. All rights reserved. See LICENSE.
 
 import XCTest
-@testable import GazeHop
+@testable import Swivel
 
 final class GazeModelTests: XCTestCase {
     /// Fake calibration samples: screens laid out left→right by head yaw / eye x.

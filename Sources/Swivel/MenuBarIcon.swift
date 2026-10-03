@@ -2,7 +2,7 @@
 
 import AppKit
 
-/// GazeHop's menu bar glyph: the logo's monitor with the text caret cut out (the hop arc from the
+/// Swivel's menu bar glyph: the logo's monitor with the text caret cut out (the hop arc from the
 /// app icon is left off; it turns into a hook at 16pt). Paused adds a slash; needing attention adds a
 /// dot badge. Drawn as a template image so macOS tints it for light/dark menu bars.
 enum MenuBarIcon {
@@ -42,7 +42,7 @@ enum MenuBarIcon {
             return true
         }
         img.isTemplate = true
-        img.accessibilityDescription = "GazeHop"
+        img.accessibilityDescription = "Swivel"
         return img
     }
 }

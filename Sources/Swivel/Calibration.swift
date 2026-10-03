@@ -25,7 +25,7 @@ final class Calibration {
     func run() {
         screens = NSScreen.screens
         guard screens.count >= 2 else {
-            alert("GazeHop needs at least two screens.")
+            alert("Swivel needs at least two screens.")
             completion(nil)
             return
         }

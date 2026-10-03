@@ -1,12 +1,12 @@
-<p align="center"><img src="docs/logo.png" width="160" alt="GazeHop icon"></p>
+<p align="center"><img src="docs/logo.png" width="160" alt="Swivel icon"></p>
 
-# GazeHop
+# Swivel
 
-Look at a screen, and your keyboard follows.
+Look at a screen, and your keyboard follows. *(Formerly GazeHop.)*
 
-**Website:** https://gazehop.gazehop-site.workers.dev
+**Website:** https://swivel.gazehop-site.workers.dev
 
-GazeHop is a tiny macOS menu-bar app for multi-monitor setups: 2, 3, 4 or more screens. It uses your webcam to see
+Swivel is a tiny macOS menu-bar app for multi-monitor setups: 2, 3, 4 or more screens. It uses your webcam to see
 which screen you're looking at and moves keyboard focus to the last window you used on that
 screen — so you stop typing into the window you just left.
 
@@ -16,26 +16,26 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
 
 - **Tracking:** Apple's Vision framework reads head direction (yaw, nose position) and eye
   gaze (pupil position within each eye) from the front camera.
-- **One person:** GazeHop locks onto one face (you, at the desk) and ignores anyone else in view.
+- **One person:** Swivel locks onto one face (you, at the desk) and ignores anyone else in view.
 - **Deciding:** a quick calibration (look at a dot on each screen) trains a nearest-centroid
-  model. GazeHop switches only after you've looked at a screen for 250 ms, with a 0.6 s
+  model. Swivel switches only after you've looked at a screen for 250 ms, with a 0.6 s
   cooldown, and never while you're dragging.
 - **Switching:** the Accessibility API brings back the last window you used on that display
   (or the frontmost window there, so no setup clicks are needed), raises it, and (optionally) moves the pointer there so scrolling works too.
 
 ## Install (no coding needed)
 
-1. Download **[GazeHop.dmg](https://gazehop.gazehop-site.workers.dev/download/GazeHop.dmg)**
+1. Download **[Swivel.dmg](https://swivel.gazehop-site.workers.dev/download/Swivel.dmg)**
    and double-click it to open.
-2. Drag **GazeHop** onto the **Applications** folder in the window that opens.
-3. Open it. macOS will say it *can't verify* the app, because GazeHop isn't notarized by
+2. Drag **Swivel** onto the **Applications** folder in the window that opens.
+3. Open it. macOS will say it *can't verify* the app, because Swivel isn't notarized by
    Apple (that needs a paid developer account). To open it anyway:
    - Click **Done** (not *Move to Trash*).
    - Open **System Settings › Privacy & Security**, scroll down, and click **Open Anyway** next
-     to the GazeHop message. Confirm with your password.
-4. Allow **Camera** when asked, then turn on GazeHop in **System Settings › Privacy & Security ›
+     to the Swivel message. Confirm with your password.
+4. Allow **Camera** when asked, then turn on Swivel in **System Settings › Privacy & Security ›
    Accessibility**.
-5. Follow the calibration dots on each screen. Done: the GazeHop icon in the menu bar (a small
+5. Follow the calibration dots on each screen. Done: the Swivel icon in the menu bar (a small
    monitor) means it's on.
 
 ## Known limitations
@@ -66,16 +66,16 @@ macOS version, number of screens, and webcam.
 ```sh
 ./scripts/make-signing-cert.sh   # once: lets macOS remember permissions across rebuilds
 ./build.sh
-open build/GazeHop.app
+open build/Swivel.app
 ```
 
 On first launch:
 
 1. Allow **Camera** access.
-2. Enable GazeHop in **System Settings › Privacy & Security › Accessibility**.
+2. Enable Swivel in **System Settings › Privacy & Security › Accessibility**.
 3. Follow the calibration dots on each screen.
 
-GazeHop shows up in the menu bar (next to the battery and clock) as a small monitor icon. You can add
+Swivel shows up in the menu bar (next to the battery and clock) as a small monitor icon. You can add
 the name next to it in **Settings › General**.
 
 > **Why the signing script?** macOS ties Camera and Accessibility permission to an app's code
@@ -109,9 +109,9 @@ All settings apply immediately.
 
 ## Multiple screens
 
-GazeHop calibrates every connected display and picks whichever one you're looking at.
+Swivel calibrates every connected display and picks whichever one you're looking at.
 
-- **Unplugging a screen** doesn't need recalibration; GazeHop just ignores it until it's back.
+- **Unplugging a screen** doesn't need recalibration; Swivel just ignores it until it's back.
 - **Plugging in a new screen** shows *New screen connected: calibrate* in the menu; run
   **Calibrate…** to include it.
 - Accuracy depends on how far apart the screens are from your point of view: side-by-side
@@ -132,34 +132,34 @@ website favicons from it:
 cd site && npm install && node scripts/make-app-icon.mjs
 ```
 
-The menu bar icon is drawn in code (`Sources/GazeHop/MenuBarIcon.swift`).
+The menu bar icon is drawn in code (`Sources/Swivel/MenuBarIcon.swift`).
 
 ## Debugging
 
 Turn on **Settings › Advanced › Detailed debug logging**, then:
 
 ```sh
-tail -f ~/Library/Logs/GazeHop.log
+tail -f ~/Library/Logs/Swivel.log
 ```
 
 Switch attempts are always logged.
 
 ## Safety
 
-- GazeHop never moves focus while a password field is active (macOS secure input).
+- Swivel never moves focus while a password field is active (macOS secure input).
 - By default it waits for a short pause in your typing, so a glance can't split a word across windows.
 - Press **⌘F1** to pause it anytime.
 
 ## Privacy
 
-GazeHop has no accounts, servers, analytics, or crash reporting.
+Swivel has no accounts, servers, analytics, or crash reporting.
 
 - **Camera:** frames are analysed in memory on your Mac to find head direction and eye position,
   then discarded. Nothing is saved, recorded, or uploaded.
-- **No network:** GazeHop makes no network connections at all.
+- **No network:** Swivel makes no network connections at all.
 - **Stored on your Mac only:** your settings and calibration (a few numbers per screen, not
-  images), in GazeHop's preferences.
-- **Log:** `~/Library/Logs/GazeHop.log` (capped at ~1 MB) records switch events with app names. Window
+  images), in Swivel's preferences.
+- **Log:** `~/Library/Logs/Swivel.log` (capped at ~1 MB) records switch events with app names. Window
   titles are only logged if you turn on detailed debug logging. It never leaves your Mac; delete it anytime.
 - **Calibration:** a few averaged head and eye angles per screen, no images. Delete it in
   Settings › Advanced.
@@ -182,12 +182,12 @@ npm run deploy     # build + wrangler deploy
 
 Copyright © 2026 Kabir Shah. All rights reserved.
 
-GazeHop is **free to use** (at home or at work), and its source code is published so you can see
+Swivel is **free to use** (at home or at work), and its source code is published so you can see
 how it works and check the privacy claims. It is **not open source**: you may not copy,
 redistribute, modify or reuse the code without permission. See [LICENSE](LICENSE) for the full
 terms. Versions released before 3 October 2026 were MIT licensed, and those copies keep their
 MIT rights.
 
 The website uses some third-party components under their own licenses; see
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). "GazeHop" and its logo are trademarks of
-Kabir Shah. Not affiliated with Apple.
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Swivel was previously called GazeHop. Not
+affiliated with Apple.

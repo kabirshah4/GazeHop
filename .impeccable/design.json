@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-10-03T00:00:00Z",
-  "title": "Design System: GazeHop",
+  "title": "Design System: Swivel",
   "extensions": {
     "colorMeta": {
       "system-blue": { "role": "primary", "displayName": "System Blue", "canonical": "#0071E3", "tonalRamp": ["#00234A", "#003A78", "#0052A6", "#0071E3", "#3D93EC", "#7AB5F2", "#B6D6F8", "#E8F1FD"] },
@@ -103,7 +103,7 @@
       "kind": "nav",
       "refersTo": "nav",
       "description": "Sticky 52px frosted bar with text links and a compact blue Download pill.",
-      "html": "<header class=\"ds-nav\"><span class=\"ds-nav-logo\">GazeHop</span><nav class=\"ds-nav-links\"><a href=\"#\">How it works</a><a href=\"#\">Privacy</a><a href=\"#\">Install</a><a href=\"#\">FAQ</a><a class=\"ds-nav-cta\" href=\"#\">Download</a></nav></header>",
+      "html": "<header class=\"ds-nav\"><span class=\"ds-nav-logo\">Swivel</span><nav class=\"ds-nav-links\"><a href=\"#\">How it works</a><a href=\"#\">Privacy</a><a href=\"#\">Install</a><a href=\"#\">FAQ</a><a class=\"ds-nav-cta\" href=\"#\">Download</a></nav></header>",
       "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 40px; background: rgba(255,255,255,.72); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 1px 0 rgba(0,0,0,.06); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; } .ds-nav-logo { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: #1D1D1F; } .ds-nav-links { display: flex; align-items: center; gap: 4px; font-size: 14px; } .ds-nav-links a { color: #515154; text-decoration: none; padding: 6px 12px; border-radius: 999px; transition: color .2s; } .ds-nav-links a:hover { color: #1D1D1F; } .ds-nav-links a:focus-visible { outline: 2px solid #0071E3; outline-offset: 3px; } .ds-nav-links .ds-nav-cta { margin-left: 4px; padding: 6px 16px; background: #0071E3; color: #fff; font-weight: 500; box-shadow: 0 1px 1px rgba(0,0,0,.08), 0 6px 18px -8px rgba(0,113,227,.7); } .ds-nav-links .ds-nav-cta:hover { background: #0077ED; color: #fff; }"
     },
     {

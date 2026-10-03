@@ -1,6 +1,6 @@
 #!/bin/sh
 # One-time: create a self-signed code-signing certificate in your login keychain.
-# Signing every build with the same certificate means macOS keeps GazeHop's Camera and
+# Signing every build with the same certificate means macOS keeps Swivel's Camera and
 # Accessibility permissions across rebuilds (ad-hoc signatures change every build).
 set -e
 NAME="GazeHop Local Signing"

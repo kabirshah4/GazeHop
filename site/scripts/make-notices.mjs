@@ -11,10 +11,10 @@ const pkgs = [
 ];
 const licenseFile = (p) => ["LICENSE", "LICENSE.md", "LICENSE.txt", "license"].map((f) => `node_modules/${p}/${f}`).find(existsSync);
 
-let out = `Third-party notices for the GazeHop website
+let out = `Third-party notices for the Swivel website
 ============================================
 
-GazeHop itself is copyright (c) 2026 Kabir Shah, all rights reserved (see
+Swivel itself is copyright (c) 2026 Kabir Shah, all rights reserved (see
 https://github.com/kabirshah4/GazeHop/blob/main/LICENSE). The macOS app uses only
 Apple's system frameworks. This website includes the third-party software and
 fonts below, each under its own license, reproduced in full.

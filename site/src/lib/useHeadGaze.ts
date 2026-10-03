@@ -6,7 +6,7 @@ export type GazeStatus = "off" | "loading" | "calibrating" | "tracking" | "no-fa
 export type Side = "first" | "second";
 
 /**
- * In-browser version of GazeHop's idea: estimate head turn from the webcam and report which
+ * In-browser version of Swivel's idea: estimate head turn from the webcam and report which
  * half of the stage you're looking at. Runs MediaPipe's face landmarker locally (runtime and
  * model are served from this site); video frames never leave the tab.
  */

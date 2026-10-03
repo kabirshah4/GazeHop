@@ -2,10 +2,10 @@
 
 import Foundation
 
-/// Appends diagnostics to ~/Library/Logs/GazeHop.log
+/// Appends diagnostics to ~/Library/Logs/Swivel.log
 enum DebugLog {
     static let url = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent("Library/Logs/GazeHop.log")
+        .appendingPathComponent("Library/Logs/Swivel.log")
     private static let fmt: DateFormatter = { let f = DateFormatter(); f.dateFormat = "HH:mm:ss.SSS"; return f }()
 
     private static let maxBytes = 1_000_000

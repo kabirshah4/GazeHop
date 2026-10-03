@@ -7,7 +7,7 @@ const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
 const ease = (x: number) => 1 - Math.pow(1 - x, 3);
 const typed = (s: string, t: number, a: number, b: number) => s.slice(0, Math.round(seg(t, a, b) * s.length));
 
-const LEFT_1 = "Plan: ship GazeHop 0.2 on Friday.";
+const LEFT_1 = "Plan: ship Swivel 0.2 on Friday.";
 const LEFT_2 = " Then tell the team.";
 const REPLY = "sounds good, sending it now";
 
@@ -102,7 +102,7 @@ export function DemoScene({ t }: { t: number }) {
           <img src="/logo-mark.svg" width={200} height={200} alt="" />
           <p className="mt-6 text-[84px] font-bold tracking-[-0.045em] text-white">Look at a screen,</p>
           <p className="-mt-3 text-[84px] font-bold tracking-[-0.045em] text-white">and your keyboard follows.</p>
-          <p className="mt-8 flex items-center gap-3 text-[30px] text-[#A3ACBD]"><span className="size-3 rounded-full bg-[#8FA8C8]" /> GazeHop · free for macOS</p>
+          <p className="mt-8 flex items-center gap-3 text-[30px] text-[#A3ACBD]"><span className="size-3 rounded-full bg-[#8FA8C8]" /> Swivel · free for macOS</p>
         </div>
       )}
     </div>

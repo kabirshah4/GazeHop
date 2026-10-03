@@ -15,7 +15,7 @@ final class GazeTracker: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate 
     var onNoFace: (() -> Void)?
 
     private let session = AVCaptureSession()
-    private let queue = DispatchQueue(label: "gazehop.gaze")
+    private let queue = DispatchQueue(label: "swivel.gaze")
     private var configured = false
 
     var isRunning: Bool { session.isRunning }
@@ -63,7 +63,7 @@ final class GazeTracker: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate 
         configured = true
     }
 
-    // The one person GazeHop follows; everyone else in frame is ignored.
+    // The one person Swivel follows; everyone else in frame is ignored.
     private var trackedCenter: CGPoint?
     private var trackedSeen = Date.distantPast
     private static let reacquireAfter: TimeInterval = 2.0   // lost this long → pick a new person

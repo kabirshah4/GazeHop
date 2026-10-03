@@ -1,5 +1,5 @@
 ---
-name: GazeHop
+name: Swivel
 description: Look at a screen, and your keyboard follows. A light, native macOS landing for a free, source-available menu bar app.
 colors:
   system-blue: "#0071E3"
@@ -149,7 +149,7 @@ components:
     padding: "4px 10px"
 ---
 
-# Design System: GazeHop
+# Design System: Swivel
 
 ## Overview
 
@@ -284,7 +284,7 @@ Pills with press feedback; quiet and confident.
 - **Focus:** 2px system blue outline at 3px offset with 8px radius on every focusable element.
 
 ### Navigation
-Sticky 52px frosted white bar with a 1px bottom rule. Logo mark plus "GazeHop" in 17px semibold display sans on the left; 14px ink-secondary links (hover to ink, rounded hit area), a GitHub glyph, and a compact blue Download pill on the right. Text links hide below 768px; the frosted sticky Download bar at the bottom of the viewport takes over on phones. The hero slides under the nav so the sky shows through the glass.
+Sticky 52px frosted white bar with a 1px bottom rule. Logo mark plus "Swivel" in 17px semibold display sans on the left; 14px ink-secondary links (hover to ink, rounded hit area), a GitHub glyph, and a compact blue Download pill on the right. Text links hide below 768px; the frosted sticky Download bar at the bottom of the viewport takes over on phones. The hero slides under the nav so the sky shows through the glass.
 
 ### Mark
 The emphasised word: serif italic on a blue-tint lozenge (0.35em radius, 0.18em side padding) in blue deep. On the blue card the same device is white text on a 20% white lozenge. One per heading, on the verb.
