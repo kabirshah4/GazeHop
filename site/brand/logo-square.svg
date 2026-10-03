@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 100 824 824">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2350C0"/><stop offset=".38" stop-color="#3A68D8"/>
+      <stop offset=".66" stop-color="#8EACEE"/><stop offset=".86" stop-color="#E9CFDB"/><stop offset="1" stop-color="#F8DCCB"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="512" cy="930" r="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFC9A6" stop-opacity=".85"/><stop offset="1" stop-color="#FFC9A6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="100" x2="0" y2="560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sclera" x1="0" y1="380" x2="0" y2="650" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEFB"/>
+    </linearGradient>
+    <radialGradient id="iris" cx="552" cy="490" r="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2C62E0"/><stop offset=".7" stop-color="#0B3FAE"/><stop offset="1" stop-color="#082C7C"/>
+    </radialGradient>
+    <filter id="lift" x="-20%" y="-40%" width="140%" height="200%">
+      <feDropShadow dx="0" dy="22" stdDeviation="26" flood-color="#0B1E5C" flood-opacity=".32"/>
+    </filter>
+    <clipPath id="eyeClip"><path d="M192 512C296 344 728 344 832 512C728 680 296 680 192 512Z"/></clipPath>
+  </defs>
+
+  <path d="M100 100H924V924H100Z" fill="url(#sky)"/>
+  <path d="M100 100H924V924H100Z" fill="url(#sun)"/>
+  <path d="M100 100H924V924H100Z" fill="url(#sheen)"/>
+
+  <g filter="url(#lift)">
+    <path d="M192 512C296 344 728 344 832 512C728 680 296 680 192 512Z" fill="url(#sclera)"/>
+  </g>
+  <g clip-path="url(#eyeClip)">
+    <circle cx="570" cy="512" r="128" fill="url(#iris)"/>
+    <circle cx="570" cy="512" r="56" fill="#0A1433"/>
+  </g>
+  <circle cx="528" cy="466" r="24" fill="#fff" opacity=".95"/>
+</svg>

@@ -1,13 +1,13 @@
 import { BASE, DOWNLOAD, ISSUES, LICENSE, REPO } from "../lib/links";
 
 export function LogoMark({ className = "size-7" }: { className?: string }) {
-  return <img src={`${BASE}logo-mark.svg`} alt="" width={28} height={28} className={className} />;
+  return <img src={`${BASE}logo-tight.svg`} alt="" width={26} height={26} className={className} />;
 }
 
 export function Logo() {
   return (
     <a href={BASE} className="flex items-center gap-2" aria-label="GazeHop home">
-      <LogoMark className="size-7 -my-1" />
+      <LogoMark className="size-[26px] rounded-[6px]" />
       <span className="font-[family-name:var(--font-display)] text-[17px] font-semibold tracking-[-0.02em]">GazeHop</span>
     </a>
   );

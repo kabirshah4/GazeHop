@@ -18,14 +18,16 @@ execFileSync("iconutil", ["-c", "icns", iconset, "-o", "../Resources/AppIcon.icn
 await sharp(svg, { density: 384 }).resize(512).png().toFile("../docs/logo.png");
 await sharp(svg, { density: 384 }).resize(512).png().toFile("public/icon.png");
 // Favicons carry a version in the name: browsers cache favicons hard, so a new design needs a new URL.
-const V = "v3";
-const png32 = await sharp(svg, { density: 384 }).resize(32).png().toBuffer();
-const png48 = await sharp(svg, { density: 384 }).resize(48).png().toBuffer();
+const V = "v4";
+const tight = "brand/logo-tight.svg";
+const png32 = await sharp(tight, { density: 384 }).resize(32).png().toBuffer();
+const png48 = await sharp(tight, { density: 384 }).resize(48).png().toBuffer();
 writeFileSync(`public/favicon-${V}-32.png`, png32);
-await sharp(svg, { density: 384 }).resize(180).png().toFile(`public/apple-touch-icon-${V}.png`);
-copyFileSync(svg, `public/favicon-${V}.svg`);
-writeFileSync("public/favicon.ico", ico([[16, await sharp(svg, { density: 384 }).resize(16).png().toBuffer()], [32, png32], [48, png48]]));
+await sharp("brand/logo-square.svg", { density: 384 }).resize(180).png().toFile(`public/apple-touch-icon-${V}.png`);
+copyFileSync(tight, `public/favicon-${V}.svg`);
+writeFileSync("public/favicon.ico", ico([[16, await sharp(tight, { density: 384 }).resize(16).png().toBuffer()], [32, png32], [48, png48]]));
 copyFileSync(svg, "public/logo-mark.svg");
+copyFileSync(tight, "public/logo-tight.svg");
 console.log("Wrote AppIcon.icns, docs/logo.png and site favicons");
 
 /** Minimal .ico writer: ICO files can hold PNG images directly. */

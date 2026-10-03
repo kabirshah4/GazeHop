@@ -1,93 +1,81 @@
-// Generates the GazeHop logo SVGs (deterministic, so the iris fibres never change):
-//   brand/logo-mark.svg  full-colour app icon (graphite tile, glossy eyeball, round pupil)
-//   brand/logo-mono.svg  single-colour mark for small/one-ink uses (intro wordmark, etc.)
+// Generates the GazeHop logo SVGs, in the website's style (light macOS, dawn sky, one white eye):
+//   brand/logo-mark.svg  full-colour app icon: continuous-corner tile filled with the hero's dawn
+//                        sky, a white eye glancing right (the same eye as the menu bar and HUD)
+//   brand/logo-tight.svg same tile cropped to its edges (favicons: no macOS icon margin)
+//   brand/logo-square.svg full-bleed square (apple-touch-icon: iOS rounds the corners itself)
+//   brand/logo-mono.svg  single-colour eye for small/one-ink uses
 // Run: node scripts/make-logo.mjs  then  node scripts/make-app-icon.mjs
 import { writeFileSync } from "node:fs";
 
-function rng(seed) {
-  let a = seed >>> 0;
-  return () => { a += 0x6d2b79f5; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-}
-const R = rng(20261003);
-const C = 512, EYE = 268, IRIS = 142;
 const f = (n) => n.toFixed(1);
 
-// Iris fibres: thin radial strokes, light and dark, slightly curved
-let fibres = "";
-for (let i = 0; i < 220; i++) {
-  const a = (i / 220) * Math.PI * 2 + (R() - 0.5) * 0.03;
-  const r0 = IRIS * (0.4 + R() * 0.08), r1 = IRIS * (0.78 + R() * 0.2);
-  const bend = (R() - 0.5) * 0.06;
-  const mx = C + Math.cos(a + bend) * (r0 + r1) / 2, my = C + Math.sin(a + bend) * (r0 + r1) / 2;
-  const light = R() < 0.55;
-  const op = light ? 0.1 + R() * 0.22 : 0.12 + R() * 0.25;
-  fibres += `<path d="M${f(C + Math.cos(a) * r0)} ${f(C + Math.sin(a) * r0)} Q${f(mx)} ${f(my)} ${f(C + Math.cos(a) * r1)} ${f(C + Math.sin(a) * r1)}" stroke="${light ? "#DCE6F3" : "#0E1622"}" stroke-opacity="${op.toFixed(2)}" stroke-width="${(1.2 + R() * 2.2).toFixed(1)}"/>`;
+/** Apple-style continuous-corner tile: a superellipse, not a rounded rect. */
+function squircle(cx, cy, size, n = 5, steps = 256) {
+  const r = size / 2;
+  let d = "";
+  for (let i = 0; i < steps; i++) {
+    const t = (i / steps) * Math.PI * 2;
+    const c = Math.cos(t), s = Math.sin(t);
+    const x = cx + r * Math.sign(c) * Math.abs(c) ** (2 / n);
+    const y = cy + r * Math.sign(s) * Math.abs(s) ** (2 / n);
+    d += `${i ? "L" : "M"}${f(x)} ${f(y)}`;
+  }
+  return d + "Z";
 }
 
-// Pupil: round, with a soft edge
-const pupil = (fill) => `<circle cx="${C}" cy="${C}" r="56" fill="${fill}"/>`;
+const TILE = squircle(512, 512, 824);
+// Almond eye: two arcs meeting at sharp corners, like the menu bar glyph
+const EYE = "M192 512C296 344 728 344 832 512C728 680 296 680 192 512Z";
+const PX = 570, PY = 512; // pupil sits right of centre: the glance that moves focus
 
-const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+const icon = (tile, viewBox = "0 0 1024 1024") => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
   <defs>
-    <radialGradient id="tile" cx="50%" cy="38%" r="75%">
-      <stop offset="0" stop-color="#232A36"/><stop offset=".6" stop-color="#11151C"/><stop offset="1" stop-color="#07090D"/>
-    </radialGradient>
-    <linearGradient id="tileEdge" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fff" stop-opacity=".09"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/>
+    <linearGradient id="sky" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2350C0"/><stop offset=".38" stop-color="#3A68D8"/>
+      <stop offset=".66" stop-color="#8EACEE"/><stop offset=".86" stop-color="#E9CFDB"/><stop offset="1" stop-color="#F8DCCB"/>
     </linearGradient>
-    <radialGradient id="sclera" cx="44%" cy="38%" r="68%">
-      <stop offset="0" stop-color="#FBFBFA"/><stop offset=".55" stop-color="#E6E7E9"/><stop offset=".85" stop-color="#B7BCC4"/><stop offset="1" stop-color="#8C929C"/>
+    <radialGradient id="sun" cx="512" cy="930" r="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFC9A6" stop-opacity=".85"/><stop offset="1" stop-color="#FFC9A6" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="iris" cx="50%" cy="50%" r="50%">
-      <stop offset=".3" stop-color="#2A3646"/><stop offset=".42" stop-color="#7C93B0"/><stop offset=".62" stop-color="#9DB1CB"/>
-      <stop offset=".82" stop-color="#5C7392"/><stop offset=".94" stop-color="#1B2433"/><stop offset="1" stop-color="#0D121A"/>
+    <linearGradient id="sheen" x1="0" y1="100" x2="0" y2="560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sclera" x1="0" y1="380" x2="0" y2="650" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEFB"/>
+    </linearGradient>
+    <radialGradient id="iris" cx="${PX - 18}" cy="${PY - 22}" r="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2C62E0"/><stop offset=".7" stop-color="#0B3FAE"/><stop offset="1" stop-color="#082C7C"/>
     </radialGradient>
-    <radialGradient id="limbus" cx="50%" cy="50%" r="50%">
-      <stop offset=".88" stop-color="#0B1018" stop-opacity="0"/><stop offset="1" stop-color="#0B1018" stop-opacity=".55"/>
-    </radialGradient>
-    <radialGradient id="gloss" cx="38%" cy="26%" r="55%">
-      <stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </radialGradient>
-    <clipPath id="irisClip"><circle cx="${C}" cy="${C}" r="${IRIS}"/></clipPath>
+    <filter id="lift" x="-20%" y="-40%" width="140%" height="200%">
+      <feDropShadow dx="0" dy="22" stdDeviation="26" flood-color="#0B1E5C" flood-opacity=".32"/>
+    </filter>
+    <clipPath id="eyeClip"><path d="${EYE}"/></clipPath>
   </defs>
 
-  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#tile)"/>
-  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#tileEdge)"/>
-  <rect x="101.5" y="101.5" width="821" height="821" rx="184.5" fill="none" stroke="#fff" stroke-opacity=".07" stroke-width="3"/>
+  <path d="${tile}" fill="url(#sky)"/>
+  <path d="${tile}" fill="url(#sun)"/>
+  <path d="${tile}" fill="url(#sheen)"/>
 
-  <ellipse cx="${C}" cy="${C + EYE * 0.92}" rx="${EYE * 0.8}" ry="${EYE * 0.16}" fill="url(#shadow)"/>
-  <circle cx="${C}" cy="${C}" r="${EYE}" fill="url(#sclera)"/>
-
-  <g clip-path="url(#irisClip)">
-    <circle cx="${C}" cy="${C}" r="${IRIS}" fill="url(#iris)"/>
-    <g fill="none" stroke-linecap="round">${fibres}</g>
-    <circle cx="${C}" cy="${C}" r="${IRIS}" fill="url(#limbus)"/>
+  <g filter="url(#lift)">
+    <path d="${EYE}" fill="url(#sclera)"/>
   </g>
-  ${pupil("#05070B")}
-
-  <ellipse cx="${C - 62}" cy="${C - 70}" rx="34" ry="24" transform="rotate(-28 ${C - 62} ${C - 70})" fill="#fff" opacity=".92"/>
-  <circle cx="${C}" cy="${C}" r="${EYE}" fill="url(#gloss)"/>
-  <circle cx="${C}" cy="${C}" r="${EYE - 1}" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="2"/>
+  <g clip-path="url(#eyeClip)">
+    <circle cx="${PX}" cy="${PY}" r="128" fill="url(#iris)"/>
+    <circle cx="${PX}" cy="${PY}" r="56" fill="#0A1433"/>
+  </g>
+  <circle cx="${PX - 42}" cy="${PY - 46}" r="24" fill="#fff" opacity=".95"/>
 </svg>
 `;
 
-// One ink: a disc with the iris drawn as a cut ring and the pupil cut out
+// One ink: almond outline with a filled pupil, the same glyph as the menu bar icon
 const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
-  <defs>
-    <mask id="gazehop-mark-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
-      <rect width="512" height="512" fill="#000"/>
-      <circle cx="256" cy="256" r="216" fill="#fff"/>
-      <circle cx="256" cy="256" r="112" fill="none" stroke="#000" stroke-width="22"/>
-      <circle cx="256" cy="256" r="46" fill="#000"/>
-    </mask>
-  </defs>
-  <rect width="512" height="512" fill="#f5f5f7" mask="url(#gazehop-mark-cut)"/>
+  <path d="M40 256C120 128 392 128 472 256C392 384 120 384 40 256Z" fill="none" stroke="#1d1d1f" stroke-width="36" stroke-linejoin="round"/>
+  <circle cx="282" cy="256" r="78" fill="#1d1d1f"/>
 </svg>
 `;
 
-writeFileSync("brand/logo-mark.svg", full);
+writeFileSync("brand/logo-mark.svg", icon(TILE));
+writeFileSync("brand/logo-tight.svg", icon(TILE, "100 100 824 824"));
+writeFileSync("brand/logo-square.svg", icon("M100 100H924V924H100Z", "100 100 824 824"));
 writeFileSync("brand/logo-mono.svg", mono);
-console.log("Wrote brand/logo-mark.svg and brand/logo-mono.svg");
+console.log("Wrote brand/logo-{mark,tight,square,mono}.svg");
