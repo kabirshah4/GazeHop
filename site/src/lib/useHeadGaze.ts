@@ -33,11 +33,13 @@ export function useHeadGaze(enabled: boolean, dwellMs = 250) {
       try {
         const vision = await import("@mediapipe/tasks-vision");
         const files = await vision.FilesetResolver.forVisionTasks(`${BASE}vendor/mediapipe`);
-        landmarker = await vision.FaceLandmarker.createFromOptions(files, {
-          baseOptions: { modelAssetPath: `${BASE}vendor/mediapipe/face_landmarker.task`, delegate: "GPU" },
+        const make = (delegate: "GPU" | "CPU") => vision.FaceLandmarker.createFromOptions(files, {
+          baseOptions: { modelAssetPath: `${BASE}vendor/mediapipe/face_landmarker.task`, delegate },
           runningMode: "VIDEO",
           numFaces: 1, // one person at a time, like the app
         });
+        // GPU is faster, but some browsers refuse it (or have no WebGL contexts to spare): fall back to CPU.
+        landmarker = await make("GPU").catch(() => make("CPU"));
       } catch {
         if (!stopped) setStatus("error");
         return;
