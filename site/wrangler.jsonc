@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gazehop",
+  "compatibility_date": "2026-10-01",
+  // Static site only: serve the Vite build, with our own 404 page for unknown paths.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

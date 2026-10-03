@@ -4,6 +4,8 @@
 
 Look at a screen, and your keyboard follows.
 
+**Website:** https://gazehop.gazehop-site.workers.dev
+
 GazeHop is a tiny macOS menu-bar app for multi-monitor setups: 2, 3, 4 or more screens. It uses your webcam to see
 which screen you're looking at and moves keyboard focus to the last window you used on that
 screen — so you stop typing into the window you just left.
@@ -153,6 +155,18 @@ GazeHop has no accounts, servers, analytics, or crash reporting.
   app names and window titles. It never leaves your Mac; delete it anytime.
 
 The code is open, so you can check all of this yourself.
+
+## Website
+
+The landing page lives in [`site/`](site) (Vite + React + Tailwind) and is deployed to
+Cloudflare Workers static assets:
+
+```sh
+cd site
+npm install
+npm run dev        # local preview
+npm run deploy     # build + wrangler deploy
+```
 
 ## License
 

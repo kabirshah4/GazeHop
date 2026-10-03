@@ -1,0 +1,59 @@
+@import "tailwindcss";
+@import "@fontsource/martian-mono/400.css";
+@import "@fontsource/martian-mono/600.css";
+@import "@fontsource-variable/hanken-grotesk";
+
+/* GazeHop tokens. Cobalt and caret yellow come from the app icon; LED green is used only
+   for the camera indicator. */
+@theme {
+  --color-paper: #F3F4F8;      /* cool display white, page background */
+  --color-card: #FFFFFF;
+  --color-ink: #12142B;        /* text, dark stages */
+  --color-ink-2: #1C1F3D;
+  --color-muted: #5B6075;
+  --color-hairline: #DADDE8;
+  --color-cobalt: #3343E8;     /* focus ring, links, primary action */
+  --color-cobalt-deep: #2420B8;
+  --color-caret: #FFD43B;      /* the caret: where your typing goes */
+  --color-led: #2BD46A;        /* camera indicator only */
+
+  --font-display: "Martian Mono", ui-monospace, Menlo, monospace;
+  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --ease-hop: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--color-caret); color: var(--color-ink); }
+  :focus-visible { outline: 2px solid var(--color-cobalt); outline-offset: 3px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+}
+
+@layer components {
+  .display { font-family: var(--font-display); letter-spacing: -0.04em; line-height: 1.08; }
+  .eyebrow { font-family: var(--font-display); font-size: 12px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--color-muted); }
+  .wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: 20px; }
+  @media (min-width: 768px) { .wrap { padding-inline: 32px; } }
+
+  /* The blinking text caret, GazeHop's signature mark */
+  .caret { display: inline-block; width: 0.55ch; height: 1.05em; margin-left: 0.06em; vertical-align: -0.14em;
+           background: var(--color-caret); border-radius: 2px; animation: blink 1.05s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .keycap { font-family: var(--font-display); font-size: 0.8em; display: inline-flex; align-items: center; gap: 0.2em;
+            padding: 0.15em 0.5em; border: 1px solid var(--color-hairline); border-bottom-width: 3px; border-radius: 7px;
+            background: var(--color-card); color: var(--color-ink); white-space: nowrap; }
+}
