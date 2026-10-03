@@ -141,9 +141,13 @@ struct SettingsView: View {
     }()
 
     var body: some View {
-        NavigationSplitView {
+        // A plain sidebar + divider + detail, System Settings style. (NavigationSplitView's split
+        // toolbar drew its grey strip a couple of points past the divider at a fixed sidebar width.)
+        HStack(spacing: 0) {
             Sidebar(pane: $pane, actions: actions)
-        } detail: {
+                .frame(width: 215)
+                .background(SidebarMaterial().ignoresSafeArea())
+            Divider().ignoresSafeArea()
             Group {
                 switch pane {
                 case .general: GeneralPane(settings: settings, actions: actions)
@@ -154,7 +158,7 @@ struct SettingsView: View {
                 case .about: AboutPane()
                 }
             }
-            .navigationTitle(pane.title)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(minWidth: 840, minHeight: 580)
     }
@@ -171,13 +175,24 @@ private struct Sidebar: View {
                 .padding(.vertical, 3)
                 .tag(p)
         }
-        // Clear the window buttons: without a toolbar the list would start right under them.
+        .listStyle(.sidebar)
+        .scrollContentBackground(.hidden)
+        // Clear the window buttons, which sit in the transparent title bar above the list.
         .safeAreaInset(edge: .top, spacing: 0) { Color.clear.frame(height: 10) }
         .safeAreaInset(edge: .bottom, spacing: 0) { SidebarStatus(state: AppState.shared, actions: actions) }
-        .frame(minWidth: 215)
-        .navigationSplitViewColumnWidth(min: 215, ideal: 215, max: 260)
-        .toolbar(removing: .sidebarToggle)
     }
+}
+
+/// The translucent sidebar material macOS uses in System Settings and Finder.
+private struct SidebarMaterial: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let v = NSVisualEffectView()
+        v.material = .sidebar
+        v.blendingMode = .behindWindow
+        v.state = .followsWindowActiveState
+        return v
+    }
+    func updateNSView(_ v: NSVisualEffectView, context: Context) {}
 }
 
 private struct SidebarStatus: View {
@@ -1033,7 +1048,8 @@ final class SettingsWindowController {
             let w = NSWindow(contentViewController: host)
             w.title = "GazeHop Settings"
             w.styleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
-            w.toolbarStyle = .unified
+            w.titlebarAppearsTransparent = true
+            w.titleVisibility = .hidden
             w.isReleasedWhenClosed = false
             w.setContentSize(NSSize(width: 860, height: 640))
             w.contentMinSize = NSSize(width: 840, height: 580)
