@@ -66,8 +66,9 @@ struct Badge: View {
 // MARK: - Root
 
 struct SettingsView: View {
+    // Only settings are observed here. Live tracking state is observed by the panes that show it,
+    // so ~8 Hz gaze updates never redraw the sidebar (which made clicks on it get lost).
     @ObservedObject var settings = Settings.shared
-    @ObservedObject var state = AppState.shared
     let actions: SettingsActions
     // `--settings tracking` (etc.) opens a specific pane; handy for screenshots and docs
     @State private var pane: Pane = {
@@ -78,19 +79,13 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(Pane.allCases, selection: $pane) { p in
-                Label { Text(p.title) } icon: { Badge(pane: p) }
-                    .padding(.vertical, 2)
-                    .tag(p)
-            }
-            .navigationSplitViewColumnWidth(min: 190, ideal: 200, max: 230)
-            .toolbar(removing: .sidebarToggle)
+            Sidebar(pane: $pane)
         } detail: {
             Group {
                 switch pane {
-                case .general: GeneralPane(settings: settings, state: state, actions: actions)
-                case .tracking: TrackingPane(settings: settings, state: state, actions: actions)
-                case .screens: ScreensPane(settings: settings, state: state, actions: actions)
+                case .general: GeneralPane(settings: settings, state: AppState.shared, actions: actions)
+                case .tracking: TrackingPane(settings: settings, state: AppState.shared, actions: actions)
+                case .screens: ScreensPane(settings: settings, state: AppState.shared, actions: actions)
                 case .permissions: PermissionsPane()
                 case .advanced: AdvancedPane(settings: settings, actions: actions)
                 case .about: AboutPane()
@@ -99,6 +94,20 @@ struct SettingsView: View {
             .navigationTitle(pane.title)
         }
         .frame(minWidth: 760, minHeight: 540)
+    }
+}
+
+/// The sidebar depends only on the selected pane, so nothing else can make it redraw.
+private struct Sidebar: View {
+    @Binding var pane: Pane
+    var body: some View {
+        List(Pane.allCases, selection: $pane) { p in
+            Label { Text(p.title) } icon: { Badge(pane: p) }
+                .padding(.vertical, 2)
+                .tag(p)
+        }
+        .navigationSplitViewColumnWidth(min: 190, ideal: 200, max: 230)
+        .toolbar(removing: .sidebarToggle)
     }
 }
 

@@ -221,7 +221,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let pred = model.predict(smoothed!, among: connected)
         if settings.debugLogging, Date().timeIntervalSince(lastDiag) > 1 {
             lastDiag = Date()
-            DebugLog.write("pred=\(pred.map { "\($0.display) conf=\(String(format: "%.2f", $0.confidence))" } ?? "nil") trusted=\(FocusManager.isTrusted) focused=\(focus.focusedDisplay.map(String.init) ?? "nil") front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?") known=\(focus.lastWindow.map { "\($0.key):\($0.value.appName)" })")
+            DebugLog.write("pred=\(pred.map { "\($0.display) conf=\(String(format: "%.2f", $0.confidence))" } ?? "nil") trusted=\(FocusManager.isTrusted) focused=\(focus.cachedFocusedDisplay.map(String.init) ?? "nil") front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?") known=\(focus.lastWindow.map { "\($0.key):\($0.value.appName)" })")
         }
         state.publishGaze(display: pred?.display, confidence: pred?.confidence ?? 0)
         guard let p = pred else { return }
@@ -241,11 +241,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
               now.timeIntervalSince(lastSwitch) * 1000 >= settings.cooldownMs,
               CGEventSource.buttonState(.combinedSessionState, button: .left) == false,  // not mid-drag
               !settings.excludedDisplays.contains(c.display),
+              // Never take focus away from GazeHop's own windows (Settings, calibration).
+              !NSApp.isActive,
               // Never move focus while a password field (secure input) is active.
               !IsSecureEventInputEnabled(),
               // Don't split a word across windows: wait for a short pause in typing.
               !settings.waitForTypingPause || CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .keyDown) > 0.35,
-              focus.focusedDisplay != c.display else { return }
+              focus.cachedFocusedDisplay != c.display,
+              focus.focusedDisplay != c.display else { return }  // one fresh check, only when about to switch
 
         lastSwitch = now
         if let w = focus.focus(display: c.display) {

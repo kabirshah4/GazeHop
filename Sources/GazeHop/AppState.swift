@@ -20,9 +20,10 @@ final class AppState: ObservableObject {
         let now = Date()
         guard now.timeIntervalSince(lastGazePublish) > 0.12 else { return }
         lastGazePublish = now
+        // Only publish real changes: every assignment to a @Published property redraws observers.
         if !faceVisible { faceVisible = true }
-        looking = display
-        self.confidence = confidence
+        if looking != display { looking = display }
+        if abs(self.confidence - confidence) > 0.04 { self.confidence = confidence }
     }
 
     func publishNoFace() {

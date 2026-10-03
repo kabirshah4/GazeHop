@@ -52,9 +52,14 @@ final class FocusManager {
                          appName: app.localizedName ?? "app", title: Self.title(of: win))
     }
 
+    /// Display with keyboard focus, refreshed every 0.3 s. Asking another app for its focused window
+    /// is a slow cross-process call, so per-frame code reads this instead of `focusedDisplay`.
+    private(set) var cachedFocusedDisplay: UInt32?
+
     private func recordCurrent() {
-        guard let w = currentWindow(), let id = Self.display(containing: w.frame) else { return }
+        guard let w = currentWindow(), let id = Self.display(containing: w.frame) else { cachedFocusedDisplay = nil; return }
         lastWindow[id] = w
+        cachedFocusedDisplay = id
     }
 
     /// Window to focus on `display`: the last one you used there if it's still open and on that
@@ -113,6 +118,7 @@ final class FocusManager {
         AXUIElementSetAttributeValue(w.element, kAXFocusedAttribute as CFString, kCFBooleanTrue)
         AXUIElementPerformAction(w.element, kAXRaiseAction as CFString)
         lastWindow[display] = w
+        cachedFocusedDisplay = display
 
         // Scrolling goes wherever the pointer is, so bring it along.
         if movePointer, Self.display(containing: CGRect(origin: NSEvent.globalPointerTopLeft, size: .zero)) != display {
