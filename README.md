@@ -14,11 +14,12 @@ Everything runs on your Mac. No video is recorded, stored, or sent anywhere.
 
 - **Tracking:** Apple's Vision framework reads head direction (yaw, nose position) and eye
   gaze (pupil position within each eye) from the front camera.
+- **One person:** GazeHop locks onto one face (you, at the desk) and ignores anyone else in view.
 - **Deciding:** a quick calibration (look at a dot on each screen) trains a nearest-centroid
   model. GazeHop switches only after you've looked at a screen for 250 ms, with a 0.6 s
   cooldown, and never while you're dragging.
-- **Switching:** the Accessibility API remembers the last focused window on each display,
-  raises it, and (optionally) moves the pointer there so scrolling works too.
+- **Switching:** the Accessibility API brings back the last window you used on that display
+  (or the frontmost window there, so no setup clicks are needed), raises it, and (optionally) moves the pointer there so scrolling works too.
 
 ## Requirements
 
@@ -67,7 +68,6 @@ The menu bar icon shows the state: plain eye = watching, slashed = paused, dot =
 | **General** | Launch at login · show the name in the menu bar · move pointer with focus · sounds · pause shortcut (⌘F1, ⌥F1, ⌃⌥G, ⌃⌥⌘G or none) |
 | **Tracking** | Look time before switching · minimum time between switches · strictness · smoothing · recalibrate |
 | **Screens** | Per-display on/off, calibration status |
-| **Laya** | Enable, server URL, confidence threshold, test connection |
 | **Advanced** | Debug logging, open log, shortcuts to Camera/Accessibility settings |
 
 All settings apply immediately.
@@ -81,15 +81,6 @@ GazeHop calibrates every connected display and picks whichever one you're lookin
   **Calibrate…** to include it.
 - Accuracy depends on how far apart the screens are from your point of view: side-by-side
   and stacked layouts work best; two screens at almost the same angle are hard to tell apart.
-
-## Optional: Laya smart filter
-
-GazeHop can ask a local [Laya](https://huggingface.co/convaiinnovations/laya) server
-(`http://127.0.0.1:8077/decide`) whether a glance is a deliberate switch. Laya is a text
-decision model, so it receives a short description of the situation (app names, window
-titles, dwell time), never camera frames. If the server is unreachable, switches go ahead.
-
-It's off by default: in early testing Laya didn't reliably tell glances from real switches.
 
 ## Tests
 

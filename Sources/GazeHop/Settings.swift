@@ -27,11 +27,6 @@ final class Settings: ObservableObject {
         didSet { d.set(excludedDisplays.map(Int.init), forKey: "excludedDisplays") }
     }
 
-    // Laya
-    @Published var layaEnabled: Bool { didSet { d.set(layaEnabled, forKey: "layaFilter") } }
-    @Published var layaURL: String { didSet { d.set(layaURL, forKey: "layaURL") } }
-    @Published var layaThreshold: Double { didSet { d.set(layaThreshold, forKey: "layaThreshold") } }
-
     // Advanced
     @Published var debugLogging: Bool { didSet { d.set(debugLogging, forKey: "debug") } }
 
@@ -40,7 +35,6 @@ final class Settings: ObservableObject {
             "showNameInMenuBar": false, "movePointer": true, "playSounds": true,
             "hotKey": HotKeyPreset.cmdF1.rawValue,
             "dwellMs": 250.0, "cooldownMs": 600.0, "strictness": 0.2, "smoothing": 0.55,
-            "layaURL": "http://127.0.0.1:8077/decide", "layaThreshold": 0.5,
         ])
         showNameInMenuBar = d.bool(forKey: "showNameInMenuBar")
         movePointer = d.bool(forKey: "movePointer")
@@ -51,9 +45,6 @@ final class Settings: ObservableObject {
         strictness = d.double(forKey: "strictness")
         smoothing = d.double(forKey: "smoothing")
         excludedDisplays = Set((d.array(forKey: "excludedDisplays") as? [Int] ?? []).map(UInt32.init))
-        layaEnabled = d.bool(forKey: "layaFilter")
-        layaURL = d.string(forKey: "layaURL") ?? ""
-        layaThreshold = d.double(forKey: "layaThreshold")
         debugLogging = d.bool(forKey: "debug")
     }
 

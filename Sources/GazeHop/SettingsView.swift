@@ -5,7 +5,6 @@ import SwiftUI
 struct SettingsActions {
     var calibrate: () -> Void
     var calibratedDisplays: () -> Set<UInt32>
-    var testLaya: (@escaping (String) -> Void) -> Void
 }
 
 struct SettingsView: View {
@@ -20,8 +19,6 @@ struct SettingsView: View {
                 .tabItem { Label("Tracking", systemImage: "eye") }
             ScreensTab(settings: settings, actions: actions)
                 .tabItem { Label("Screens", systemImage: "display.2") }
-            LayaTab(settings: settings, actions: actions)
-                .tabItem { Label("Laya", systemImage: "brain") }
             AdvancedTab(settings: settings)
                 .tabItem { Label("Advanced", systemImage: "wrench.and.screwdriver") }
         }
@@ -120,34 +117,6 @@ private struct ScreensTab: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)) { _ in
             screens = NSScreen.screens
         }
-    }
-}
-
-private struct LayaTab: View {
-    @ObservedObject var settings: Settings
-    let actions: SettingsActions
-    @State private var testResult = ""
-
-    var body: some View {
-        Form {
-            Section {
-                Toggle("Ask Laya before switching", isOn: $settings.layaEnabled)
-                TextField("Server URL", text: $settings.layaURL)
-                LabeledSlider(title: "Switch when Laya is at least", value: $settings.layaThreshold,
-                              range: 0.05...0.95, step: 0.05, format: { "\(Int($0 * 100))% sure" })
-                HStack {
-                    Button("Test connection") {
-                        testResult = "Testing…"
-                        actions.testLaya { testResult = $0 }
-                    }
-                    Text(testResult).font(.caption).foregroundStyle(.secondary)
-                }
-            } footer: {
-                Text("Experimental. Laya is a local text model: it gets a short description (app names, window titles, timing), never camera images. If the server is down, switches go ahead.")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-        }
-        .formStyle(.grouped)
     }
 }
 

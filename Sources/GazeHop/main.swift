@@ -6,13 +6,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let settings = Settings.shared
     private let tracker = GazeTracker()
     private let focus = FocusManager()
-    private let laya = LayaFilter()
     private var model = GazeModel.load()
     private var calibration: Calibration?
     private lazy var settingsWindow = SettingsWindowController(actions: SettingsActions(
         calibrate: { [weak self] in self?.calibrate() },
-        calibratedDisplays: { [weak self] in Set(self?.model?.centroids.keys ?? [:].keys) },
-        testLaya: { [weak self] done in self?.laya.test(completion: done) }))
+        calibratedDisplays: { [weak self] in Set(self?.model?.centroids.keys ?? [:].keys) }))
 
     private var statusItem: NSStatusItem!
     private var statusLine = NSMenuItem(title: "Starting…", action: nil, keyEquivalent: "")
@@ -22,9 +20,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private var paused = UserDefaults.standard.bool(forKey: "paused")
     private var smoothed: [Double]?
-    private var candidate: (display: UInt32, since: Date)?
+    /// Screen you seem to be looking at: when that started, and the last confident frame for it.
+    private var candidate: (display: UInt32, since: Date, lastHit: Date)?
     private var lastSwitch = Date.distantPast
-    private var pendingLaya = false
+    private var lastNoWindowLog: UInt32?
     private var lastDiag = Date.distantPast
     private var pauseHotKey: HotKey?
 
@@ -123,8 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if model == nil { setStatus("Needs calibration", icon: .attention); return }
         if !uncalibratedScreens.isEmpty { setStatus("New screen connected: calibrate", icon: .attention); return }
         let active = connected.subtracting(settings.excludedDisplays).count
-        let layaNote = laya.enabled ? " · Laya \(laya.lastStatus)" : ""
-        setStatus("Watching \(active) of \(connected.count) screens\(layaNote)", icon: .active)
+        setStatus("Watching \(active) of \(connected.count) screens", icon: .active)
     }
 
     @objc private func openSettings() { settingsWindow.show() }
@@ -204,34 +202,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             lastDiag = Date()
             DebugLog.write("pred=\(pred.map { "\($0.display) conf=\(String(format: "%.2f", $0.confidence))" } ?? "nil") trusted=\(FocusManager.isTrusted) focused=\(focus.focusedDisplay.map(String.init) ?? "nil") front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?") known=\(focus.lastWindow.map { "\($0.key):\($0.value.appName)" })")
         }
-        guard let p = pred, p.confidence >= settings.strictness else { candidate = nil; return }
+        guard let p = pred else { return }
+        let now = Date()
 
-        if candidate?.display != p.display { candidate = (p.display, Date()); return }
-        guard let c = candidate, Date().timeIntervalSince(c.since) * 1000 >= settings.dwellMs,
-              Date().timeIntervalSince(lastSwitch) * 1000 >= settings.cooldownMs,
-              !pendingLaya,
+        // Confident frames start or extend a look at a screen. Unsure frames are ignored rather
+        // than restarting the timer (confidence flickers around the threshold), but a look that
+        // hasn't been confirmed recently expires.
+        if p.confidence >= settings.strictness {
+            if candidate?.display == p.display { candidate?.lastHit = now }
+            else { candidate = (p.display, now, now) }
+        }
+        guard let c = candidate else { return }
+        if now.timeIntervalSince(c.lastHit) > 0.35 { candidate = nil; return }
+
+        guard now.timeIntervalSince(c.since) * 1000 >= settings.dwellMs,
+              now.timeIntervalSince(lastSwitch) * 1000 >= settings.cooldownMs,
               CGEventSource.buttonState(.combinedSessionState, button: .left) == false,  // not mid-drag
-              !settings.excludedDisplays.contains(p.display),
-              let current = focus.focusedDisplay, current != p.display,
-              let target = focus.lastWindow[p.display] else { return }
+              !settings.excludedDisplays.contains(c.display),
+              focus.focusedDisplay != c.display else { return }
 
-        let from = focus.currentWindow()
-        let ctx = LayaFilter.Context(
-            fromApp: from?.appName ?? "unknown", fromTitle: from?.title ?? "",
-            toApp: target.appName, toTitle: target.title,
-            dwellMs: Int(Date().timeIntervalSince(c.since) * 1000),
-            confidence: p.confidence,
-            secondsSinceKey: CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .keyDown))
-        pendingLaya = true
-        laya.shouldSwitch(ctx) { [weak self] allow in
-            guard let self else { return }
-            self.pendingLaya = false
-            self.lastSwitch = Date()   // also rate-limits re-asking Laya after a "no"
-            if allow {
-                let ok = self.focus.focus(display: p.display)
-                DebugLog.write("SWITCH -> \(p.display) \(target.appName) ok=\(ok)")
-            } else { DebugLog.write("laya blocked switch") }
-            if self.laya.enabled { self.refreshStatus() }
+        lastSwitch = now
+        if let w = focus.focus(display: c.display) {
+            DebugLog.write("SWITCH -> \(c.display) \(w.appName) \"\(w.title)\" conf=\(String(format: "%.2f", p.confidence))")
+            lastNoWindowLog = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self else { return }
+                let landed = self.focus.focusedDisplay
+                if landed != c.display {
+                    DebugLog.write("  focus did not land: now on \(landed.map(String.init) ?? "nil") front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?")")
+                }
+            }
+        } else if lastNoWindowLog != c.display {
+            DebugLog.write("no window to focus on screen \(c.display)")
+            lastNoWindowLog = c.display
         }
     }
 }

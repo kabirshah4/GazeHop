@@ -57,25 +57,69 @@ final class FocusManager {
         lastWindow[id] = w
     }
 
-    /// Focus the last window used on `display`. Returns false if nothing is known there.
-    @discardableResult
-    func focus(display: UInt32) -> Bool {
-        guard let w = lastWindow[display],
-              let app = NSRunningApplication(processIdentifier: w.pid), !app.isTerminated,
-              let frame = Self.frame(of: w.element) else {   // window closed?
-            lastWindow[display] = nil
-            return false
+    /// Window to focus on `display`: the last one you used there if it's still open and on that
+    /// screen, otherwise the frontmost normal window on that screen. No setup clicks needed.
+    func target(for display: UInt32) -> WindowRef? {
+        if let w = lastWindow[display],
+           let app = NSRunningApplication(processIdentifier: w.pid), !app.isTerminated,
+           let frame = Self.frame(of: w.element), Self.display(containing: frame) == display {
+            return w
         }
+        lastWindow[display] = nil
+        return frontmostWindow(on: display)
+    }
+
+    /// Frontmost regular window on a display, from the window server's front-to-back list.
+    private func frontmostWindow(on display: UInt32) -> WindowRef? {
+        let me = ProcessInfo.processInfo.processIdentifier
+        guard let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements],
+                                                    kCGNullWindowID) as? [[String: Any]] else { return nil }
+        for info in list {
+            guard (info[kCGWindowLayer as String] as? Int) == 0,
+                  let pid = info[kCGWindowOwnerPID as String] as? pid_t, pid != me,
+                  let b = info[kCGWindowBounds as String] as? NSDictionary,
+                  let bounds = CGRect(dictionaryRepresentation: b),
+                  bounds.width >= 120, bounds.height >= 80,
+                  Self.display(containing: bounds) == display,
+                  let app = NSRunningApplication(processIdentifier: pid), app.activationPolicy == .regular,
+                  let element = Self.axWindow(pid: pid, matching: bounds) else { continue }
+            return WindowRef(pid: pid, element: element, frame: bounds,
+                             appName: app.localizedName ?? "app", title: Self.title(of: element))
+        }
+        return nil
+    }
+
+    /// The app's Accessibility window whose frame matches a window-server rect.
+    private static func axWindow(pid: pid_t, matching rect: CGRect) -> AXUIElement? {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(AXUIElementCreateApplication(pid), kAXWindowsAttribute as CFString, &value) == .success,
+              let windows = value as? [AXUIElement] else { return nil }
+        return windows.first { w in
+            guard let f = frame(of: w) else { return false }
+            return abs(f.minX - rect.minX) < 3 && abs(f.minY - rect.minY) < 3
+                && abs(f.width - rect.width) < 3 && abs(f.height - rect.height) < 3
+        }
+    }
+
+    /// Focus the right window on `display`. Returns the window, or nil if that screen has none.
+    @discardableResult
+    func focus(display: UInt32) -> WindowRef? {
+        guard let w = target(for: display),
+              let app = NSRunningApplication(processIdentifier: w.pid) else { return nil }
+        let axApp = AXUIElementCreateApplication(w.pid)
         app.activate()
+        AXUIElementSetAttributeValue(axApp, kAXFrontmostAttribute as CFString, kCFBooleanTrue)
         AXUIElementSetAttributeValue(w.element, kAXMainAttribute as CFString, kCFBooleanTrue)
+        AXUIElementSetAttributeValue(w.element, kAXFocusedAttribute as CFString, kCFBooleanTrue)
         AXUIElementPerformAction(w.element, kAXRaiseAction as CFString)
+        lastWindow[display] = w
 
         // Scrolling goes wherever the pointer is, so bring it along.
         if movePointer, Self.display(containing: CGRect(origin: NSEvent.globalPointerTopLeft, size: .zero)) != display {
-            CGWarpMouseCursorPosition(CGPoint(x: frame.midX, y: frame.midY))
+            CGWarpMouseCursorPosition(CGPoint(x: w.frame.midX, y: w.frame.midY))
             CGAssociateMouseAndMouseCursorPosition(1)
         }
-        return true
+        return w
     }
 
     // MARK: geometry helpers

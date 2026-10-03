@@ -61,30 +61,70 @@ final class GazeTracker: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate 
         configured = true
     }
 
+    // The one person GazeHop follows; everyone else in frame is ignored.
+    private var trackedCenter: CGPoint?
+    private var trackedSeen = Date.distantPast
+    private static let reacquireAfter: TimeInterval = 2.0   // lost this long → pick a new person
+    private static let maxJump: CGFloat = 0.2               // per-frame movement, in frame widths
+    private static let minFaceWidth: CGFloat = 0.08         // ignore small faces far in the background
+
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer,
                        from connection: AVCaptureConnection) {
         guard let pixels = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        let request = VNDetectFaceLandmarksRequest()
         let handler = VNImageRequestHandler(cvPixelBuffer: pixels, orientation: .up)
-        try? handler.perform([request])
 
-        // Use the largest face (the person at the desk).
-        guard let face = request.results?.max(by: { area($0) < area($1) }),
-              let features = Self.features(for: face) else {
+        // 1. Find faces, then choose exactly one.
+        let rects = VNDetectFaceRectanglesRequest()
+        try? handler.perform([rects])
+        guard let face = pickFace(rects.results ?? []) else {
+            DispatchQueue.main.async { self.onNoFace?() }
+            return
+        }
+
+        // 2. Landmarks for that face only.
+        let landmarks = VNDetectFaceLandmarksRequest()
+        landmarks.inputFaceObservations = [face]
+        try? handler.perform([landmarks])
+        guard let detailed = landmarks.results?.first,
+              let features = Self.features(for: detailed, pose: face) else {
             DispatchQueue.main.async { self.onNoFace?() }
             return
         }
         DispatchQueue.main.async { self.onSample?(features) }
     }
 
+    /// Keeps following the same person: the face nearest to where they were last seen.
+    /// Only after they've been gone for a while does it pick the largest face again.
+    private func pickFace(_ faces: [VNFaceObservation]) -> VNFaceObservation? {
+        let candidates = faces.filter { $0.boundingBox.width >= Self.minFaceWidth }
+        let now = Date()
+        let chosen: VNFaceObservation?
+        if let last = trackedCenter, now.timeIntervalSince(trackedSeen) < Self.reacquireAfter {
+            chosen = candidates
+                .map { ($0, hypot($0.boundingBox.midX - last.x, $0.boundingBox.midY - last.y)) }
+                .filter { $0.1 <= Self.maxJump }
+                .min { $0.1 < $1.1 }?.0
+        } else {
+            chosen = candidates.max { area($0) < area($1) }
+        }
+        if let chosen {
+            if trackedCenter == nil || now.timeIntervalSince(trackedSeen) >= Self.reacquireAfter {
+                DebugLog.write("tracking face (\(candidates.count) in view)")
+            }
+            trackedCenter = CGPoint(x: chosen.boundingBox.midX, y: chosen.boundingBox.midY)
+            trackedSeen = now
+        }
+        return chosen
+    }
+
     private func area(_ f: VNFaceObservation) -> CGFloat {
         f.boundingBox.width * f.boundingBox.height
     }
 
-    private static func features(for face: VNFaceObservation) -> [Double]? {
+    private static func features(for face: VNFaceObservation, pose: VNFaceObservation) -> [Double]? {
         guard let lm = face.landmarks else { return nil }
-        let yaw = face.yaw?.doubleValue ?? 0
-        let pitch = face.pitch?.doubleValue ?? 0
+        let yaw = (face.yaw ?? pose.yaw)?.doubleValue ?? 0
+        let pitch = (face.pitch ?? pose.pitch)?.doubleValue ?? 0
 
         // Landmark points are normalized to the face bounding box.
         let nose = mean(lm.nose?.normalizedPoints ?? lm.noseCrest?.normalizedPoints ?? [])
