@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import { AnimatedGridPattern } from "../components/magicui/animated-grid-pattern";
+import { Eye3D } from "../components/Eye3D";
 import DecryptedText from "../components/reactbits/DecryptedText";
 import LightRays from "../components/reactbits/LightRays";
 import ShinyText from "../components/reactbits/ShinyText";
@@ -37,7 +38,7 @@ export function Hero() {
         </motion.p>
 
         {/* The 3D eye lands here and follows your pointer */}
-        <div data-eye="pointer" className="my-8 size-[clamp(120px,13vw,230px)] md:my-10" aria-hidden="true" />
+        <Eye3D look="pointer" className="my-8 size-[clamp(120px,13vw,230px)] md:my-10" />
 
         <motion.h1 {...rise(0.1)} id="hero-title" className="t-hero max-w-[14ch] text-balance">
           Look at a screen, and your keyboard follows<span className="caret" aria-hidden="true" />

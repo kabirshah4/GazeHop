@@ -2,29 +2,32 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 /**
- * The GazeHop eye: one photographic 3D eyeball on a fixed, click-through canvas.
+ * A photographic 3D eyeball that lives in the page like any other element and scrolls with it.
+ * Each instance renders into its own canvas, only while it's on screen.
  *
- * Sections place empty anchor boxes with `data-eye="<look>"`. The eye flies to whichever anchor
- * is nearest the middle of the viewport, sizes itself to the box, and looks where the anchor says:
- *   pointer  follow the mouse          hop     glance left, then right, like switching screens
- *   left     look at the left screen   right   look at the right screen
- *   camera   mirror the visitor's head in the camera demo (eyeBus.lean)       ahead  straight on
+ *   look="pointer"  follows the mouse          look="hop"     glances left, then right
+ *   look="left"     looks at the left screen   look="right"   looks at the right screen
+ *   look="camera"   mirrors the visitor's head in the camera demo (eyeBus.lean)
  *
  * Rendering: the eyeball (sclera + iris + pupil) is a custom shader with the iris recessed under
  * the cornea (parallax), plus two clear gloss layers (whole eye + corneal bulge) that only add
- * reflections of a studio softbox setup, which is what makes it read as wet and real.
+ * reflections of a small studio softbox setup, which is what makes it read as wet and real.
  */
 export const eyeBus = { lean: 0 };
 
-type Look = "pointer" | "hop" | "left" | "right" | "camera" | "ahead";
+export type Look = "pointer" | "hop" | "left" | "right" | "camera" | "ahead";
 
-const IRIS = 0.5; // iris radius on the front of a unit eyeball
+const IRIS = 0.5;       // iris radius on the front of a unit eyeball
+const FILL = 0.86;      // eyeball diameter as a share of the box
 
-export function FlyingEye() {
+export function Eye3D({ look = "ahead", className = "" }: { look?: Look; className?: string }) {
+  const boxRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lookRef = useRef<Look>(look);
+  lookRef.current = look;
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
+    const box = boxRef.current!, canvas = canvasRef.current!;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let renderer: THREE.WebGLRenderer;
@@ -36,11 +39,10 @@ export function FlyingEye() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
 
     const scene = new THREE.Scene();
 
-    // Studio lighting for reflections: a big key softbox, a rim strip, a faint floor bounce.
+    // Studio lighting for reflections: a small key softbox up-left, a rim strip, a faint floor bounce.
     const pmrem = new THREE.PMREMGenerator(renderer);
     const studio = new THREE.Scene();
     studio.background = new THREE.Color(0x05070b);
@@ -53,148 +55,125 @@ export function FlyingEye() {
       m.lookAt(0, 0, 0);
       studio.add(m);
     };
-    softbox(3.2, 2.2, [-2.6, 2.4, 3.6], 7);            // key, upper left
-    softbox(0.5, 4.5, [4.2, 0.2, 1.4], 2.6, 0xdfe8f5); // rim strip, right
-    softbox(5, 0.8, [0, -3.6, 2.2], 0.6);              // floor bounce
+    softbox(0.9, 0.7, [-3.0, 3.1, 2.4], 9);
+    softbox(0.35, 3.2, [4.4, 0.3, 0.9], 1.8, 0xdfe8f5);
+    softbox(5, 0.8, [0, -3.6, 2.2], 0.3);
     const envMap = pmrem.fromScene(studio, 0).texture;
 
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -4000, 4000);
-    camera.position.z = 2000;
+    const half = 1 / FILL;
+    const camera = new THREE.OrthographicCamera(-half, half, half, -half, -10, 10);
+    camera.position.z = 5;
 
-    // ---- the eye ----
-    const root = new THREE.Group(); // position + size
-    const ball = new THREE.Group(); // gaze rotation
-    root.add(ball);
-    scene.add(root);
-
+    const ball = new THREE.Group();
+    scene.add(ball);
     const uniforms = {
       uViewObj: { value: new THREE.Vector3(0, 0, 1) },
       uLightObj: { value: new THREE.Vector3(-0.5, 0.55, 0.68).normalize() },
       uPupil: { value: 0.34 },
     };
-    const eyeball = new THREE.Mesh(
+    ball.add(new THREE.Mesh(
       new THREE.SphereGeometry(1, 128, 96),
       new THREE.ShaderMaterial({ uniforms, vertexShader: VERT, fragmentShader: FRAG, toneMapped: false }),
-    );
-    ball.add(eyeball);
-
-    // Gloss layers: black and additive, so they contribute only reflections.
+    ));
     const gloss = (roughness: number, intensity: number) => new THREE.MeshPhysicalMaterial({
       color: 0x000000, roughness, metalness: 0, envMap, envMapIntensity: intensity,
       transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
     });
     ball.add(new THREE.Mesh(new THREE.SphereGeometry(1.002, 96, 64), gloss(0.16, 2.2)));
-    // Corneal bulge: a cap of a smaller sphere that meets the eyeball at the edge of the iris.
-    ball.add(new THREE.Mesh(corneaGeometry(), gloss(0.02, 4.5)));
+    ball.add(new THREE.Mesh(corneaGeometry(), gloss(0.03, 3)));
 
-    // Soft halo so it sits in the page rather than on it
     const halo = new THREE.Mesh(
-      new THREE.PlaneGeometry(3.4, 3.4),
+      new THREE.PlaneGeometry(2.3, 2.3),
       new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(drawHalo()), transparent: true, depthWrite: false, depthTest: false }),
     );
-    halo.position.z = -1.5;
+    halo.position.z = -2;
     halo.renderOrder = -1;
-    root.add(halo);
+    scene.add(halo);
 
-    // ---- layout + motion state ----
-    let W = 0, H = 0;
     const resize = () => {
-      W = window.innerWidth; H = window.innerHeight;
-      renderer.setSize(W, H, false);
-      camera.left = -W / 2; camera.right = W / 2; camera.top = H / 2; camera.bottom = -H / 2;
-      camera.updateProjectionMatrix();
+      const r = box.getBoundingClientRect();
+      renderer.setSize(Math.max(1, r.width), Math.max(1, r.height), false);
     };
+    const ro = new ResizeObserver(resize);
+    ro.observe(box);
     resize();
-    window.addEventListener("resize", resize);
 
-    const pointer = { x: W / 2, y: H * 0.3 };
+    const pointer = { x: window.innerWidth / 2, y: window.innerHeight * 0.3 };
     const onMove = (e: PointerEvent) => { pointer.x = e.clientX; pointer.y = e.clientY; };
     window.addEventListener("pointermove", onMove, { passive: true });
 
-    const cur = { x: 0, y: H * 0.2, r: 0, yaw: 0, pitch: 0 };
+    // Only animate while visible
+    let visible = false;
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
+    }, { rootMargin: "100px" });
+    io.observe(box);
+
+    const cur = { yaw: 0, pitch: 0 };
     const keyWorld = new THREE.Vector3(-0.5, 0.55, 0.68).normalize();
     const q = new THREE.Quaternion();
-    let first = true;
     let saccade = { x: 0, y: 0, until: 0 };
     let raf = 0;
-    let wasVisible = true;
+    let first = true;
     let last = performance.now();
 
-    const tick = (now: number) => {
+    function tick(now: number) {
+      if (!visible) { raf = 0; return; }
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
 
-      // Nearest visible anchor to the viewport's middle
-      let best: { el: HTMLElement; rect: DOMRect; d: number } | null = null;
-      document.querySelectorAll<HTMLElement>("[data-eye]").forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.bottom < -40 || rect.top > H + 40 || rect.width === 0) return;
-        const d = Math.abs(rect.top + rect.height / 2 - H / 2);
-        if (!best || d < best.d) best = { el, rect, d };
-      });
+      const r = box.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const W = window.innerWidth, H = window.innerHeight;
+      let yaw = 0, pitch = 0;
+      const mode = lookRef.current;
+      if (mode === "pointer" && !reduce) {
+        yaw = clamp(((pointer.x - cx) / W) * 1.9, -0.55, 0.55);
+        pitch = clamp(((pointer.y - cy) / H) * 1.4, -0.36, 0.36);
+      } else if (mode === "hop") {
+        yaw = reduce ? 0.45 : (Math.floor(now / 1900) % 2 === 0 ? -0.45 : 0.45);
+        pitch = 0.08;
+      } else if (mode === "left") { yaw = -0.45; pitch = 0.06; }
+      else if (mode === "right") { yaw = 0.45; pitch = 0.06; }
+      else if (mode === "camera") { yaw = clamp(-eyeBus.lean * 0.5, -0.5, 0.5); }
 
-      let tx = cur.x, ty = cur.y, tr = 0, yaw = 0, pitch = 0;
-      if (best) {
-        const { el, rect } = best as { el: HTMLElement; rect: DOMRect };
-        const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
-        tx = cx - W / 2; ty = H / 2 - cy;
-        tr = (Math.min(rect.width, rect.height) / 2) * 0.86;
-        const look = (el.dataset.eye || "ahead") as Look;
-        if (look === "pointer" && !reduce) {
-          yaw = clamp(((pointer.x - cx) / W) * 1.9, -0.55, 0.55);
-          pitch = clamp(((pointer.y - cy) / H) * 1.4, -0.36, 0.36);
-        } else if (look === "hop") {
-          yaw = reduce ? 0.45 : (Math.floor(now / 1900) % 2 === 0 ? -0.45 : 0.45);
-          pitch = 0.08;
-        } else if (look === "left") { yaw = -0.45; pitch = 0.06; }
-        else if (look === "right") { yaw = 0.45; pitch = 0.06; }
-        else if (look === "camera") { yaw = clamp(-eyeBus.lean * 0.5, -0.5, 0.5); }
-      }
-
-      // Tiny involuntary saccades make it feel alive
       if (!reduce && now > saccade.until) {
         saccade = { x: (Math.random() - 0.5) * 0.06, y: (Math.random() - 0.5) * 0.04, until: now + 900 + Math.random() * 2400 };
       }
-
-      const follow = (k: number) => (reduce || first ? 1 : 1 - Math.exp(-dt * k));
-      const vx = tx - cur.x;
-      cur.x += vx * follow(5);
-      cur.y += (ty - cur.y) * follow(5);
-      cur.r += (tr - cur.r) * follow(6);
-      cur.yaw += (yaw + saccade.x - cur.yaw) * follow(14);
-      cur.pitch += (pitch + saccade.y - cur.pitch) * follow(14);
+      const k = reduce || first ? 1 : 1 - Math.exp(-dt * 14);
+      cur.yaw += (yaw + saccade.x - cur.yaw) * k;
+      cur.pitch += (pitch + saccade.y - cur.pitch) * k;
       first = false;
-
-      root.position.set(cur.x, cur.y, 0);
-      root.scale.setScalar(Math.max(cur.r, 0.0001));
-      root.visible = cur.r > 2;
-      root.rotation.z = reduce ? 0 : clamp(-vx * 0.0005, -0.3, 0.3);
       ball.rotation.set(cur.pitch, cur.yaw, 0);
 
-      // View + key light in the eyeball's own space (for iris parallax and shading)
       ball.updateMatrixWorld();
       ball.getWorldQuaternion(q).invert();
       uniforms.uViewObj.value.set(0, 0, 1).applyQuaternion(q);
       uniforms.uLightObj.value.copy(keyWorld).applyQuaternion(q);
       uniforms.uPupil.value = reduce ? 0.34 : 0.335 + Math.sin(now * 0.0007) * 0.025; // pupil breathes
 
-      // Skip GPU work while the eye is off-screen (render one last frame to clear it)
-      if (root.visible || wasVisible) renderer.render(scene, camera);
-      wasVisible = root.visible;
+      renderer.render(scene, camera);
       raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
+    }
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      raf = 0;
+      visible = false;
+      io.disconnect();
+      ro.disconnect();
       window.removeEventListener("pointermove", onMove);
       renderer.dispose();
       pmrem.dispose();
     };
   }, []);
 
-  return <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none fixed inset-0 z-[5] h-full w-full" />;
+  return (
+    <div ref={boxRef} className={`relative ${className}`} aria-hidden="true">
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+    </div>
+  );
 }
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));

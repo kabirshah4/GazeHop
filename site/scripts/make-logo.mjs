@@ -1,5 +1,5 @@
 // Generates the GazeHop logo SVGs (deterministic, so the iris fibres never change):
-//   brand/logo-mark.svg  full-colour app icon (graphite tile, glossy eyeball, caret pupil)
+//   brand/logo-mark.svg  full-colour app icon (graphite tile, glossy eyeball, round pupil)
 //   brand/logo-mono.svg  single-colour mark for small/one-ink uses (intro wordmark, etc.)
 // Run: node scripts/make-logo.mjs  then  node scripts/make-app-icon.mjs
 import { writeFileSync } from "node:fs";
@@ -24,11 +24,8 @@ for (let i = 0; i < 220; i++) {
   fibres += `<path d="M${f(C + Math.cos(a) * r0)} ${f(C + Math.sin(a) * r0)} Q${f(mx)} ${f(my)} ${f(C + Math.cos(a) * r1)} ${f(C + Math.sin(a) * r1)}" stroke="${light ? "#DCE6F3" : "#0E1622"}" stroke-opacity="${op.toFixed(2)}" stroke-width="${(1.2 + R() * 2.2).toFixed(1)}"/>`;
 }
 
-// Pupil: a text caret (I-beam), the "you look, you type" idea
-const caret = (fill) => `
-  <rect x="${C - 15}" y="${C - 62}" width="30" height="124" rx="9" fill="${fill}"/>
-  <rect x="${C - 42}" y="${C - 62}" width="84" height="24" rx="9" fill="${fill}"/>
-  <rect x="${C - 42}" y="${C + 38}" width="84" height="24" rx="9" fill="${fill}"/>`;
+// Pupil: round, with a soft edge
+const pupil = (fill) => `<circle cx="${C}" cy="${C}" r="56" fill="${fill}"/>`;
 
 const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <defs>
@@ -69,7 +66,7 @@ const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
     <g fill="none" stroke-linecap="round">${fibres}</g>
     <circle cx="${C}" cy="${C}" r="${IRIS}" fill="url(#limbus)"/>
   </g>
-  ${caret("#05070B")}
+  ${pupil("#05070B")}
 
   <ellipse cx="${C - 62}" cy="${C - 70}" rx="34" ry="24" transform="rotate(-28 ${C - 62} ${C - 70})" fill="#fff" opacity=".92"/>
   <circle cx="${C}" cy="${C}" r="${EYE}" fill="url(#gloss)"/>
@@ -77,16 +74,14 @@ const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
 </svg>
 `;
 
-// One ink: a disc with the iris drawn as a cut ring and the caret pupil cut out
+// One ink: a disc with the iris drawn as a cut ring and the pupil cut out
 const mono = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
   <defs>
     <mask id="gazehop-mark-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
       <rect width="512" height="512" fill="#000"/>
       <circle cx="256" cy="256" r="216" fill="#fff"/>
       <circle cx="256" cy="256" r="112" fill="none" stroke="#000" stroke-width="22"/>
-      <rect x="244" y="200" width="24" height="112" rx="8" fill="#000"/>
-      <rect x="220" y="200" width="72" height="22" rx="8" fill="#000"/>
-      <rect x="220" y="290" width="72" height="22" rx="8" fill="#000"/>
+      <circle cx="256" cy="256" r="46" fill="#000"/>
     </mask>
   </defs>
   <rect width="512" height="512" fill="#f5f5f7" mask="url(#gazehop-mark-cut)"/>

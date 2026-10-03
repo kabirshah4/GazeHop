@@ -8,7 +8,7 @@ import ScrollReveal from "../components/reactbits/ScrollReveal";
 import ShinyText from "../components/reactbits/ShinyText";
 import SpotlightCard from "../components/reactbits/SpotlightCard";
 import { DownloadButton, GitHubButton, LogoMark } from "../components/Chrome";
-import { eyeBus } from "../components/FlyingEye";
+import { Eye3D, eyeBus } from "../components/Eye3D";
 import { DOWNLOAD, ISSUES, SOURCE } from "../lib/links";
 import { useHeadGaze, type GazeStatus } from "../lib/useHeadGaze";
 
@@ -92,7 +92,7 @@ export function HowItWorks() {
 
         <Scene n={2} flip title="Look at a screen." body="Your webcam reads head direction and pupil position many times a second with Apple's Vision framework. Hold your look for a quarter of a second and GazeHop decides.">
           <div className="relative">
-            <div data-eye="hop" className="mx-auto mb-6 size-[clamp(110px,11vw,170px)]" aria-hidden="true" />
+            <Eye3D look="hop" className="mx-auto mb-6 size-[clamp(110px,11vw,170px)]" />
             <HopScreens />
           </div>
         </Scene>
@@ -112,7 +112,7 @@ function Scene({ n, title, body, flip = false, children }: { n: number; title: s
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const drift = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [60, -60]);
   return (
-    <div ref={ref} className="wrap relative z-10 grid min-h-[64vh] items-center gap-10 py-12 md:grid-cols-2 md:gap-20">
+    <div ref={ref} className="wrap relative z-10 grid min-h-[64vh] items-center gap-10 py-12 md:grid-cols-2 md:gap-20 lg:pl-20">
       {/* Marker on the rail */}
       <span className={`absolute left-[10px] top-1/2 hidden size-[9px] -translate-y-1/2 rounded-full border transition-all duration-500 lg:block min-[1240px]:left-[11.5px] min-[1800px]:left-[15.5px] ${inView ? "border-[color:var(--color-cyan)] bg-[color:var(--color-cyan)] shadow-[0_0_0_5px_rgba(195,210,230,.12)]" : "border-white/25 bg-[color:var(--color-bg)]"}`} aria-hidden="true" />
       <div className={flip ? "md:order-2" : ""}>
@@ -452,7 +452,7 @@ export function TryIt() {
               </div>
             );
           })}
-          <div data-eye={live ? "camera" : "hop"} className="order-2 size-28" aria-hidden="true" />
+          <Eye3D look={live ? "camera" : "hop"} className="order-2 size-28" />
         </div>
         <div className="mt-8 flex flex-col items-center gap-3 text-[15px]">
           <p className="inline-flex items-center gap-2.5 text-[color:var(--color-fg-2)]">
@@ -720,7 +720,7 @@ export function FinalCTA() {
               <LightRays raysOrigin="top-center" raysColor="#C9D6E8" raysSpeed={0.5} lightSpread={0.8} rayLength={1.3}
                          fadeDistance={0.9} saturation={0.35} followMouse mouseInfluence={0.06} />
             </div>
-            <div data-eye="pointer" className="relative mx-auto mb-8 size-24 md:size-28" aria-hidden="true" />
+            <Eye3D look="pointer" className="mx-auto mb-8 size-24 md:size-28" />
             <WordsIn text="Stop typing into the wrong window." className="t-h2 relative mx-auto max-w-[18ch]" />
             <p className="relative mx-auto mt-5 max-w-xl text-[color:var(--color-fg-2)]">Free for macOS. About a minute to set up.</p>
             <div className="relative mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">

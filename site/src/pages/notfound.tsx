@@ -2,15 +2,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "../styles.css";
 import { DownloadButton, Footer, Nav } from "../components/Chrome";
-import { FlyingEye } from "../components/FlyingEye";
+import { Eye3D } from "../components/Eye3D";
 import { BASE } from "../lib/links";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <FlyingEye />
     <Nav />
     <main className="wrap relative z-10 flex min-h-[70vh] flex-col items-center justify-center py-24 text-center">
-      <div data-eye="pointer" className="mb-8 size-32" aria-hidden="true" />
+      <Eye3D look="pointer" className="mb-8 size-32" />
       <p className="eyebrow mb-4">404</p>
       <h1 className="t-h2 mb-4">Nothing to look at here<span className="caret" aria-hidden="true" /></h1>
       <p className="mb-9 max-w-md text-[color:var(--color-fg-2)]">This page doesn't exist. It may have moved, or the link has a typo.</p>

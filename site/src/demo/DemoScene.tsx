@@ -73,9 +73,8 @@ export function DemoScene({ t }: { t: number }) {
           <path d="M10 55 C 55 -5, 145 -5, 190 55 C 145 115, 55 115, 10 55 Z" fill="#0B0F19" stroke="#F5F7FA" strokeWidth="9" strokeLinejoin="round" />
           <g transform={`translate(${gaze * 34} 0)`}>
             <circle cx="100" cy="55" r="30" fill="#8FA8C8" />
-            <rect x="96" y="36" width="8" height="38" rx="3" fill="#0B0F19" />
-            <rect x="89" y="36" width="22" height="7" rx="3" fill="#0B0F19" />
-            <rect x="89" y="67" width="22" height="7" rx="3" fill="#0B0F19" />
+            <circle cx="100" cy="55" r="13" fill="#0B0F19" />
+            <circle cx="93" cy="47" r="4.5" fill="#FFFFFF" opacity=".85" />
           </g>
         </svg>
         <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10">
