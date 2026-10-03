@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { BASE } from "./links";
+import { allowMediaPipeScripts } from "./trustedTypes";
 
 export type GazeStatus = "off" | "loading" | "calibrating" | "tracking" | "no-face" | "denied" | "error";
 export type Side = "first" | "second";
@@ -31,6 +32,7 @@ export function useHeadGaze(enabled: boolean, dwellMs = 250) {
         return;
       }
       try {
+        allowMediaPipeScripts();
         const vision = await import("@mediapipe/tasks-vision");
         const files = await vision.FilesetResolver.forVisionTasks(`${BASE}vendor/mediapipe`);
         const make = (delegate: "GPU" | "CPU") => vision.FaceLandmarker.createFromOptions(files, {

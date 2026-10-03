@@ -16,4 +16,6 @@ hdiutil create -volname "GazeHop" -srcfolder "$STAGE" -fs HFS+ -format UDZO -ima
 rm -rf "$STAGE"
 mkdir -p site/public/download
 cp dist/GazeHop.dmg site/public/download/GazeHop.dmg
+# Published checksum, so anyone can confirm their download wasn't altered: shasum -a 256 -c
+(cd dist && shasum -a 256 GazeHop.dmg) > site/public/download/GazeHop.dmg.sha256
 echo "Built dist/GazeHop.dmg ($(du -h dist/GazeHop.dmg | cut -f1)), version $(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)"

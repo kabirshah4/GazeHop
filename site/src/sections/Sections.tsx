@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { DownloadButton, LogoMark } from "../components/Chrome";
-import { DOWNLOAD, ISSUES, SOURCE, LICENSE } from "../lib/links";
+import { BASE, DOWNLOAD, ISSUES, SOURCE, LICENSE } from "../lib/links";
 import { useHeadGaze, type GazeStatus } from "../lib/useHeadGaze";
 import { Sky } from "./Hero";
 
@@ -457,7 +457,7 @@ const I = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" className="size-[15
 
 const STEPS: Step[] = [
   { title: "Download", badge: <Badge bg="linear-gradient(#4FA0FF,#0A6CF0)"><I d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" /></Badge>,
-    body: <>Download <b>GazeHop.dmg</b> and double-click it. A window opens with GazeHop and your Applications folder.</>, mock: <MockFile /> },
+    body: <>Download <b>GazeHop.dmg</b> and double-click it. A window opens with GazeHop and your Applications folder. Want to check the file? Compare it with the <a className="text-[color:var(--color-blue)] hover:underline" href={`${BASE}download/GazeHop.dmg.sha256`}>SHA-256 checksum</a>.</>, mock: <MockFile /> },
   { title: "Move to Applications", badge: <Badge bg="linear-gradient(#64B5FF,#2D7FF0)"><I d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></Badge>,
     body: <>In that window, drag <b>GazeHop</b> onto the <b>Applications</b> folder. Then eject the disk image.</>, mock: <MockFile apps /> },
   { title: "Open it once", badge: <Badge bg="linear-gradient(#A0A0A6,#6E6E73)"><I d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></Badge>,
