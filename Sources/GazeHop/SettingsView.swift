@@ -171,6 +171,8 @@ private struct Sidebar: View {
                 .padding(.vertical, 3)
                 .tag(p)
         }
+        // Clear the window buttons: without a toolbar the list would start right under them.
+        .safeAreaInset(edge: .top, spacing: 0) { Color.clear.frame(height: 10) }
         .safeAreaInset(edge: .bottom, spacing: 0) { SidebarStatus(state: AppState.shared, actions: actions) }
         .frame(minWidth: 215)
         .navigationSplitViewColumnWidth(min: 215, ideal: 215, max: 260)
