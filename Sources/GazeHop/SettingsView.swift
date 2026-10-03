@@ -7,6 +7,7 @@ import SwiftUI
 struct SettingsActions {
     var calibrate: () -> Void
     var togglePause: () -> Void
+    var forgetCalibration: () -> Void
 }
 
 // MARK: - Panes
@@ -142,6 +143,10 @@ private struct GeneralPane: View {
                 Toggle(isOn: $settings.movePointer) {
                     Text("Move the pointer to the focused window")
                     Text("So scrolling works right away on the screen you look at.")
+                }
+                Toggle(isOn: $settings.waitForTypingPause) {
+                    Text("Wait until I stop typing")
+                    Text("Focus never moves mid-word. GazeHop also never switches while a password field is active.")
                 }
                 Toggle("Play a sound when pausing and resuming", isOn: $settings.playSounds)
             } header: { Text("When switching") }
@@ -464,6 +469,7 @@ private struct PermissionRow: View {
 private struct AdvancedPane: View {
     @ObservedObject var settings: Settings
     let actions: SettingsActions
+    @State private var confirmDelete = false
 
     var body: some View {
         Form {
@@ -479,8 +485,19 @@ private struct AdvancedPane: View {
 
             Section {
                 LabeledContent("Calibration") {
-                    Button("Recalibrate…", action: actions.calibrate)
+                    HStack {
+                        Button("Recalibrate…", action: actions.calibrate)
+                        Button("Delete Calibration Data", role: .destructive) { confirmDelete = true }
+                    }
                 }
+            } footer: {
+                Text("Calibration is a few averaged head and eye angles per screen, stored only on this Mac. No images.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            .confirmationDialog("Delete calibration data?", isPresented: $confirmDelete) {
+                Button("Delete", role: .destructive, action: actions.forgetCalibration)
+            } message: {
+                Text("GazeHop stops switching until you calibrate again.")
             }
         }
         .formStyle(.grouped)

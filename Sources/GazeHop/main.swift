@@ -10,7 +10,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var calibration: Calibration?
     private lazy var settingsWindow = SettingsWindowController(actions: SettingsActions(
         calibrate: { [weak self] in self?.calibrate() },
-        togglePause: { [weak self] in self?.togglePause() }))
+        togglePause: { [weak self] in self?.togglePause() },
+        forgetCalibration: { [weak self] in self?.forgetCalibration() }))
     private let state = AppState.shared
 
     private var statusItem: NSStatusItem!
@@ -160,6 +161,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         c.run()
     }
 
+    /// Erase stored calibration (per-screen averages of head and eye angles) and ask for a new one.
+    private func forgetCalibration() {
+        UserDefaults.standard.removeObject(forKey: "gazeModel")
+        model = nil
+        smoothed = nil
+        candidate = nil
+        state.calibrated = []
+        DebugLog.write("calibration deleted")
+        refreshStatus()
+    }
+
     /// Connected screens the model has never been calibrated on.
     private var uncalibratedScreens: Set<UInt32> {
         connected.subtracting(model?.centroids.keys ?? [:].keys)
@@ -229,11 +241,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
               now.timeIntervalSince(lastSwitch) * 1000 >= settings.cooldownMs,
               CGEventSource.buttonState(.combinedSessionState, button: .left) == false,  // not mid-drag
               !settings.excludedDisplays.contains(c.display),
+              // Never move focus while a password field (secure input) is active.
+              !IsSecureEventInputEnabled(),
+              // Don't split a word across windows: wait for a short pause in typing.
+              !settings.waitForTypingPause || CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .keyDown) > 0.35,
               focus.focusedDisplay != c.display else { return }
 
         lastSwitch = now
         if let w = focus.focus(display: c.display) {
-            DebugLog.write("SWITCH -> \(c.display) \(w.appName) \"\(w.title)\" conf=\(String(format: "%.2f", p.confidence))")
+            // Window titles can be private (document names, email subjects): only log them in debug mode.
+            DebugLog.write("SWITCH -> \(c.display) \(w.appName)" + (settings.debugLogging ? " \"\(w.title)\" conf=\(String(format: "%.2f", p.confidence))" : ""))
             let screenName = NSScreen.screens.first { $0.displayID == c.display }?.localizedName ?? "screen"
             state.lastSwitch = "\(w.appName) on \(screenName)"
             lastNoWindowLog = nil

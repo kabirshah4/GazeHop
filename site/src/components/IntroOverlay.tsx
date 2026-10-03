@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { TextAnimationCollection } from "../shaders/neuform-isolated/NeuformIsolatedEffects";
-import "../shaders/threeui.css";
 
 /**
  * Opening beat: ThreeUI's chromatic wordmark assembly ("threeui-intro"), set to GazeHop.

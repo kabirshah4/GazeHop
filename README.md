@@ -144,6 +144,12 @@ tail -f ~/Library/Logs/GazeHop.log
 
 Switch attempts are always logged.
 
+## Safety
+
+- GazeHop never moves focus while a password field is active (macOS secure input).
+- By default it waits for a short pause in your typing, so a glance can't split a word across windows.
+- Press **⌘F1** to pause it anytime.
+
 ## Privacy
 
 GazeHop has no accounts, servers, analytics, or crash reporting.
@@ -153,8 +159,10 @@ GazeHop has no accounts, servers, analytics, or crash reporting.
 - **No network:** GazeHop makes no network connections at all.
 - **Stored on your Mac only:** your settings and calibration (a few numbers per screen, not
   images), in GazeHop's preferences.
-- **Debug log:** if you turn on detailed debug logging, `~/Library/Logs/GazeHop.log` can contain
-  app names and window titles. It never leaves your Mac; delete it anytime.
+- **Log:** `~/Library/Logs/GazeHop.log` (capped at ~1 MB) records switch events with app names. Window
+  titles are only logged if you turn on detailed debug logging. It never leaves your Mac; delete it anytime.
+- **Calibration:** a few averaged head and eye angles per screen, no images. Delete it in
+  Settings › Advanced.
 
 The code is open, so you can check all of this yourself.
 
@@ -171,5 +179,8 @@ npm run deploy     # build + wrangler deploy
 ```
 
 ## License
+
+GazeHop's own code is MIT licensed. Some website components have their own licenses; see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 MIT

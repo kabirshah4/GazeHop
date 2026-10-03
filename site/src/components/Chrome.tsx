@@ -14,10 +14,10 @@ export function Logo() {
   );
 }
 
-export function AppleGlyph({ className = "" }: { className?: string }) {
+export function DownloadGlyph({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 17 20" className={className} aria-hidden="true" fill="currentColor">
-      <path d="M14.1 10.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9C3.6 4.8 1.9 5.8 1 7.4c-1.9 3.3-.5 8.1 1.3 10.8.9 1.3 1.9 2.7 3.3 2.7 1.3-.1 1.8-.9 3.4-.9 1.6 0 2 .9 3.4.8 1.4 0 2.3-1.3 3.2-2.6 1-1.5 1.4-2.9 1.4-3-.1 0-2.9-1.1-2.9-4.6zM11.5 2.9c.7-.9 1.2-2.1 1.1-3.3-1 0-2.3.7-3 1.5-.7.8-1.3 2-1.1 3.2 1.1.1 2.3-.6 3-1.4z" />
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" />
     </svg>
   );
 }
@@ -33,7 +33,7 @@ export function GitHubGlyph({ className = "" }: { className?: string }) {
 export function DownloadButton({ label = "Download for macOS", className = "" }: { label?: string; className?: string }) {
   return (
     <ShimmerLink href={DOWNLOAD} className={className}>
-      <AppleGlyph className="-mt-0.5 h-[18px] w-auto" />
+      <DownloadGlyph className="h-[18px] w-[18px]" />
       {label}
     </ShimmerLink>
   );

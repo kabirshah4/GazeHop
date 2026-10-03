@@ -11,6 +11,8 @@ final class Settings: ObservableObject {
     // General
     @Published var showNameInMenuBar: Bool { didSet { d.set(showNameInMenuBar, forKey: "showNameInMenuBar") } }
     @Published var movePointer: Bool { didSet { d.set(movePointer, forKey: "movePointer") } }
+    /// Don't move focus mid-word: wait for a short pause in typing first.
+    @Published var waitForTypingPause: Bool { didSet { d.set(waitForTypingPause, forKey: "waitForTypingPause") } }
     @Published var playSounds: Bool { didSet { d.set(playSounds, forKey: "playSounds") } }
     @Published var hotKey: HotKeyPreset { didSet { d.set(hotKey.rawValue, forKey: "hotKey") } }
 
@@ -32,12 +34,13 @@ final class Settings: ObservableObject {
 
     private init() {
         d.register(defaults: [
-            "showNameInMenuBar": false, "movePointer": true, "playSounds": true,
+            "showNameInMenuBar": false, "movePointer": true, "waitForTypingPause": true, "playSounds": true,
             "hotKey": HotKeyPreset.cmdF1.rawValue,
             "dwellMs": 250.0, "cooldownMs": 600.0, "strictness": 0.2, "smoothing": 0.55,
         ])
         showNameInMenuBar = d.bool(forKey: "showNameInMenuBar")
         movePointer = d.bool(forKey: "movePointer")
+        waitForTypingPause = d.bool(forKey: "waitForTypingPause")
         playSounds = d.bool(forKey: "playSounds")
         hotKey = HotKeyPreset(rawValue: d.string(forKey: "hotKey") ?? "") ?? .cmdF1
         dwellMs = d.double(forKey: "dwellMs")
