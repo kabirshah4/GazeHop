@@ -34,6 +34,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var connected: Set<UInt32> { Set(NSScreen.screens.map(\.displayID)) }
 
     func applicationDidFinishLaunching(_ note: Notification) {
+        // `--preview`: Settings window only, with sample live data. No camera, focus changes,
+        // hotkey or menu bar item, so it can run next to a real GazeHop for screenshots and design work.
+        if CommandLine.arguments.contains("--preview") {
+            let ids = NSScreen.screens.map(\.displayID)
+            state.calibrated = Set(ids)
+            state.faceVisible = true
+            state.looking = ids.first
+            state.confidence = 0.42
+            state.statusText = "Watching"
+            state.icon = .active
+            state.lastSwitch = "Notes on \(NSScreen.screens.first?.localizedName ?? "Built-in Display"), 2 s ago"
+            openSettings()
+            return
+        }
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.autosaveName = "GazeHop"
         statusItem.button?.imagePosition = .imageLeft
