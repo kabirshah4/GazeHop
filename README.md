@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/icon.png" width="160" alt="GazeHop icon"></p>
+<p align="center"><img src="docs/logo.png" width="160" alt="GazeHop icon"></p>
 
 # GazeHop
 

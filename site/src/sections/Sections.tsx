@@ -275,7 +275,7 @@ export function Features() {
           <Card className="md:col-span-4" title="Leave some screens out" body="Turn off any display you only watch, like a TV or a stream on a side monitor. GazeHop never moves your keyboard there.">
             <ExcludeArt />
           </Card>
-          <Card className="md:col-span-3" title="Tune how it feels" body="Look time, strictness, smoothing and the pause shortcut live in Settings, and apply the moment you change them.">
+          <Card className="md:col-span-3" title="Tune how it feels" body="Try it: drag the sliders. The same controls live in GazeHop's Settings and apply the moment you change them.">
             <SlidersArt />
           </Card>
           <Card className="md:col-span-3" title="Quiet in the menu bar" body="One small eye next to your clock. A slash when paused, a dot when it needs you.">
@@ -362,19 +362,66 @@ function FaceArt() {
   );
 }
 
+/** Interactive version of GazeHop's Tracking settings, with a live preview of the look timer. */
 function SlidersArt() {
-  const rows: [string, string, number][] = [["Look time", "250 ms", 0.17], ["Strictness", "20%", 0.27], ["Smoothing", "55%", 0.61]];
+  const reduce = useReducedMotion();
+  const [look, setLook] = useState(250);       // ms, same range and default as the app
+  const [strict, setStrict] = useState(20);    // %
+  const [smooth, setSmooth] = useState(55);    // %
+  const [phase, setPhase] = useState({ side: 0, start: performance.now() });
+  const [now, setNow] = useState(performance.now());
+
+  // Preview loop: dwell bar fills over `look` ms, focus hops, short pause, glance back.
+  useEffect(() => {
+    if (reduce) return;
+    let raf = 0;
+    const loop = (t: number) => {
+      setNow(t);
+      setPhase((p) => (t - p.start > look + 900 ? { side: 1 - p.side, start: t } : p));
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [look, reduce]);
+
+  const elapsed = reduce ? look : now - phase.start;
+  const dwell = Math.min(1, elapsed / look);
+  const focused = dwell >= 1 ? 1 - phase.side : phase.side; // gaze is on the *other* screen until the timer completes
+  const gazeOn = 1 - phase.side;
+
+  const rows: { label: string; value: number; set: (v: number) => void; min: number; max: number; step: number; fmt: string }[] = [
+    { label: "Look time", value: look, set: setLook, min: 100, max: 1000, step: 50, fmt: `${look} ms` },
+    { label: "Strictness", value: strict, set: setStrict, min: 5, max: 60, step: 5, fmt: `${strict}%` },
+    { label: "Smoothing", value: smooth, set: setSmooth, min: 0, max: 90, step: 5, fmt: `${smooth}%` },
+  ];
+  const summary = `Focus moves after ${look} ms, ${strict >= 35 ? "only on a clear look" : strict >= 15 ? "on a confident look" : "on any look"}, ${smooth >= 60 ? "very steady" : smooth >= 30 ? "balanced" : "quick to react"}.`;
+
   return (
-    <div className="flex h-full flex-col justify-center gap-4" aria-hidden="true">
-      {rows.map(([l, v, p]) => (
-        <div key={l}>
-          <div className="mb-1.5 flex justify-between text-[13px]"><span>{l}</span><span className="font-mono text-[12px] text-[color:var(--color-fg-3)]">{v}</span></div>
-          <div className="relative h-1 rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-[color:var(--color-cyan)]" style={{ width: `${p * 100}%` }} />
-            <span className="absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow" style={{ left: `${p * 100}%` }} />
+    <div className="flex h-full flex-col justify-center gap-3.5">
+      <div className="grid grid-cols-2 gap-2" aria-hidden="true">
+        {[0, 1].map((i) => (
+          <div key={i} className={`relative h-10 rounded-[7px] border transition-colors duration-200 ${focused === i ? "border-[color:var(--color-cyan)] bg-[color:var(--color-cyan)]/[.08]" : "border-white/10 bg-white/[.02]"}`}>
+            {gazeOn === i && dwell < 1 && (
+              <div className="absolute inset-x-2 bottom-1.5 h-[3px] overflow-hidden rounded-full bg-white/10">
+                <div className="h-full origin-left rounded-full bg-[color:var(--color-cyan)]" style={{ transform: `scaleX(${dwell})` }} />
+              </div>
+            )}
+            {focused === i && <span className="absolute right-2 top-1.5 font-mono text-[9px] uppercase tracking-wider text-[color:var(--color-cyan)]">Focused</span>}
           </div>
-        </div>
+        ))}
+      </div>
+      {rows.map((r) => (
+        <label key={r.label} className="block">
+          <span className="mb-1.5 flex justify-between text-[13px]">
+            <span>{r.label}</span>
+            <span className="font-mono text-[12px] text-[color:var(--color-fg-2)]">{r.fmt}</span>
+          </span>
+          <input type="range" className="gh-range" min={r.min} max={r.max} step={r.step} value={r.value}
+                 onChange={(e) => r.set(Number(e.target.value))}
+                 style={{ "--p": `${((r.value - r.min) / (r.max - r.min)) * 100}%` } as React.CSSProperties} />
+        </label>
       ))}
+      <p className="text-[12.5px] text-[color:var(--color-fg-3)]" aria-live="polite">{summary}</p>
     </div>
   );
 }

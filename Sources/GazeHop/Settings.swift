@@ -52,17 +52,16 @@ final class Settings: ObservableObject {
         dwellMs = 250; cooldownMs = 600; strictness = 0.2; smoothing = 0.55
     }
 
-    // Launch at login lives in the system, not UserDefaults.
-    var launchAtLogin: Bool {
-        get { SMAppService.mainApp.status == .enabled }
-        set {
-            objectWillChange.send()
-            do {
-                if newValue { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
-            } catch {
-                DebugLog.write("launch at login: \(error.localizedDescription)")
-            }
+    // Launch at login lives in the system (Login Items), not UserDefaults.
+    var launchAtLoginStatus: SMAppService.Status { SMAppService.mainApp.status }
+
+    func setLaunchAtLogin(_ on: Bool) {
+        do {
+            if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+        } catch {
+            DebugLog.write("launch at login: \(error.localizedDescription)")
         }
+        objectWillChange.send() // after the change, so the toggle re-reads the new status
     }
 }
 

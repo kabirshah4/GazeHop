@@ -10,7 +10,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var calibration: Calibration?
     private lazy var settingsWindow = SettingsWindowController(actions: SettingsActions(
         calibrate: { [weak self] in self?.calibrate() },
-        calibratedDisplays: { [weak self] in Set(self?.model?.centroids.keys ?? [:].keys) }))
+        togglePause: { [weak self] in self?.togglePause() }))
+    private let state = AppState.shared
 
     private var statusItem: NSStatusItem!
     private var statusLine = NSMenuItem(title: "Starting…", action: nil, keyEquivalent: "")
@@ -49,8 +50,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(screensChanged),
             name: NSApplication.didChangeScreenParametersNotification, object: nil)
 
+        if CommandLine.arguments.contains("--settings") { openSettings() }  // open Settings on launch
+
         tracker.onSample = { [weak self] f in self?.handle(f) }
-        tracker.onNoFace = { [weak self] in self?.candidate = nil }
+        tracker.onNoFace = { [weak self] in self?.candidate = nil; self?.state.publishNoFace() }
+        state.paused = paused
+        state.calibrated = Set(model?.centroids.keys ?? [:].keys)
         guard !paused else { refreshStatus(); return }
         tracker.start { [weak self] error in
             guard let self else { return }
@@ -113,6 +118,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         button.image = MenuBarIcon.image(icon)
         button.title = settings.showNameInMenuBar ? " GazeHop" : ""
         button.toolTip = "GazeHop: \(text)"
+        state.statusText = text
+        state.icon = icon
     }
 
     private func refreshStatus() {
@@ -130,6 +137,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func togglePause() {
         paused.toggle()
         UserDefaults.standard.set(paused, forKey: "paused")
+        state.paused = paused
+        if paused { state.publishNoFace() }
         paused ? tracker.stop() : tracker.start { _ in }
         candidate = nil
         if settings.playSounds { NSSound(named: paused ? "Pop" : "Tink")?.play() }
@@ -142,7 +151,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if !tracker.isRunning { tracker.start { _ in } }
         let c = Calibration(tracker: tracker) { [weak self] newModel in
             guard let self else { return }
-            if let newModel { self.model = newModel; newModel.save() }
+            if let newModel { self.model = newModel; newModel.save(); self.state.calibrated = Set(newModel.centroids.keys) }
             self.calibration = nil
             if self.paused { self.tracker.stop() }
             self.refreshStatus()
@@ -202,6 +211,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             lastDiag = Date()
             DebugLog.write("pred=\(pred.map { "\($0.display) conf=\(String(format: "%.2f", $0.confidence))" } ?? "nil") trusted=\(FocusManager.isTrusted) focused=\(focus.focusedDisplay.map(String.init) ?? "nil") front=\(NSWorkspace.shared.frontmostApplication?.localizedName ?? "?") known=\(focus.lastWindow.map { "\($0.key):\($0.value.appName)" })")
         }
+        state.publishGaze(display: pred?.display, confidence: pred?.confidence ?? 0)
         guard let p = pred else { return }
         let now = Date()
 
@@ -224,6 +234,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         lastSwitch = now
         if let w = focus.focus(display: c.display) {
             DebugLog.write("SWITCH -> \(c.display) \(w.appName) \"\(w.title)\" conf=\(String(format: "%.2f", p.confidence))")
+            let screenName = NSScreen.screens.first { $0.displayID == c.display }?.localizedName ?? "screen"
+            state.lastSwitch = "\(w.appName) on \(screenName)"
             lastNoWindowLog = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
                 guard let self else { return }
