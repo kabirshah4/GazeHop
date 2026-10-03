@@ -1,88 +1,121 @@
 @import "tailwindcss";
 @import "@fontsource-variable/inter";
+@import "@fontsource/eb-garamond/400.css";
+@import "@fontsource/eb-garamond/400-italic.css";
 
-/* GazeHop, dark edition. Green and cyan are reserved for tracking state: if something glows,
-   it means "watching", "calibrated" or "on-device". */
+/* GazeHop, macOS edition. Light, calm, native. One accent: system blue. Glass only where macOS
+   itself uses it (menu bar, HUD, navigation). */
 @theme {
-  --color-bg: #0B0F19;          /* rich dark blue-gray page */
-  --color-bg-2: #0E1422;        /* raised sections */
-  --color-panel: #111827;       /* cards */
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-2: rgba(255, 255, 255, 0.14);
-  --color-fg: #F5F7FA;
-  --color-fg-2: #A3ACBD;        /* secondary text */
-  --color-fg-3: #6B7486;        /* captions */
-  --color-track: #8FA8C8;       /* active tracking */
-  --color-cyan: #C3D2E6;        /* calibrated / focus */
+  --color-ground: #F5F5F7;      /* Apple page grey */
+  --color-card: #FFFFFF;
+  --color-ink: #1D1D1F;
+  --color-ink-2: #515154;       /* secondary text, 7:1 on ground */
+  --color-ink-3: #6E6E73;       /* tertiary, 4.6:1 on white */
+  --color-line: rgba(0, 0, 0, 0.08);
+  --color-line-2: rgba(0, 0, 0, 0.12);
+  --color-blue: #0071E3;        /* system blue (links, primary action) */
+  --color-blue-hover: #0077ED;
+  --color-blue-deep: #0058B0;
+  --color-blue-tint: #E8F1FD;
+  --color-green: #28A745;       /* status only: "watching", "allowed" */
 
-  --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter Variable", system-ui, sans-serif;
-  --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter Variable", system-ui, sans-serif;
+  --font-serif: ui-serif, "New York", "EB Garamond", Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
-  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
-  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
-  @keyframes shimmer-slide { to { transform: translate(calc(100cqw - 100%), 0); } }
-  @keyframes spin-around {
-    0% { transform: translateZ(0) rotate(0); }
-    15%, 35% { transform: translateZ(0) rotate(90deg); }
-    65%, 85% { transform: translateZ(0) rotate(270deg); }
-    100% { transform: translateZ(0) rotate(360deg); }
-  }
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; color-scheme: dark; }
+  html { -webkit-text-size-adjust: 100%; color-scheme: light; }
   html.has-lenis { scroll-behavior: auto; }
   body {
-    background: var(--color-bg);
-    color: var(--color-fg);
+    background: var(--color-ground);
+    color: var(--color-ink);
     font-family: var(--font-sans);
-    font-size: clamp(16px, 0.35vw + 14.8px, 18px);
-    line-height: 1.6;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.022em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  ::selection { background: rgba(143,168,200, 0.35); color: #fff; }
-  :focus-visible { outline: 2px solid var(--color-cyan); outline-offset: 3px; border-radius: 8px; }
+  ::selection { background: rgba(0, 113, 227, 0.2); }
+  :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 3px; border-radius: 8px; }
   @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
     *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   }
 }
 
 @layer components {
-  .wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: 20px; }
-  @media (min-width: 768px) { .wrap { padding-inline: 32px; } }
-  @media (min-width: 1800px) { .wrap { max-width: 1440px; } }
+  .wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: 22px; }
+  @media (min-width: 768px) { .wrap { padding-inline: 40px; } }
 
-  /* Fluid type scale: phone to 5K monitor */
-  .t-hero { font-size: clamp(42px, 7.2vw + 6px, 132px); line-height: 0.98; letter-spacing: -0.045em; font-weight: 700; }
-  .t-h2 { font-size: clamp(30px, 3.4vw + 12px, 64px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 680; }
-  .t-h3 { font-size: clamp(20px, 0.6vw + 16px, 24px); line-height: 1.25; letter-spacing: -0.015em; font-weight: 620; }
-  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-fg-3); }
+  /* Type scale, size-specific tracking (Apple: tighten as it grows) */
+  .t-hero { font-family: var(--font-serif); font-weight: 400; font-size: clamp(44px, 6.4vw, 92px); line-height: 1.02; letter-spacing: -0.02em; }
+  .t-h2 { text-wrap: balance; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 3.8vw, 56px); line-height: 1.07; letter-spacing: -0.03em; }
+  .t-h3 { font-family: var(--font-display); font-weight: 600; font-size: clamp(22px, 1.6vw, 28px); line-height: 1.14; letter-spacing: -0.02em; }
+  .t-lead { font-size: clamp(19px, 1.4vw, 23px); line-height: 1.38; letter-spacing: -0.02em; color: var(--color-ink-2); }
+  .serif-em { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
 
-  /* Pulsing "active tracking" dot */
-  .pulse-dot { position: relative; display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: var(--color-track); }
-  .pulse-dot::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; background: var(--color-track); opacity: .45; animation: pulse 2s ease-out infinite; }
-  @keyframes pulse { from { transform: scale(.6); opacity: .55; } to { transform: scale(2.2); opacity: 0; } }
+  /* Buttons: pill, press feedback on pointer-down */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 980px; padding: 12px 22px;
+         font-size: 17px; font-weight: 500; letter-spacing: -0.02em; transition: background-color .2s, transform .12s var(--ease-out), box-shadow .2s; }
+  .btn:active { transform: scale(0.97); }
+  .btn-blue { background: var(--color-blue); color: #fff; box-shadow: 0 1px 1px rgba(0,0,0,.08), 0 6px 18px -8px rgba(0,113,227,.7); }
+  .btn-blue:hover { background: var(--color-blue-hover); }
+  .btn-ghost { color: var(--color-blue); }
+  .btn-ghost:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .btn-quiet { background: rgba(0,0,0,.05); color: var(--color-ink); }
+  .btn-quiet:hover { background: rgba(0,0,0,.08); }
 
-  .caret { display: inline-block; width: 0.08em; min-width: 3px; height: 0.95em; margin-left: 0.04em; vertical-align: -0.1em; background: var(--color-track); border-radius: 2px; animation: blink 1.05s steps(1) infinite; }
+  /* Cards: continuous-feel corners, hairline, soft offset shadow */
+  .card { background: var(--color-card); border-radius: 28px; box-shadow: 0 0 0 1px var(--color-line), 0 18px 40px -26px rgba(0,0,0,.22); }
+
+  /* macOS materials */
+  .glass-light { background: rgba(255,255,255,.72); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+  .glass-dark { background: rgba(28,28,30,.72); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); color: #fff; }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-light { background: rgba(255,255,255,.97); backdrop-filter: none; }
+    .glass-dark { background: rgba(28,28,30,.97); backdrop-filter: none; }
+  }
+
+  .kbd { font-family: var(--font-display); font-weight: 500; display: inline-flex; align-items: center; justify-content: center;
+         min-width: 1.9em; padding: .18em .5em; border-radius: .38em; background: linear-gradient(#fff, #f2f2f4);
+         box-shadow: 0 0 0 1px rgba(0,0,0,.1), 0 1.5px 0 rgba(0,0,0,.12); color: var(--color-ink); }
+
+  .caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 1px; vertical-align: -0.16em; background: var(--color-blue); border-radius: 1px; animation: blink 1.06s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
-  .kbd { font-family: var(--font-mono); font-size: .82em; display: inline-flex; align-items: center; padding: .12em .5em; border: 1px solid var(--color-line-2); border-bottom-width: 2px; border-radius: 7px; background: rgba(255,255,255,.04); white-space: nowrap; }
+  /* Hero sky: blue stays deep through the headline (white text 4.5:1+), then dawns to page grey.
+     Phones get later stops because the text takes a larger share of a shorter hero. */
+  :root {
+    --sky-sun: radial-gradient(55% 340px at 50% calc(100% - 300px), rgba(255,196,160,.55), transparent 70%),
+               radial-gradient(30% 220px at 22% calc(100% - 360px), rgba(255,170,190,.30), transparent 70%),
+               radial-gradient(30% 220px at 80% calc(100% - 380px), rgba(255,214,170,.30), transparent 70%);
+    --sky-hero: linear-gradient(180deg, #2350C0 0%, #3060D2 26%, #3A68D8 46%, #7F9FEA 58%, #BFC6EE 70%, #EED6DC 82%, #F6E3DA 91%, var(--color-ground) 100%);
+  }
+  @media (max-width: 767px) {
+    :root {
+      --sky-sun: radial-gradient(70% 140px at 50% calc(100% - 110px), rgba(255,196,160,.5), transparent 70%);
+      --sky-hero: linear-gradient(180deg, #2350C0 0%, #3463D4 44%, #3A68D8 66%, #9DB4EE 77%, #E9D3DD 88%, var(--color-ground) 100%);
+    }
+  }
 
-  /* Range slider used in the "Tune how it feels" card */
+  /* Hero desktop: --u scales everything with the stage, like an image */
+  .mac-frame { --u: 1cqw; --hu: var(--u); --hud-x: 50%; }
+  /* Phones: the desk bleeds past the screen edge so the MacBook (where focus lands) sits at a
+     readable size; the HUD gets its own larger scale and centres on the viewport. */
+  @media (max-width: 639px) {
+    .mac-stage { width: 150vw; margin-left: calc(50% - 102vw); }
+    .mac-frame { --hu: calc(var(--u) * 1.9); --hud-x: 68%; }
+  }
+
+  /* Range slider (interactive settings preview) */
   .gh-range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 999px; cursor: pointer;
-    background: linear-gradient(to right, var(--color-cyan) var(--p, 50%), rgba(255,255,255,.1) var(--p, 50%)); }
-  .gh-range::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 999px; background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,.5), 0 0 0 4px rgba(195,210,230,.12); transition: box-shadow .2s, transform .15s; }
-  .gh-range::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
-  .gh-range:hover::-webkit-slider-thumb { box-shadow: 0 1px 3px rgba(0,0,0,.5), 0 0 0 6px rgba(195,210,230,.18); }
-  .gh-range:active::-webkit-slider-thumb { transform: scale(1.12); }
-  .gh-range:focus-visible { outline: 2px solid var(--color-cyan); outline-offset: 6px; }
-
-  /* Spotlight card: a soft light follows the pointer (set --mx/--my from JS) */
-  .spot { position: relative; isolation: isolate; }
-  .spot::before { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; opacity: 0; transition: opacity .3s;
-    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(195,210,230, .10), transparent 60%); }
-  .spot:hover::before { opacity: 1; }
+    background: linear-gradient(to right, var(--color-blue) var(--p, 50%), rgba(0,0,0,.1) var(--p, 50%)); }
+  .gh-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 999px; background: #fff;
+    box-shadow: 0 0 0 .5px rgba(0,0,0,.12), 0 3px 8px rgba(0,0,0,.18); transition: transform .15s var(--ease-out); }
+  .gh-range::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 3px 8px rgba(0,0,0,.18); }
+  .gh-range:active::-webkit-slider-thumb { transform: scale(1.08); }
 }

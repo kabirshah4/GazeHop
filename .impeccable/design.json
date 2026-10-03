@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-03T00:00:00Z",
+  "title": "Design System: GazeHop",
+  "extensions": {
+    "colorMeta": {
+      "system-blue": { "role": "primary", "displayName": "System Blue", "canonical": "#0071E3", "tonalRamp": ["#00234A", "#003A78", "#0052A6", "#0071E3", "#3D93EC", "#7AB5F2", "#B6D6F8", "#E8F1FD"] },
+      "system-blue-hover": { "role": "primary", "displayName": "System Blue Hover", "canonical": "#0077ED" },
+      "blue-deep": { "role": "primary", "displayName": "Blue Deep", "canonical": "#0058B0" },
+      "blue-tint": { "role": "primary", "displayName": "Blue Tint", "canonical": "#E8F1FD" },
+      "sky-deep": { "role": "tertiary", "displayName": "Dawn Sky Blue", "canonical": "#2350C0", "tonalRamp": ["#2350C0", "#3060D2", "#3A68D8", "#7F9FEA", "#BFC6EE", "#EED6DC", "#F6E3DA", "#F5F5F7"] },
+      "sky-peach": { "role": "tertiary", "displayName": "Horizon Peach", "canonical": "#F6E3DA" },
+      "page-grey": { "role": "neutral", "displayName": "Page Grey", "canonical": "#F5F5F7", "tonalRamp": ["#1D1D1F", "#3A3A3C", "#515154", "#6E6E73", "#A1A1A6", "#D2D2D7", "#E8E8ED", "#F5F5F7"] },
+      "card-white": { "role": "neutral", "displayName": "Card White", "canonical": "#FFFFFF" },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#1D1D1F" },
+      "ink-secondary": { "role": "neutral", "displayName": "Ink Secondary", "canonical": "#515154" },
+      "ink-tertiary": { "role": "neutral", "displayName": "Ink Tertiary", "canonical": "#6E6E73" },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "rgba(0, 0, 0, 0.08)" },
+      "hairline-strong": { "role": "neutral", "displayName": "Hairline Strong", "canonical": "rgba(0, 0, 0, 0.12)" },
+      "status-green": { "role": "status", "displayName": "Status Green", "canonical": "#28A745" },
+      "switch-green": { "role": "status", "displayName": "Switch Green", "canonical": "#34C759" },
+      "glass-dark": { "role": "neutral", "displayName": "HUD Glass", "canonical": "rgba(28, 28, 30, 0.72)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headline only, white on the dawn sky." },
+      "display-close": { "displayName": "Display Close", "purpose": "Closing line only, ink on the pale close sky." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles." },
+      "title": { "displayName": "Title", "purpose": "Headings inside large cards and the Install step panel." },
+      "title-small": { "displayName": "Title Small", "purpose": "Tile titles, Privacy points, FAQ questions." },
+      "lead": { "displayName": "Lead", "purpose": "One sentence under a centred headline." },
+      "body": { "displayName": "Body", "purpose": "Default text." },
+      "body-small": { "displayName": "Body Small", "purpose": "Tile and Privacy descriptions." },
+      "label": { "displayName": "Label", "purpose": "Captions, footer, nav links, chips." },
+      "serif-accent": { "displayName": "Serif Accent", "purpose": "One italic word inside a sans heading (the Mark)." },
+      "mono": { "displayName": "Mono", "purpose": "Terminal command only." }
+    },
+    "shadows": [
+      { "name": "card", "value": "0 0 0 1px rgba(0,0,0,.08), 0 18px 40px -26px rgba(0,0,0,.22)", "purpose": "Every white card." },
+      { "name": "inset-panel", "value": "0 0 0 1px rgba(0,0,0,.06)", "purpose": "Flat white panels inside cards." },
+      { "name": "window", "value": "0 0 0 .5px rgba(0,0,0,.18), 0 20px 40px -18px rgba(0,0,0,.3)", "purpose": "Miniature macOS windows." },
+      { "name": "window-large", "value": "0 0 0 .5px rgba(0,0,0,.2), 0 30px 70px -30px rgba(0,0,0,.35)", "purpose": "The Install window." },
+      { "name": "blue-lift", "value": "0 1px 1px rgba(0,0,0,.08), 0 6px 18px -8px rgba(0,113,227,.7)", "purpose": "Primary blue buttons only." },
+      { "name": "sky-surface", "value": "0 24px 50px -30px rgba(30,70,200,.7)", "purpose": "Sky-blue card and icon tile." },
+      { "name": "hud", "value": "0 12px 30px -10px rgba(0,0,0,.45)", "purpose": "Dark glass HUD." },
+      { "name": "focus-ring", "value": "0 0 0 2px #0071E3", "purpose": "Active demo pane; focus uses a 2px outline at 3px offset." }
+    ],
+    "motion": [
+      { "name": "spring-ui", "value": "spring, bounce 0, duration 0.35s", "purpose": "Sidebar selection, panel swap, FAQ chevron and height." },
+      { "name": "spring-reveal", "value": "spring, bounce 0, duration 0.8s; opacity 0 to 1, y 18px to 0, once", "purpose": "Scroll reveals." },
+      { "name": "spring-hero", "value": "spring, bounce 0, duration 0.9s; stagger 0 / 0.08 / 0.16 / 0.22s", "purpose": "Hero lines." },
+      { "name": "spring-desk", "value": "spring, bounce 0, duration 1.2s, delay 0.25s; y 40px, scale 0.98", "purpose": "Hero desk illustration." },
+      { "name": "spring-switch", "value": "spring, bounce 0.15, duration 0.35s", "purpose": "Switch thumb only." },
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "CSS transitions: button press, tile lift, slider thumb." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "System blue pill for the main action, with a leading download glyph.",
+      "html": "<a class=\"ds-btn ds-btn-primary\" href=\"#\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14\"/></svg>Download for Mac</a>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 980px; padding: 12px 22px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; font-size: 17px; font-weight: 500; letter-spacing: -0.02em; text-decoration: none; border: 0; cursor: pointer; transition: background-color .2s, transform .12s cubic-bezier(0.16,1,0.3,1), box-shadow .2s; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid #0071E3; outline-offset: 3px; } .ds-btn-primary { background: #0071E3; color: #fff; box-shadow: 0 1px 1px rgba(0,0,0,.08), 0 6px 18px -8px rgba(0,113,227,.7); } .ds-btn-primary:hover { background: #0077ED; }"
+    },
+    {
+      "name": "On-Sky Button Pair",
+      "kind": "button",
+      "refersTo": "button-on-sky",
+      "description": "Hero pair on the dawn sky: white pill plus white text link.",
+      "html": "<div class=\"ds-sky\"><a class=\"ds-btn-sky\" href=\"#\">Download for Mac</a><a class=\"ds-btn-sky-link\" href=\"#\">View the source <span aria-hidden=\"true\">›</span></a></div>",
+      "css": ".ds-sky { display: flex; gap: 20px; align-items: center; padding: 32px; background: linear-gradient(180deg, #2350C0, #3060D2); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; } .ds-btn-sky, .ds-btn-sky-link { display: inline-flex; align-items: center; gap: 8px; border-radius: 980px; padding: 12px 22px; font-size: 17px; font-weight: 500; letter-spacing: -0.02em; text-decoration: none; transition: background-color .2s, transform .12s cubic-bezier(0.16,1,0.3,1); } .ds-btn-sky { background: #fff; color: #1D1D1F; box-shadow: 0 8px 24px -10px rgba(20,30,90,.55); } .ds-btn-sky:hover { background: rgba(255,255,255,.9); } .ds-btn-sky:active { transform: scale(0.97); } .ds-btn-sky-link { color: #fff; } .ds-btn-sky-link:hover { text-decoration: underline; text-underline-offset: 4px; } .ds-btn-sky:focus-visible, .ds-btn-sky-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost and Quiet Buttons",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Blue text link-button with chevron, and a 5% black quiet pill for secondary actions.",
+      "html": "<div style=\"display:flex;gap:12px;align-items:center\"><a class=\"ds-btn-ghost\" href=\"#\">Read the source code <span aria-hidden=\"true\">›</span></a><button class=\"ds-btn-quiet\">Copy</button></div>",
+      "css": ".ds-btn-ghost, .ds-btn-quiet { display: inline-flex; align-items: center; gap: 8px; border-radius: 980px; padding: 12px 22px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; font-size: 17px; font-weight: 500; letter-spacing: -0.02em; border: 0; cursor: pointer; text-decoration: none; transition: background-color .2s, transform .12s cubic-bezier(0.16,1,0.3,1); } .ds-btn-ghost { color: #0071E3; background: transparent; } .ds-btn-ghost:hover { text-decoration: underline; text-underline-offset: 4px; } .ds-btn-quiet { background: rgba(0,0,0,.05); color: #1D1D1F; padding: 8px 22px; font-size: 14px; } .ds-btn-quiet:hover { background: rgba(0,0,0,.08); } .ds-btn-ghost:active, .ds-btn-quiet:active { transform: scale(0.97); } .ds-btn-ghost:focus-visible, .ds-btn-quiet:focus-visible { outline: 2px solid #0071E3; outline-offset: 3px; }"
+    },
+    {
+      "name": "Feature Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White 28px card with hairline and soft offset shadow; art well above, text below.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-art\"><span class=\"ds-kbd\">⌘</span><span class=\"ds-kbd\">F1</span></div><div class=\"ds-card-body\"><h3>Pause in a keystroke.</h3><p>Gaming on one screen, a video on the other? Pause from any app, resume the same way.</p></div></article>",
+      "css": ".ds-card { max-width: 360px; background: #fff; border-radius: 28px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.08), 0 18px 40px -26px rgba(0,0,0,.22); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; color: #1D1D1F; transition: transform .3s cubic-bezier(0.16,1,0.3,1); } .ds-card:hover { transform: translateY(-2px); } .ds-card-art { display: flex; justify-content: center; gap: 12px; padding: 40px 24px; font-size: 34px; background: linear-gradient(180deg, #F7F8FB, #FFFFFF); } .ds-kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 1.9em; padding: .18em .5em; border-radius: .38em; background: linear-gradient(#fff, #f2f2f4); box-shadow: 0 0 0 1px rgba(0,0,0,.1), 0 1.5px 0 rgba(0,0,0,.12); font-weight: 500; } .ds-card-body { padding: 20px 24px 24px; } .ds-card-body h3 { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -0.02em; } .ds-card-body p { margin: 6px 0 0; font-size: 15px; line-height: 1.47; color: #515154; }"
+    },
+    {
+      "name": "Mark",
+      "kind": "custom",
+      "refersTo": "mark",
+      "description": "One serif italic word on a blue-tint lozenge inside a sans heading.",
+      "html": "<h3 class=\"ds-mark-h\">Your keyboard <span class=\"ds-mark\">follows</span> in a quarter of a second</h3>",
+      "css": ".ds-mark-h { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 28px; line-height: 1.14; letter-spacing: -0.02em; color: #1D1D1F; max-width: 18ch; } .ds-mark { font-family: ui-serif, 'New York', 'EB Garamond', Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -0.01em; background: #E8F1FD; color: #0058B0; border-radius: .35em; padding: 0 .18em; }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Sticky 52px frosted bar with text links and a compact blue Download pill.",
+      "html": "<header class=\"ds-nav\"><span class=\"ds-nav-logo\">GazeHop</span><nav class=\"ds-nav-links\"><a href=\"#\">How it works</a><a href=\"#\">Privacy</a><a href=\"#\">Install</a><a href=\"#\">FAQ</a><a class=\"ds-nav-cta\" href=\"#\">Download</a></nav></header>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 40px; background: rgba(255,255,255,.72); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 1px 0 rgba(0,0,0,.06); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; } .ds-nav-logo { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: #1D1D1F; } .ds-nav-links { display: flex; align-items: center; gap: 4px; font-size: 14px; } .ds-nav-links a { color: #515154; text-decoration: none; padding: 6px 12px; border-radius: 999px; transition: color .2s; } .ds-nav-links a:hover { color: #1D1D1F; } .ds-nav-links a:focus-visible { outline: 2px solid #0071E3; outline-offset: 3px; } .ds-nav-links .ds-nav-cta { margin-left: 4px; padding: 6px 16px; background: #0071E3; color: #fff; font-weight: 500; box-shadow: 0 1px 1px rgba(0,0,0,.08), 0 6px 18px -8px rgba(0,113,227,.7); } .ds-nav-links .ds-nav-cta:hover { background: #0077ED; color: #fff; }"
+    },
+    {
+      "name": "Gaze HUD",
+      "kind": "custom",
+      "refersTo": "hud",
+      "description": "Dark glass pill showing which display is being looked at, with a dwell bar.",
+      "html": "<div class=\"ds-hud-stage\"><div class=\"ds-hud\"><svg viewBox=\"0 0 28 18\" height=\"18\" aria-hidden=\"true\"><path d=\"M2 9C7 1.5 21 1.5 26 9C21 16.5 7 16.5 2 9Z\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.8\" stroke-linejoin=\"round\"/><circle cx=\"14\" cy=\"9\" r=\"3.6\" fill=\"#fff\"/></svg><span>Looking at <span class=\"ds-hud-dim\">Built-in Display</span></span><span class=\"ds-hud-bar\"><span></span></span></div></div>",
+      "css": ".ds-hud-stage { padding: 32px; background: linear-gradient(180deg, #7F9FEA, #EED6DC); } .ds-hud { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 10px; border-radius: 999px; background: rgba(28,28,30,.72); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; font-size: 13px; font-weight: 500; letter-spacing: -0.01em; box-shadow: 0 12px 30px -10px rgba(0,0,0,.45); } .ds-hud-dim { color: rgba(255,255,255,.65); } .ds-hud-bar { width: 44px; height: 4px; border-radius: 999px; background: rgba(255,255,255,.15); overflow: hidden; } .ds-hud-bar span { display: block; width: 60%; height: 100%; border-radius: 999px; background: #fff; }"
+    },
+    {
+      "name": "Settings Controls",
+      "kind": "input",
+      "refersTo": "switch / range",
+      "description": "macOS-style switch and blue-filled range slider from the Settings preview.",
+      "html": "<div class=\"ds-controls\"><label class=\"ds-row\"><span>Studio Display</span><button class=\"ds-switch\" role=\"switch\" aria-checked=\"true\" aria-label=\"Studio Display\"><span></span></button></label><label class=\"ds-range-label\"><span class=\"ds-range-head\"><span>Look time</span><span class=\"ds-range-val\">250 ms</span></span><input class=\"ds-range\" type=\"range\" min=\"100\" max=\"1000\" value=\"250\" style=\"--p: 17%\"></label></div>",
+      "css": ".ds-controls { max-width: 320px; display: grid; gap: 16px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; font-size: 14px; color: #1D1D1F; } .ds-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(0,0,0,.06); } .ds-switch { position: relative; width: 40px; height: 24px; border: 0; border-radius: 999px; background: #34C759; cursor: pointer; transition: background-color .2s; } .ds-switch[aria-checked=false] { background: rgba(0,0,0,.15); } .ds-switch span { position: absolute; top: 2px; left: 18px; width: 20px; height: 20px; border-radius: 999px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.25); } .ds-switch:focus-visible { outline: 2px solid #0071E3; outline-offset: 3px; } .ds-range-head { display: flex; justify-content: space-between; margin-bottom: 8px; } .ds-range-val { color: #6E6E73; font-variant-numeric: tabular-nums; } .ds-range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 999px; cursor: pointer; background: linear-gradient(to right, #0071E3 var(--p, 50%), rgba(0,0,0,.1) var(--p, 50%)); } .ds-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 .5px rgba(0,0,0,.12), 0 3px 8px rgba(0,0,0,.18); transition: transform .15s cubic-bezier(0.16,1,0.3,1); } .ds-range:active::-webkit-slider-thumb { transform: scale(1.08); } .ds-range::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 3px 8px rgba(0,0,0,.18); } .ds-range:focus-visible { outline: 2px solid #0071E3; outline-offset: 3px; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "Small 5% black pill naming a safety state.",
+      "html": "<span class=\"ds-chip\">Focus held</span>",
+      "css": ".ds-chip { display: inline-block; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.05); color: #515154; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', system-ui, sans-serif; font-size: 12px; font-weight: 500; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Desk at Dawn",
+    "overview": "The page is a Mac on a quiet morning. It opens on a deep blue sky that warms to peach at the horizon and settles, with no seam, into Apple's page grey, and a two-display desktop rises out of it doing the product's job. Everything after the hero is light, calm and native: grey ground, white continuous-corner cards with hairline edges, SF Pro text, and one blue that only ever means \"act here\". The serif voice (New York, falling back to EB Garamond) is kept for the two lines that frame the page, the hero headline and the closing line, plus single italic words that carry the verb of a sentence.\n\nDensity is generous. Sections breathe on 96 to 128px of vertical space, headlines are short and balanced, and the interesting surfaces are working miniatures of the product's own UI (menu bar, HUD, Settings toggles and sliders, an Install window with a sidebar) rather than illustration or stock imagery. Depth comes from soft, low offset shadows under a 1px hairline, and from frosted glass where macOS itself would frost something.\n\nThe page refuses the dark developer-tool landing and the generic SaaS hero. It is honest by construction: nothing on it is a fabricated metric, quote or logo, and it says plainly that it is not affiliated with Apple.",
+    "keyCharacteristics": [
+      "Light macOS ground (page grey) with white 28px cards; one action blue.",
+      "A dawn sky in the hero and the close, always fading into the ground colour.",
+      "Serif only for the page's opening and closing lines and single emphasised words.",
+      "Real product UI rebuilt in HTML/CSS as the imagery; no generated pictures.",
+      "Springs with zero bounce; content visible by default, motion only refines arrival."
+    ],
+    "rules": [
+      { "name": "The One Blue Rule", "body": "System blue means \"you can act here\". If it is not a button, link, selection, focus ring or live control state, it is not system blue.", "section": "colors" },
+      { "name": "The Sky Is Weather Rule", "body": "Sky blues and peaches are atmosphere. They fill backgrounds and the occasional hero-material card, and every sky gradient ends in page grey so a section never has a hard seam.", "section": "colors" },
+      { "name": "The Native Colours Rule", "body": "Colours borrowed from macOS itself (window traffic lights `#FF5F57 / #FEBC2E / #28C840`, iMessage blue `#0A84FF` and grey `#E9E9EB`, Dock and Settings badge gradients) appear only inside the miniatures that reproduce that piece of macOS. They are quotations, not palette.", "section": "colors" },
+      { "name": "The Two Serif Lines Rule", "body": "The full serif display appears exactly twice: the hero headline and the closing line. Elsewhere serif is limited to a single italic word inside a sans heading (the **Mark** or its white-on-blue twin).", "section": "typography" },
+      { "name": "The Sentence Case Rule", "body": "Headings, buttons and labels are sentence case. There are no uppercase eyebrow labels above headings.", "section": "typography" },
+      { "name": "The Hairline First Rule", "body": "Every raised white surface carries a 1px (or 0.5px for windows) hairline ring; the offset shadow is negative-spread and soft so the edge, not the shadow, defines the shape.", "section": "elevation" },
+      { "name": "The Frost Floats Rule", "body": "Frosted glass (white 72% or dark 72%, saturate 180% and 20 to 24px blur) is for things that float over other content: the nav, the sticky mobile bar, the menu bars and Dock inside the miniatures, the HUD and its in-card status pill, and the close's floating keycaps. Cards and content panels are never glass. With reduced transparency, glass becomes 97% opaque.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** keep the ground page grey and put content on white 28px cards with the hairline-plus-soft-shadow edge.",
+      "**Do** reserve system blue for actions, links, selection, focus and live control state.",
+      "**Do** end every sky gradient in page grey, and keep white text only on the deep blue band of the hero sky.",
+      "**Do** set the hero and closing lines in the serif, and limit serif elsewhere to one italic word in a Mark.",
+      "**Do** build imagery from the product's real UI (windows, menu bar, HUD, Settings controls) in HTML and CSS.",
+      "**Do** use zero-bounce springs, and render content visible by default so motion only refines arrival.",
+      "**Do** keep the footer line \"Not affiliated with Apple. Mac and macOS are trademarks of Apple Inc.\"",
+      "**Do** vary grids: uneven spans, or equal widths only when the cards differ in material."
+    ],
+    "donts": [
+      "**Don't** use AI-generated imagery or photographs; every visual is drawn in code or is the product's own logo mark.",
+      "**Don't** use emerald or teal greens; green appears only as status green and switch green, for status.",
+      "**Don't** show fabricated testimonials, ratings, user counts, press logos or metrics.",
+      "**Don't** use the Apple logo or imply Apple affiliation.",
+      "**Don't** put uppercase eyebrow labels above headings.",
+      "**Don't** use gradient text; gradients belong to backgrounds, cards, badges and wallpapers.",
+      "**Don't** use the hero-metric template (big number, small label, repeated).",
+      "**Don't** build grids of identical same-size cards.",
+      "**Don't** frost cards or content panels; glass is for chrome that floats.",
+      "**Don't** introduce a second accent hue for actions."
+    ]
+  }
+}

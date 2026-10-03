@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "lenis/dist/lenis.css";
 
 /** Momentum-smoothed scrolling (Lenis). Off when the visitor prefers reduced motion. */
@@ -14,7 +13,6 @@ export function SmoothScroll() {
       autoRaf: true,
       anchors: true,            // sections set scroll-margin-top to clear the sticky nav
     });
-    lenis.on("scroll", ScrollTrigger.update); // keep scroll-linked text reveals in sync
     document.documentElement.classList.add("has-lenis");
     return () => { lenis.destroy(); document.documentElement.classList.remove("has-lenis"); };
   }, []);

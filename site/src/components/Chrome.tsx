@@ -1,15 +1,14 @@
 import { BASE, DOWNLOAD, ISSUES, LICENSE, REPO } from "../lib/links";
-import { ShimmerLink } from "./magicui/shimmer-link";
 
-export function LogoMark({ className = "size-8" }: { className?: string }) {
-  return <img src={`${BASE}logo-mark.svg`} alt="" width={32} height={32} className={className} />;
+export function LogoMark({ className = "size-7" }: { className?: string }) {
+  return <img src={`${BASE}logo-mark.svg`} alt="" width={28} height={28} className={className} />;
 }
 
 export function Logo() {
   return (
-    <a href={BASE} className="flex items-center gap-2.5" aria-label="GazeHop home">
-      <LogoMark className="size-8 -m-0.5" />
-      <span className="text-[17px] font-semibold tracking-[-0.02em]">GazeHop</span>
+    <a href={BASE} className="flex items-center gap-2" aria-label="GazeHop home">
+      <LogoMark className="size-7 -my-1" />
+      <span className="font-[family-name:var(--font-display)] text-[17px] font-semibold tracking-[-0.02em]">GazeHop</span>
     </a>
   );
 }
@@ -30,35 +29,34 @@ export function GitHubGlyph({ className = "" }: { className?: string }) {
   );
 }
 
-export function DownloadButton({ label = "Download for macOS", className = "" }: { label?: string; className?: string }) {
+export function DownloadButton({ label = "Download for Mac", className = "" }: { label?: string; className?: string }) {
   return (
-    <ShimmerLink href={DOWNLOAD} className={className}>
-      <DownloadGlyph className="h-[18px] w-[18px]" />
+    <a href={DOWNLOAD} className={`btn btn-blue ${className}`}>
+      <DownloadGlyph className="size-[17px]" />
       {label}
-    </ShimmerLink>
+    </a>
   );
 }
 
-export function GitHubButton({ label = "View source on GitHub" }: { label?: string }) {
+export function SourceLink({ label = "View the source" }: { label?: string }) {
   return (
-    <a href={REPO} className="inline-flex items-center justify-center gap-2.5 rounded-[12px] border border-[color:var(--color-line-2)] bg-white/[.03] px-6 py-3.5 font-semibold text-[color:var(--color-fg)] transition hover:border-white/30 hover:bg-white/[.06]">
-      <GitHubGlyph className="size-[18px]" />
-      {label}
+    <a href={REPO} className="btn btn-ghost">
+      {label} <span aria-hidden="true">›</span>
     </a>
   );
 }
 
 export function Nav() {
   return (
-    <header className="sticky top-0 z-40 border-b border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur-xl">
-      <nav className="wrap flex h-16 items-center justify-between" aria-label="Main">
+    <header className="glass-light sticky top-0 z-40 shadow-[0_1px_0_rgba(0,0,0,.06)]">
+      <nav className="wrap flex h-[52px] items-center justify-between" aria-label="Main">
         <Logo />
-        <div className="flex items-center gap-1 text-[15px]">
+        <div className="flex items-center gap-1 text-[14px] text-[color:var(--color-ink-2)]">
           {[["How it works", "#how"], ["Privacy", "#privacy"], ["Install", "#install"], ["FAQ", "#faq"]].map(([l, h]) => (
-            <a key={h} href={`${BASE}${h}`} className="hidden rounded-lg px-3 py-2 text-[color:var(--color-fg-2)] hover:text-white md:block">{l}</a>
+            <a key={h} href={`${BASE}${h}`} className="hidden rounded-full px-3 py-1.5 transition-colors hover:text-[color:var(--color-ink)] md:block">{l}</a>
           ))}
-          <a href={REPO} className="rounded-lg px-3 py-2 text-[color:var(--color-fg-2)] hover:text-white" aria-label="GitHub"><GitHubGlyph className="size-5" /></a>
-          <a href={DOWNLOAD} className="ml-1 hidden rounded-[10px] bg-white px-3.5 py-2 font-semibold text-[color:var(--color-bg)] hover:bg-white/90 sm:block">Download</a>
+          <a href={REPO} className="rounded-full p-2 transition-colors hover:text-[color:var(--color-ink)]" aria-label="GazeHop on GitHub"><GitHubGlyph className="size-[18px]" /></a>
+          <a href={DOWNLOAD} className="btn btn-blue ml-1 !px-4 !py-[6px] !text-[14px]">Download</a>
         </div>
       </nav>
     </header>
@@ -67,19 +65,19 @@ export function Nav() {
 
 export function Footer() {
   return (
-    <footer className="relative z-10 border-t border-[color:var(--color-line)] pb-28 pt-14 md:pb-14">
-      <div className="wrap grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-ground)] pb-28 pt-12 text-[13px] text-[color:var(--color-ink-3)] md:pb-12">
+      <div className="wrap grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div className="space-y-3">
           <Logo />
-          <p className="max-w-xs text-[15px] text-[color:var(--color-fg-2)]">A free, open-source macOS menu bar app. Look at a screen, and your keyboard follows.</p>
+          <p className="max-w-xs">A free, open-source menu bar app for Macs with more than one screen.</p>
         </div>
         <Col title="Product" links={[["Download", DOWNLOAD], ["How it works", `${BASE}#how`], ["Install guide", `${BASE}#install`], ["FAQ", `${BASE}#faq`]]} />
         <Col title="Open source" links={[["Source code", REPO], ["Report a problem", ISSUES], ["MIT license", LICENSE]]} />
         <Col title="Legal" links={[["Privacy", `${BASE}privacy`], ["Terms", `${BASE}terms`]]} />
       </div>
-      <div className="wrap mt-12 flex flex-col gap-2 text-[13px] text-[color:var(--color-fg-3)] md:flex-row md:justify-between">
-        <p>Built by <a className="underline decoration-white/20 underline-offset-4 hover:text-white" href="https://github.com/kabirshah4">@kabirshah4</a>. Contact: <a className="underline decoration-white/20 underline-offset-4 hover:text-white" href={ISSUES}>GitHub issues</a>.</p>
-        <p>Not affiliated with Apple. macOS is a trademark of Apple Inc.</p>
+      <div className="wrap mt-10 flex flex-col gap-2 border-t border-[color:var(--color-line)] pt-5 md:flex-row md:justify-between">
+        <p>Built by <a className="text-[color:var(--color-ink-2)] hover:underline" href="https://github.com/kabirshah4">@kabirshah4</a>. Questions? <a className="text-[color:var(--color-ink-2)] hover:underline" href={ISSUES}>Open an issue</a>.</p>
+        <p>Not affiliated with Apple. Mac and macOS are trademarks of Apple Inc.</p>
       </div>
     </footer>
   );
@@ -88,9 +86,9 @@ export function Footer() {
 function Col({ title, links }: { title: string; links: [string, string][] }) {
   return (
     <div>
-      <p className="eyebrow mb-3">{title}</p>
-      <ul className="space-y-2 text-[15px]">
-        {links.map(([l, h]) => <li key={l}><a href={h} className="text-[color:var(--color-fg-2)] hover:text-white">{l}</a></li>)}
+      <p className="mb-3 font-semibold text-[color:var(--color-ink)]">{title}</p>
+      <ul className="space-y-2">
+        {links.map(([l, h]) => <li key={l}><a href={h} className="hover:text-[color:var(--color-ink)] hover:underline">{l}</a></li>)}
       </ul>
     </div>
   );
@@ -98,7 +96,7 @@ function Col({ title, links }: { title: string; links: [string, string][] }) {
 
 export function StickyMobileCTA() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg)]/85 p-3 backdrop-blur-xl md:hidden">
+    <div className="glass-light fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--color-line)] p-3 md:hidden">
       <DownloadButton label="Get GazeHop for your Mac" className="w-full" />
     </div>
   );
